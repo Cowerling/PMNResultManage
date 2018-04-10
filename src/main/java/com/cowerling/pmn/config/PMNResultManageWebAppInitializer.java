@@ -2,10 +2,10 @@ package com.cowerling.pmn.config;
 
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 
 public class PMNResultManageWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
     private static final String ACTIVE_PROFILES = "development";
@@ -33,6 +33,14 @@ public class PMNResultManageWebAppInitializer extends AbstractAnnotationConfigDi
         ConfigurableEnvironment environment = (ConfigurableEnvironment) context.getEnvironment();
         environment.setActiveProfiles(ACTIVE_PROFILES);
         return context;
+    }
+
+    @Override
+    protected Filter[] getServletFilters() {
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("UTF-8");
+        characterEncodingFilter.setForceEncoding(true);
+        return new Filter[] { characterEncodingFilter };
     }
 
     @Override
