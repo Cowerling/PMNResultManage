@@ -3,7 +3,7 @@ package com.cowerling.pmn.domain.user;
 import java.util.Arrays;
 
 public enum UserRole {
-    ADMIN("Administrator"), ADVAN_USER("Advanced User"), USER("User");
+    ADMIN("管理员"), ADVAN_USER("高级用户"), USER("普通用户");
 
     private String description;
 

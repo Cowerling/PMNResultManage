@@ -9,8 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +63,16 @@ public class WideExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public String userNotFoundHandler() {
+        return "error/resource";
+    }
+
+    @ExceptionHandler(ParseException.class)
+    public String parseHandler() {
+        return "error/resource";
+    }
+
+    @ExceptionHandler(IOException.class)
+    public String ioHandler() {
         return "error/resource";
     }
 }

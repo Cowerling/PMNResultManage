@@ -1,5 +1,6 @@
 package com.cowerling.pmn.data;
 
+import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.UserMapper;
 import com.cowerling.pmn.data.message.ExceptionMessage;
 import com.cowerling.pmn.domain.user.User;
@@ -14,6 +15,7 @@ public class MybatisUserRepository implements UserRepository {
     private static final String UNIQUE_CONSTRAINT_NAME_IN_USER  = "uc_name_in_user";
 
     @Autowired
+    @GenericData
     private SqlSessionFactory sqlSessionFactory;
 
     private SqlSession currentSession() {
@@ -47,6 +49,20 @@ public class MybatisUserRepository implements UserRepository {
             else {
                 throw e;
             }
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void updateUser(User user)
+    {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            userMapper.updateUser(user);
+            sqlSession.commit();
         } finally {
             sqlSession.close();
         }
