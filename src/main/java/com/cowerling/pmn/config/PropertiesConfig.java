@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySource(value = {"classpath:datasource.properties", "classpath:upload.properties"})
+@PropertySource(value = {"classpath:datasource.properties", "classpath:upload.properties", "classpath:geoserver.properties"})
 public class PropertiesConfig {
     @Bean
     public PropertySourcesPlaceholderConfigurer propertyConfigurer() {

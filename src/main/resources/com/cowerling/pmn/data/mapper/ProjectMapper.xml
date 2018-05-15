@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cowerling.pmn.data.mapper.ProjectMapper">
+    <resultMap id="projectResult" type="project">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="category" column="category" />
+        <result property="createTime" column="create_time" />
+        <result property="remark" column="remark" />
+        <result property="category" column="category" />
+        <result property="status" column="status" />
+        <association property="creator" column="creator" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
+        <association property="manager" column="manager" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
+        <association property="principal" column="principal" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
+        <association property="members" column="id" select="com.cowerling.pmn.data.mapper.UserMapper.selectUsersByProjectId" />
+    </resultMap>
+</mapper>

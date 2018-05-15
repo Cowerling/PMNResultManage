@@ -35,6 +35,18 @@ public class MybatisUserRepository implements UserRepository {
     }
 
     @Override
+    public User findUserById(Long id) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            return userMapper.selectUserById(id);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public void saveUser(User user) throws DuplicateUserException {
         SqlSession sqlSession = currentSession();
 

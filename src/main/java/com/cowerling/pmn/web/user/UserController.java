@@ -1,4 +1,4 @@
-package com.cowerling.pmn.web;
+package com.cowerling.pmn.web.user;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.data.UserRepository;
@@ -8,6 +8,7 @@ import com.cowerling.pmn.domain.user.form.UserProfileForm;
 import com.cowerling.pmn.domain.user.form.UserSecurityForm;
 import com.cowerling.pmn.exception.DuplicateUserException;
 import com.cowerling.pmn.exception.ExceptionMessage;
+import com.cowerling.pmn.geodata.GeoAuthenticationRepository;
 import com.cowerling.pmn.security.PasswordEncoderService;
 import com.cowerling.pmn.utils.ImageUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,9 @@ import java.util.Arrays;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private GeoAuthenticationRepository geoAuthenticationRepository;
 
     @Autowired
     private PasswordEncoderService passwordEncoderService;
@@ -73,8 +77,8 @@ public class UserController {
 
         try {
             user.setPassword(passwordEncoderService.encode(user.getPassword()));
-
             userRepository.saveUser(user);
+            geoAuthenticationRepository.saveUser(user.getName());
         } catch (DuplicateUserException e) {
             errors.reject(e.getClass().getName(), e.getMessage());
             return "user/register";
