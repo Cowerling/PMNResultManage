@@ -2,14 +2,15 @@ package com.cowerling.pmn.data;
 
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
+import javafx.util.Pair;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.cowerling.pmn.data.provider.ProjectSqlProvider.*;
 
 public interface ProjectRepository {
-    enum FindMode {
-        CREATOR, MANAGER, PRINCIPAL, PARTICIPATOR
-    }
-
-    List<Project> findProjectsByUser(User user, FindMode findMode, int offset, int limit);
+    Project findProjectById(Long id);
+    List<Project> findProjectsByUser(User user, FindMode findMode, Map<Field, Object> filters, List<Pair<Field, Order>> orders, int offset, int limit);
     Long findProjectCountByUser(User user, FindMode findMode);
 }

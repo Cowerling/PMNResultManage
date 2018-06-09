@@ -4,6 +4,7 @@ import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.ProjectMapper;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
+import javafx.util.Pair;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -11,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.cowerling.pmn.data.provider.ProjectSqlProvider.*;
 
 @Repository
 public class MybatisProjectRepository implements ProjectRepository {
@@ -23,25 +27,27 @@ public class MybatisProjectRepository implements ProjectRepository {
     }
 
     @Override
-    public List<Project> findProjectsByUser(User user, FindMode findMode, int offset, int limit) {
+    public Project findProjectById(Long id) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+
+            return projectMapper.selectProjectById(id);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<Project> findProjectsByUser(User user, FindMode findMode, Map<Field, Object> filters, List<Pair<Field, Order>> orders, int offset, int limit) {
         SqlSession sqlSession = currentSession();
 
         try {
             ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
             RowBounds rowBounds = new RowBounds(offset, limit);
 
-            switch (findMode) {
-                case CREATOR:
-                    return projectMapper.selectProjectsByCreatorId(user.getId(), rowBounds);
-                case MANAGER:
-                    return projectMapper.selectProjectsByManagerId(user.getId(), rowBounds);
-                case PRINCIPAL:
-                    return projectMapper.selectProjectsByPrincipalId(user.getId(), rowBounds);
-                case PARTICIPATOR:
-                    return projectMapper.selectProjectsByParticipatorId(user.getId(), rowBounds);
-                default:
-                    return null;
-            }
+            return projectMapper.selectProjectsByUserId(user.getId(), findMode, filters, orders, rowBounds);
         } finally {
             sqlSession.close();
         }
@@ -54,18 +60,7 @@ public class MybatisProjectRepository implements ProjectRepository {
         try {
             ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
 
-            switch (findMode) {
-                case CREATOR:
-                    return projectMapper.selectProjectCountByCreatorId(user.getId());
-                case MANAGER:
-                    return projectMapper.selectProjectCountByManagerId(user.getId());
-                case PRINCIPAL:
-                    return projectMapper.selectProjectCountByPrincipalId(user.getId());
-                case PARTICIPATOR:
-                    return projectMapper.selectProjectCountByParticipatorId(user.getId());
-                default:
-                    return null;
-            }
+            return projectMapper.selectProjectCountByUserId(user.getId(), findMode);
         } finally {
             sqlSession.close();
         }

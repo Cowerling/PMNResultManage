@@ -28,6 +28,7 @@ public class Project {
     private List<User> members = new ArrayList<User>();
     private String remark;
     private ProjectStatus status;
+    private String tag;
 
     public Project() {
         createTime = new Date();
@@ -111,5 +112,13 @@ public class Project {
 
     public void setStatus(ProjectStatus status) {
         this.status = status;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

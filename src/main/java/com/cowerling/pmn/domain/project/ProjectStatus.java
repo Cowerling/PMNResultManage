@@ -13,4 +13,8 @@ public enum ProjectStatus {
     public String toString() {
         return description;
     }
+
+    public String format() {
+        return "project-" + name().toLowerCase().replace('_', '-');
+    }
 }

@@ -3,12 +3,20 @@ package com.cowerling.pmn.data;
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.UserMapper;
 import com.cowerling.pmn.data.message.ExceptionMessage;
+import com.cowerling.pmn.domain.department.Department;
 import com.cowerling.pmn.domain.user.User;
+import com.cowerling.pmn.domain.user.UserRole;
 import com.cowerling.pmn.exception.DuplicateUserException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.cowerling.pmn.data.provider.UserSqlProvider.*;
 
 @Repository
 public class MybatisUserRepository implements UserRepository {
@@ -41,6 +49,77 @@ public class MybatisUserRepository implements UserRepository {
         try {
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             return userMapper.selectUserById(id);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<User> findUsersByAlias(String alias) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            return userMapper.selectUsersByAlias(alias);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<User> findUsersByDepartmentId(Long departmentId) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            return userMapper.selectUsersByDepartmentId(departmentId, null);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<User> findUsersByDepartmentId(Long departmentId, UserRole userRole) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
+            return userMapper.selectUsersByDepartmentId(departmentId, new HashMap<>() {
+                {
+                    put(Field.ROLE, userRole);
+                }
+            });
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public int findUserCountByDepartment(Department department) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
+            return userMapper.selectUserCountByDepartmentId(department.getId(), null);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public int findUserCountByDepartment(Department department, UserRole userRole) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+
+            return userMapper.selectUserCountByDepartmentId(department.getId(), new HashMap<>() {
+                {
+                    put(Field.ROLE, userRole);
+                }
+            });
         } finally {
             sqlSession.close();
         }

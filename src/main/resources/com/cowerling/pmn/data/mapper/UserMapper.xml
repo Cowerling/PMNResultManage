@@ -16,5 +16,6 @@
         <result property="registerDate" column="register_date" />
         <result property="photo" column="photo" />
         <result property="userRole" column="role" />
+        <association property="department" column="department" select="com.cowerling.pmn.data.mapper.DepartmentMapper.selectDepartmentById" />
     </resultMap>
 </mapper>

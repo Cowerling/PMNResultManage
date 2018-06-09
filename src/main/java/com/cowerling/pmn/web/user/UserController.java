@@ -1,6 +1,7 @@
 package com.cowerling.pmn.web.user;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
+import com.cowerling.pmn.data.DepartmentRepository;
 import com.cowerling.pmn.data.UserRepository;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.domain.user.UserGender;
@@ -14,6 +15,7 @@ import com.cowerling.pmn.utils.ImageUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.print.attribute.standard.Media;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -42,6 +45,9 @@ public class UserController {
 
     @Autowired
     private GeoAuthenticationRepository geoAuthenticationRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @Autowired
     private PasswordEncoderService passwordEncoderService;
@@ -66,6 +72,7 @@ public class UserController {
         }
 
         model.addAttribute("registerUser", new User());
+        model.addAttribute("departments", departmentRepository.findDepartments());
         return "user/register";
     }
 
@@ -97,7 +104,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public String showProfile(Model model) {
+    public String showProfile() {
         return "user/profile";
     }
 

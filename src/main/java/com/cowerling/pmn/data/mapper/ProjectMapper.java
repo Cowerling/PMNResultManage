@@ -1,58 +1,26 @@
 package com.cowerling.pmn.data.mapper;
 
+import com.cowerling.pmn.data.provider.ProjectSqlProvider;
 import com.cowerling.pmn.domain.project.Project;
+import javafx.util.Pair;
 import org.apache.ibatis.annotations.ResultMap;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
+import java.util.Map;
+
+import static com.cowerling.pmn.data.provider.ProjectSqlProvider.*;
 
 public interface ProjectMapper {
-    @Select("SELECT t_project.id, name, t_project_category.category AS category, creator, create_time, manager, principal, remark, t_project_status.category AS status FROM t_project " +
-            "LEFT OUTER JOIN t_project_category ON t_project.category = t_project_category.id " +
-            "LEFT OUTER JOIN t_project_status ON t_project.status = t_project_status.id " +
-            "WHERE creator = #{creatorId} " +
-            "ORDER BY t_project.id")
+    @SelectProvider(type = ProjectSqlProvider.class, method = "selectProjectsById")
     @ResultMap("com.cowerling.pmn.data.mapper.ProjectMapper.projectResult")
-    List<Project> selectProjectsByCreatorId(Long creatorId, RowBounds rowBounds);
+    Project selectProjectById(Long id);
 
-    @Select("SELECT COUNT(*) FROM t_project " +
-            "WHERE creator = #{creatorId}")
-    Long selectProjectCountByCreatorId(Long creatorId);
-
-    @Select("SELECT t_project.id, name, t_project_category.category AS category, creator, create_time, manager, principal, remark, t_project_status.category AS status FROM t_project " +
-            "LEFT OUTER JOIN t_project_category ON t_project.category = t_project_category.id " +
-            "LEFT OUTER JOIN t_project_status ON t_project.status = t_project_status.id " +
-            "WHERE manager = #{managerId} " +
-            "ORDER BY t_project.id")
+    @SelectProvider(type = ProjectSqlProvider.class, method = "selectProjectsByUserId")
     @ResultMap("com.cowerling.pmn.data.mapper.ProjectMapper.projectResult")
-    List<Project> selectProjectsByManagerId(Long managerId, RowBounds rowBounds);
+    List<Project> selectProjectsByUserId(Long userId, FindMode findMode, Map<Field, Object> filters, List<Pair<Field, Order>> orders, RowBounds rowBounds);
 
-    @Select("SELECT COUNT(*) FROM t_project " +
-            "WHERE manager = #{managerId}")
-    Long selectProjectCountByManagerId(Long managerId);
-
-    @Select("SELECT t_project.id, name, t_project_category.category AS category, creator, create_time, manager, principal, remark, t_project_status.category AS status FROM t_project " +
-            "LEFT OUTER JOIN t_project_category ON t_project.category = t_project_category.id " +
-            "LEFT OUTER JOIN t_project_status ON t_project.status = t_project_status.id " +
-            "WHERE principal = #{principalId} " +
-            "ORDER BY t_project.id")
-    @ResultMap("com.cowerling.pmn.data.mapper.ProjectMapper.projectResult")
-    List<Project> selectProjectsByPrincipalId(Long principalId, RowBounds rowBounds);
-
-    @Select("SELECT COUNT(*) FROM t_project " +
-            "WHERE principal = #{principalId}")
-    Long selectProjectCountByPrincipalId(Long principalId);
-
-    @Select("SELECT t_project.id, name, t_project_category.category AS category, creator, create_time, manager, principal, remark, t_project_status.category AS status FROM t_project " +
-            "LEFT OUTER JOIN t_project_category ON t_project.category = t_project_category.id " +
-            "LEFT OUTER JOIN t_project_members ON t_project.id = t_project_members.project " +
-            "WHERE t_project_members.member = #{participatorId} " +
-            "ORDER BY t_project.id")
-    @ResultMap("com.cowerling.pmn.data.mapper.ProjectMapper.projectResult")
-    List<Project> selectProjectsByParticipatorId(Long participatorId, RowBounds rowBounds);
-
-    @Select("SELECT COUNT(*) FROM t_project_members " +
-            "WHERE member = #{participatorId}")
-    Long selectProjectCountByParticipatorId(Long participatorId);
+    @SelectProvider(type = ProjectSqlProvider.class, method = "selectProjectCountByUserId")
+    Long selectProjectCountByUserId(Long userId, FindMode findMode);
 }

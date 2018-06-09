@@ -1,16 +1,13 @@
-package com.cowerling.pmn.web;
+package com.cowerling.pmn.web.exception;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.exception.UserNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;

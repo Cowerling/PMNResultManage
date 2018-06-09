@@ -23,4 +23,8 @@ public enum UserRole {
     public UserRole[] subordinate() {
         return Arrays.stream(UserRole.values()).filter(x -> x.ordinal() > this.ordinal()).toArray(size -> new UserRole[size]);
     }
+
+    public boolean superior(UserRole userRole) {
+        return this.ordinal() < userRole.ordinal();
+    }
 }

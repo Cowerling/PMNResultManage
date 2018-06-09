@@ -1,6 +1,7 @@
 package com.cowerling.pmn.domain.user;
 
 import com.cowerling.pmn.annotation.Phone;
+import com.cowerling.pmn.domain.department.Department;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.ibatis.type.Alias;
 
@@ -13,33 +14,24 @@ import java.util.Date;
 public class User {
     @JsonIgnore
     private Long id;
-
     @NotNull
     @Size(min = 6, max = 30, message = "{name.size}")
     private String name;
-
     @NotNull
     @Size(min = 6, max = 30, message = "{password.size}")
     @JsonIgnore
     private String password;
-
     @Email
     private String email;
-
     private String alias;
-
     private UserGender userGender;
-
     private Date birthday;
-
     @Phone(message = "{phone.size}")
     private String phone;
-
     private Date registerDate;
-
     private String photo;
-
     private UserRole userRole;
+    private Department department;
 
     public User() {
         userRole = UserRole.USER;
@@ -132,5 +124,13 @@ public class User {
 
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }
