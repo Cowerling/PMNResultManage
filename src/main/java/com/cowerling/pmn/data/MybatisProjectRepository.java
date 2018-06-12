@@ -65,4 +65,43 @@ public class MybatisProjectRepository implements ProjectRepository {
             sqlSession.close();
         }
     }
+
+    @Override
+    public void updateProject(Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+            projectMapper.updateProject(project);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveProject(Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+            projectMapper.insertProject(project);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void removeProjectById(Long id) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+            projectMapper.deleteProjectById(id);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

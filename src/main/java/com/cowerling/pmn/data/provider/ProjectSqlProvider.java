@@ -1,5 +1,6 @@
 package com.cowerling.pmn.data.provider;
 
+import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.utils.DateUtils;
 import javafx.util.Pair;
 import org.apache.ibatis.jdbc.SQL;
@@ -138,8 +139,25 @@ public class ProjectSqlProvider {
                     WHERE(findMode + " = " + userId);
                 } else {
                     SELECT("COUNT(*) FROM t_project_members");
-                    WHERE("WHERE member = " + userId);
+                    WHERE("member = " + userId);
                 }
+            }
+        }.toString();
+    }
+
+    public String updateProject(final Project project) {
+        return new SQL() {
+            {
+                UPDATE("t_project");
+                if (project.getManager() != null) {
+                    SET("manager = #{manager.id}");
+                }
+                if (project.getPrincipal()!= null) {
+                    SET("principal = #{principal.id}");
+                }
+                SET("remark = #{remark}");
+                SET("status = (SELECT id FROM t_project_status WHERE category = #{status})");
+                WHERE("id = #{id}");
             }
         }.toString();
     }

@@ -51,7 +51,7 @@ public interface UserMapper {
     void insertUser(User user);
 
     @Update("UPDATE t_user " +
-            "SET name = #{name}, password = #{password}, email = #{email}, alias = #{alias}, gender =(SELECT id FROM t_user_gender WHERE category = #{userGender}), birthday = #{birthday}, phone = #{phone}, register_date = #{registerDate}, photo = #{photo}, role = (SELECT id FROM t_user_role WHERE category = #{userRole}) " +
+            "SET name = #{name}, password = #{password}, email = #{email}, alias = #{alias}, gender = (SELECT id FROM t_user_gender WHERE category = #{userGender}), birthday = #{birthday}, phone = #{phone}, register_date = #{registerDate}, photo = #{photo}, role = (SELECT id FROM t_user_role WHERE category = #{userRole}) " +
             "WHERE id = #{id}")
     void updateUser(User user);
 }

@@ -32,6 +32,15 @@ public class Project {
 
     public Project() {
         createTime = new Date();
+        status = ProjectStatus.WAIT;
+    }
+
+    public Project(String name, User creator, ProjectCategory category, String remark) {
+        this();
+        this.name = name;
+        this.creator = creator;
+        this.category = category;
+        this.remark = remark;
     }
 
     public Long getId() {

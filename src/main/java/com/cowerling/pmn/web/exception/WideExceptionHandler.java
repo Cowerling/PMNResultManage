@@ -1,6 +1,7 @@
 package com.cowerling.pmn.web.exception;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
+import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.exception.UserNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
@@ -44,6 +45,9 @@ public class WideExceptionHandler {
     public String resourceNotFoundHandler() {
         return "error/resource";
     }
+
+    @ExceptionHandler(EncoderServiceException.class)
+    public String encoderServiceHandler() { return "error/internal"; }
 
     @ExceptionHandler(AuthenticationException.class)
     public String authenticationHandler(AuthenticationException e, Model model) {

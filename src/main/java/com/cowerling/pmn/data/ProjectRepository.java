@@ -13,4 +13,7 @@ public interface ProjectRepository {
     Project findProjectById(Long id);
     List<Project> findProjectsByUser(User user, FindMode findMode, Map<Field, Object> filters, List<Pair<Field, Order>> orders, int offset, int limit);
     Long findProjectCountByUser(User user, FindMode findMode);
+    void updateProject(Project project);
+    void saveProject(Project project);
+    void removeProjectById(Long id);
 }
