@@ -4,7 +4,7 @@ import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.ProjectMapper;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

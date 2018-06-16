@@ -2,7 +2,7 @@ package com.cowerling.pmn.data.mapper;
 
 import com.cowerling.pmn.data.provider.ProjectSqlProvider;
 import com.cowerling.pmn.domain.project.Project;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 

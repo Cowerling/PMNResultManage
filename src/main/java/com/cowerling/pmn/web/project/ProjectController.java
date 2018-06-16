@@ -13,7 +13,7 @@ import com.cowerling.pmn.domain.user.UserRole;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,16 +95,16 @@ public class ProjectController {
 
                 switch (columnName) {
                     case LIST_REQUEST_COLUMN_NAME:
-                        orders.add(new Pair<>(NAME, order));
+                        orders.add(Pair.of(NAME, order));
                         break;
                     case LIST_REQUEST_COLUMN_CATEGORY:
-                        orders.add(new Pair<>(CATEGORY, order));
+                        orders.add(Pair.of(CATEGORY, order));
                         break;
                     case LIST_REQUEST_COLUMN_CREATE_TIME:
-                        orders.add(new Pair<>(CREATE_TIME, order));
+                        orders.add(Pair.of(CREATE_TIME, order));
                         break;
                     case LIST_REQUEST_COLUMN_STATUS:
-                        orders.add(new Pair<>(STATUS, order));
+                        orders.add(Pair.of(STATUS, order));
                         break;
                     default:
                         break;

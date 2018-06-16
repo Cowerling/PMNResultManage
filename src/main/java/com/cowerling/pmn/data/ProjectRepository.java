@@ -2,7 +2,7 @@ package com.cowerling.pmn.data;
 
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Map;

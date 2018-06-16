@@ -2,7 +2,7 @@ package com.cowerling.pmn.data.provider;
 
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.utils.DateUtils;
-import javafx.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Date;
