@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <title th:text="#{register_success_title}">Registration Success</title>
+
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap/3.3.7/css/bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/font-awesome/4.7.0/css/font-awesome.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/ionicons/2.0.1/css/ionicons.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/adminlte/2.4.3/css/AdminLTE.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/css/font.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery-3.3.1.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/user/register_success.js}"></script>
+    </head>
+    <body class="hold-transition lockscreen">
+        <div class="lockscreen-wrapper">
+            <div class="lockscreen-logo">
+                <b th:text="#{register_success_logo}">logo</b>
+            </div>
+
+            <div class="lockscreen-name">
+                <span th:text="#{register_success_congratulation}">Congratulation! </span><span th:text="${name}">user</span><span th:text="#{register_success_successfully}">, register successfully.</span>
+            </div>
+
+            <div>
+                <img class="img-responsive center-block" th:src="@{/resources/image/success.png}">
+            </div>
+
+            <div class="text-center">
+                <span th:text="#{register_success_redirect_to_home_after}">Redirect to home after </span>
+                <span id="count_down"></span>
+                <span th:text="#{register_success_seconds_or}">seconds Or</span>
+                <a id="sign_in" th:href="@{/login}"><span th:text="#{register_success_sign_in}">sign in</span></a>
+            </div>
+        </div>
+    </body>
+</html>

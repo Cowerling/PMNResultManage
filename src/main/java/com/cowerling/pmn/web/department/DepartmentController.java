@@ -32,17 +32,20 @@ public class DepartmentController {
     @Autowired
     private GeneralEncoderService generalEncoderService;
 
-    private UserRole authenticateUserRole(UserRole loginUserRole) {
-        UserRole userRole;
-
-        switch (loginUserRole) {
-            case ADMIN:
+    private UserRole suitableUserRole(String userGrade) {
+        UserRole userRole = UserRole.SUPER_ADMIN;
+        switch (userGrade.toLowerCase()) {
+            case ConstantValue.USER_GRADE_CREATOR:
+                userRole = UserRole.ADMIN;
+                break;
+            case ConstantValue.USER_GRADE_MANAGER:
                 userRole = UserRole.ADVAN_USER;
                 break;
-            case ADVAN_USER:
-            case USER:
-            default:
+            case ConstantValue.USER_GRADE_PRINCIPAL:
+            case ConstantValue.USER_GRADE_PARTICIPATOR:
                 userRole = UserRole.USER;
+                break;
+            default:
                 break;
         }
 
@@ -50,7 +53,8 @@ public class DepartmentController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Department> list(@RequestParam(value = "userAlias", defaultValue = ConstantValue.EMPTY_PARAMETER) String userAlias, @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+    public List<Department> list(@RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
+                                 @RequestParam(value = "userAlias", defaultValue = ConstantValue.EMPTY_PARAMETER) String userAlias) throws ResourceNotFoundException {
         try {
             List<Department> departments = new ArrayList<>();
 
@@ -61,7 +65,7 @@ public class DepartmentController {
 
                 List<User> users = userRepository.findUsersByAlias(userAlias);
                 users.forEach(user -> {
-                    if (loginUser.getUserRole().superior(user.getUserRole())) {
+                    if (user.getUserRole() == suitableUserRole(userGrade)) {
                         Department department = user.getDepartment();
                         if (!departmentMap.containsKey(department.getName())) {
                             departmentMap.put(department.getName(), department);
@@ -75,11 +79,13 @@ public class DepartmentController {
             }
 
             departments.forEach(department -> {
+                UserRole userRole = suitableUserRole(userGrade);
+
                 try {
-                    if (loginUser.getUserRole() == UserRole.SUPER_ADMIN) {
+                    if (userRole == UserRole.SUPER_ADMIN) {
                         department.setSpecificNumber(userRepository.findUserCountByDepartment(department));
                     } else {
-                        department.setSpecificNumber(userRepository.findUserCountByDepartment(department, authenticateUserRole(loginUser.getUserRole())));
+                        department.setSpecificNumber(userRepository.findUserCountByDepartment(department, userRole));
                     }
                     department.setTag(generalEncoderService.staticEncrypt(department.getId()));
                 } catch (EncoderServiceException e) {
@@ -94,14 +100,18 @@ public class DepartmentController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> users(@RequestParam(value = "departmentTag") String departmentTag, @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+    public List<User> users(@RequestParam(value = "departmentTag") String departmentTag,
+                            @RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
+                            @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
         try {
             Long departmentId = Long.parseLong(generalEncoderService.staticDecrypt(departmentTag));
 
-            if (loginUser.getUserRole() == UserRole.SUPER_ADMIN) {
+            UserRole userRole = suitableUserRole(userGrade);
+
+            if (userRole == UserRole.SUPER_ADMIN) {
                 return userRepository.findUsersByDepartmentId(departmentId);
             } else {
-                return userRepository.findUsersByDepartmentId(departmentId, authenticateUserRole(loginUser.getUserRole()));
+                return userRepository.findUsersByDepartmentId(departmentId, userRole);
             }
         } catch (Exception e) {
             throw new ResourceNotFoundException();

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <title>Day Trace | 404</title>
+
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap/3.3.7/css/bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/font-awesome/4.7.0/css/font-awesome.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/adminlte/2.4.3/css/AdminLTE.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/css/font.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery-3.3.1.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+    </head>
+    <body class="hold-transition lockscreen">
+        <div class="error-page">
+            <h1 class="headline text-yellow">403</h1>
+
+            <div class="error-content">
+                <h3><i class="fa fa-warning text-red"></i> Request Forbidden.</h3>
+
+                <p>
+                    <span th:text="${message}"></span> Meanwhile, you may <a th:href="@{/}">return to home</a>.
+                </p>
+            </div>
+
+            <div class="text-center">
+                <img class="img-responsive center-block" th:src="@{/resources/image/forbidden.png}">
+            </div>
+        </div>
+    </body>
+</html>

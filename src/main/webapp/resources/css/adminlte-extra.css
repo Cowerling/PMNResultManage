@@ -1,0 +1,171 @@
+.content-no-board {
+    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.box-no-board {
+    border-radius: 0px;
+    border-top: 0px;
+    margin-bottom: 0px;
+}
+
+.main-footer-narrow {
+    padding: 5px;
+}
+
+.width-8-per {
+    min-width: 6%;
+}
+
+.image-preview-input {
+    position: relative;
+    overflow: hidden;
+    margin: 0px;
+}
+.image-preview-input input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.image-preview-input-title {
+    margin-left:2px;
+}
+
+.super-admin {
+    color: #ffd700;
+}
+
+.admin {
+    color: #00bfff;
+}
+
+.advan-user {
+    color: #ee82ee;
+}
+
+.user {
+    color: #008000;
+}
+
+.medal-1 {
+    background-color: #dd4b39 !important;
+}
+
+.medal-2 {
+    background-color: #ffd700 !important;
+}
+
+.medal-3 {
+    background-color: #2374e9 !important;
+}
+
+.medal-4 {
+    background-color: #159f5c !important;
+}
+
+.creator:before {
+    content: "\f1d1";
+}
+
+.builder-i:before,
+.builder-ii:before,
+.builder-iii:before {
+    content: "\f0ad";
+}
+
+.login:before {
+    content: "\f007";
+}
+
+.login {
+    color: #ffffff !important;
+    background-color: #00c0ef !important;
+}
+
+.login-image-page {
+    background-image: url('../image/login-background.jpg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.compact {
+    height: 85%;
+}
+
+.icon-right {
+    margin-right: 5px;
+}
+
+.table-status {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius:3px;
+}
+
+.table-delete-tool {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #dd4b39;
+}
+
+.project-user-img {
+    padding: 10px;
+}
+
+.project-member-img {
+    max-width: 50%;
+}
+
+.text-danger {
+    color: #dd4b39;
+}
+
+.text-success {
+    color: #00a65a;
+}
+
+.project-wait {
+    border-color: #c23321;
+    background-color: #dd4b39 !important;
+    color: #fff !important;
+}
+
+.project-progress {
+    border-color: #c87f0a;
+    background-color: #f39c12 !important;
+    color: #fff !important;
+}
+
+.project-finish {
+    border-color: #00733e;
+    background-color: #00a65a !important;
+    color: #fff !important;
+}
+
+.text-area {
+    width: 100%;
+    min-height: 100px;
+    font-size: 14px;
+    line-height: 18px;
+    border: 1px solid #dddddd;
+    padding: 10px;
+    resize: none;
+}
+
+.tree-view {
+    height: 400px;
+    overflow-y :scroll;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px;
+}

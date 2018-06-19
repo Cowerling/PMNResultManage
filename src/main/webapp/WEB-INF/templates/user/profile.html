@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/icheck/1.0.2/skins/all.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.validate-1.17.0.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery.inputmask/3.1.27/jquery.inputmask.bundle.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.imageselectutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/icheck/1.0.2/icheck.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/user/profile.js}"></script>
+    </head>
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+            <header class="main-header" th:replace="layout/page :: header"></header>
+
+            <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+            <div class="content-wrapper">
+
+                <section class="content">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="box box-primary">
+                                <div class="box-body box-profile">
+                                    <img class="profile-user-img img-responsive img-circle" th:src="@{'/resources/image/user/'+ ${loginUser.photo != null ? loginUser.photo : 'sample-160x160.png'}}" alt="User profile picture">
+
+                                    <h3 class="profile-username text-center" th:text="${loginUser.alias}">alias</h3>
+
+                                    <p class="text-muted text-center" th:text="${loginUser.userRole}">user role</p>
+
+                                    <ul class="list-group list-group-unbordered">
+                                        <li class="list-group-item">
+                                            <b><i class="fa fa-id-card-o width-8-per"></i><span th:text="#{profile_username}">username</span></b><a class="pull-right" th:text="${loginUser.name}"></a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b><i class="fa fa-calendar width-8-per"></i><span th:text="#{profile_registerDate}">register date</span></b><a class="pull-right" th:text="${#dates.format(loginUser.registerDate, 'yyyy-MM-dd')}"></a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b><i class="fa fa-users width-8-per"></i><span th:text="#{profile_department}">department</span></b><a class="pull-right" th:text="${loginUser.department.name}"></a>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <b><i class="fa fa-map-marker width-8-per"></i><span th:text="#{profile_login_site}">login site</span></b><a class="pull-right" id="location"></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-9">
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#settings" data-toggle="tab" th:text="#{profile_settings}">settings</a></li>
+                                    <li><a href="#security" data-toggle="tab" th:text="#{profile_security}">Security</a></li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div class="active tab-pane" id="settings">
+                                        <form id="settingForm" class="form-horizontal" th:action="@{profile/settings}" method="post" enctype="multipart/form-data">
+                                            <div class="form-group">
+                                                <label for="inputGender" class="col-sm-2 control-label" th:text="#{profile_gender}">gender</label>
+
+                                                <div class="col-sm-10">
+                                                    <select class="form-control select2" id="inputGender" style="width: 100%;" name="gender">
+                                                        <option>...</option>
+                                                        <option th:each="gender : ${T(com.cowerling.pmn.domain.user.UserGender).values()}" th:text="${gender}" th:value="${gender.name()}" th:selected="${loginUser.userGender == gender}"></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="inputEmail" class="col-sm-2 control-label" th:text="#{profile_email}">email</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="email" class="form-control" id="inputEmail" th:placeholder="#{profile_email_placeholder}" th:value="${loginUser.email}" name="email">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="inputBirthday" class="col-sm-2 control-label" th:text="#{profile_birthday}">birthday</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control pull-right" id="inputBirthday" th:value="${#dates.format(loginUser.birthday, 'yyyy-MM-dd')}" name="birthday">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="inputPhone" class="col-sm-2 control-label" th:text="#{profile_phone}">phone</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="inputPhone" data-inputmask='"mask": "999-9999-9999"' data-mask th:value="${loginUser.phone}" name="phone">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="inputPhoto" class="col-sm-2 control-label" th:text="#{profile_phote}">photo</label>
+
+                                                <div class="col-sm-10">
+                                                    <div class="input-group image-preview">
+                                                        <input type="text" class="form-control image-preview-filename" disabled="disabled">
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-primary image-preview-clear" style="display:none;">
+                                                                <span class="glyphicon glyphicon-remove"></span><span th:text="#{profile_clear}">clear</span>
+                                                            </button>
+
+                                                            <div class="btn btn-primary image-preview-input">
+                                                                <span class="glyphicon glyphicon-folder-open"></span>
+                                                                <span class="image-preview-input-title" th:text="#{profile_browse}">browse</span>
+                                                                <input id="inputPhoto" type="file" accept="image/png, image/jpeg, image/gif" name="photo"/>
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-2 col-sm-10">
+                                                    <button type="submit" class="btn btn-success" th:text="#{profile_submit}">submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div class="tab-pane" id="security">
+                                        <form id="securityForm" class="form-horizontal" th:action="@{profile/security}" method="post" enctype="multipart/form-data">
+
+                                            <div class="form-group">
+                                                <label for="inputPassword" class="col-sm-2 control-label" th:text="#{profile_password}">password</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="password" id="inputPassword" name="password" class="form-control" th:placeholder="#{profile_password_placeholder}" minlength="6" maxlength="30" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="inputRetypePassword" class="col-sm-2 control-label" th:text="#{profile_retype_password}">retype password</label>
+
+                                                <div class="col-sm-10">
+                                                    <input type="password" class="form-control" id="inputRetypePassword" th:placeholder="#{profile_retype_password_placeholder}" equalTo="#inputPassword">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="col-sm-offset-2 col-sm-10">
+                                                    <button type="submit" class="btn btn-danger" th:text="#{profile_reset}">reset</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+
+            <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+            <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>

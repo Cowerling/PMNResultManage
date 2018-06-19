@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/openlayer/4.6.5/ol.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/openlayer/4.6.5/ol.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/home.js}"></script>
+        <script type="text/javascript" src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    </head>
+    <body class="hold-transition skin-blue fixed">
+        <div class="wrapper">
+            <header class="main-header" th:replace="layout/page :: header"></header>
+
+            <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+            <div class="content-wrapper">
+
+                <section class="content">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="box">
+                                <div class="box-body">
+                                    <div id="map"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+
+            <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+            <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+    <head th:fragment="head(links, scripts)">
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <title th:text="#{page_title}">title</title>
+
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap/3.3.7/css/bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/font-awesome/4.7.0/css/font-awesome.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/ionicons/2.0.1/css/ionicons.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/select2/4.0.3/css/select2.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/adminlte/2.4.3/css/AdminLTE.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/adminlte/2.4.3/css/skins/_all-skins.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/css/font.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/css/adminlte-extra.css}">
+
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery-3.3.1.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.uiutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/adminlte/2.4.3/js/adminlte.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/layout/page.js}"></script>
+
+        <th:block th:replace="${links}" />
+        <th:block th:replace="${scripts}" />
+    </head>
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+            <header class="main-header" th:fragment="header">
+                <a class="logo">
+                    <span class="logo-mini" th:text="#{page_logo}">logo</span>
+                    <span class="logo-lg"><b th:text="#{page_logo}">logo</b></span>
+                </a>
+
+                <nav class="navbar navbar-static-top" role="navigation">
+                    <a class="sidebar-toggle" data-toggle="push-menu" role="button" href="#"></a>
+
+                    <div class="collapse navbar-collapse pull-left">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a href="https://www.baidu.com/">Baidu</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown messages-menu">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span class="label label-success" id="message_remind_sub_count">4</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="header">
+                                        <span id="message_remind_count">4</span>
+                                        <span th:text="#{page_messages_to_read}"> messages</span>
+                                    </li>
+                                    <li>
+                                        <ul class="menu">
+                                            <li>
+                                                <a href="#">
+                                                    <div class="pull-left">
+                                                        <img th:src="@{'/resources/image/user/'+ ${loginUser.photo != null ? loginUser.photo : 'sample-160x160.png'}}" class="img-circle" alt="User Image">
+                                                    </div>
+                                                    <h4 id="message_remind_content"></h4>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="footer"><a href="#"><span th:text="#{page_see_all_messages}">See ALL Messages</span></a></li>
+                                </ul>
+                            </li>
+
+                            <li class="dropdown user user-menu">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <img th:src="@{'/resources/image/user/'+ ${loginUser.photo != null ? loginUser.photo : 'sample-160x160.png'}}" class="user-image" alt="User Image">
+                                    <span class="hidden-xs" th:text="${loginUser.alias}">alias</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="user-header">
+                                        <img th:src="@{'/resources/image/user/'+ ${loginUser.photo != null ? loginUser.photo : 'sample-160x160.png'}}" class="img-circle" alt="User Image">
+                                        <p>
+                                            <span th:text="${loginUser.alias}">alias</span>
+                                            <small><span th:text="#{page_since}">Member since </span><span th:text="${#dates.format(loginUser.registerDate, 'yyyy-MM-dd')}">0000</span></small>
+                                        </p>
+                                    </li>
+
+                                    <li class="user-footer">
+                                        <div class="pull-left">
+                                            <a th:href="@{/user/profile}" class="btn btn-primary btn-flat"><span th:text="#{page_profile}">Profile</span></a>
+                                        </div>
+                                        <div class="pull-right">
+                                            <form th:action="@{/logout}" method="post">
+                                                <input class="btn btn-warning btn-flat" type="submit" name="logout" th:value="#{page_sign_out}" />
+                                            </form>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <aside class="main-sidebar" th:fragment="sidebar">
+                <section class="sidebar">
+
+                    <div class="user-panel">
+                        <div class="pull-left image">
+                            <img th:src="@{'/resources/image/user/'+ ${loginUser.photo != null ? loginUser.photo : 'sample-160x160.png'}}" class="img-circle" alt="User Image">
+                        </div>
+                        <div class="pull-left info">
+                            <p th:text="${loginUser.alias}">alias</p>
+                            <a><i class="fa fa-user-circle-o" th:classappend="${loginUser.userRole.format()}"></i><span th:text="${loginUser.userRole}">UserRole</span></a>
+                        </div>
+                    </div>
+
+                    <ul class="sidebar-menu" data-widget="tree">
+                        <li class="header"><b th:text="#{page_menu}">MENU</b></li>
+
+                        <li class="menu-map">
+                            <a th:href="@{/}">
+                                <i class="fa fa-map-o"></i>
+                                <span th:text="#{page_map}">Map</span>
+                            </a>
+                        </li>
+
+                        <li class="treeview menu-project">
+                            <a href="#">
+                                <i class="fa fa-file-text-o"></i>
+                                <span th:text="#{page_project}">Project</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="menu-project-list"><a th:href="@{/project/list}"><i class="fa fa-circle-o"></i><span th:text="#{page_project_list}">List</span></a></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+
+                </section>
+            </aside>
+
+            <footer class="main-footer main-footer-narrow" th:fragment="footer">
+                <div class="container">
+                    <div class="pull-right hidden-xs">
+                        <strong th:text="#{page_all_rights_reserved}">All rights reserved</strong>
+                    </div>
+                </div>
+            </footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:fragment="control_sidebar">
+
+            </aside>
+            <div class="control-sidebar-bg" th:fragment="control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <title th:text="#{register_title}">registration</title>
+
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap/3.3.7/css/bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/font-awesome/4.7.0/css/font-awesome.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/ionicons/2.0.1/css/ionicons.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/adminlte/2.4.3/css/AdminLTE.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/icheck/1.0.2/skins/all.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/css/font.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery-3.3.1.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.validate-1.17.0.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/icheck/1.0.2/icheck.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/user/register.js}"></script>
+    </head>
+    <body class="hold-transition register-page">
+        <div class="register-box">
+            <div class="register-logo">
+                <b th:text="#{register_logo}">logo</b>
+            </div>
+
+            <div class="register-box-body">
+                <p class="login-box-msg" th:text="#{register_register_a_new_account}">Register a new account</p>
+
+                <form th:action="@{''}" method="post" th:object="${registerUser}">
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" th:placeholder="#{register_username}" th:field="*{name}" required>
+                        <span class="glyphicon glyphicon-user form-control-feedback" th:classappend="${#fields.hasErrors('name')}? 'text-red'"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" th:placeholder="#{register_alias}" th:field="*{alias}" required>
+                        <span class="glyphicon glyphicon-list-alt form-control-feedback" th:classappend="${#fields.hasErrors('alias')}? 'text-red'"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="text" class="form-control" th:placeholder="#{register_phone}" th:field="*{phone}" required>
+                        <span class="glyphicon glyphicon-phone form-control-feedback" th:classappend="${#fields.hasErrors('phone')}? 'text-red'"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="password" id="password" class="form-control" th:placeholder="#{register_password}" th:field="*{password}" required>
+                        <span class="glyphicon glyphicon-lock form-control-feedback" th:classappend="${#fields.hasErrors('password')}? 'text-red'"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input type="password" id="retype_password" class="form-control" th:placeholder="#{register_retype_password}" equalTo="#password">
+                        <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-8">
+                        </div>
+                        <div class="col-xs-4">
+                            <button id="submit2" type="submit" class="btn btn-primary btn-block btn-flat" th:text="#{register_register}">Register</button>
+                        </div>
+                    </div>
+
+                    <div class="text-red" th:if="${#fields.hasErrors('*')}">
+                        <ul class="list-unstyled">
+                            <li th:each="error : ${#fields.errors('*')}">
+                                <span><i class="fa fa-times-circle-o"></i><b th:text="${error}"></b></span>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+
+                <a th:href="@{/login}" class="text-center"><span th:text="#{register_already_have}">I already have a account</span></a>
+            </div>
+        </div>
+    </body>
+</html>
