@@ -27,12 +27,15 @@ public class ProjectSqlProvider {
 
     public enum Field {
         NAME("name"),
+        CREATOR("creator"),
+        MANAGER("manager"),
+        PRINCIPAL("principal"),
         CATEGORY("t_project_category.category"),
         CREATE_TIME("create_time"),
         START_CREATE_TIME("create_time"),
         END_CREATE_TIME("create_time"),
         REMARK("remark"),
-        STATUS("status");
+        STATUS("t_project_status.category");
 
         private String sqlExpression;
 
@@ -97,12 +100,34 @@ public class ProjectSqlProvider {
                     filters.forEach((key, value) -> {
                         switch (key) {
                             case NAME:
+                                ((List<String>) value).forEach(item -> {
+                                    WHERE(String.format("%s LIKE '%%%s%%'", key, item));
+                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            case CREATOR:
+                            case MANAGER:
+                            case PRINCIPAL:
+                                ((List<Long>) value).forEach(item -> {
+                                    WHERE(String.format("%s = %d", key, item));
+                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
                             case REMARK:
                                 WHERE(String.format("%s LIKE '%%%s%%'", key, value));
                                 break;
                             case CATEGORY:
                             case STATUS:
-                                WHERE(String.format("%s = '%s'", key, value));
+                                ((List<String>) value).forEach(item -> {
+                                    WHERE(String.format("%s = '%s'", key, item));
+                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
                                 break;
                             case START_CREATE_TIME:
                                 WHERE(String.format("create_time >= '%s'", DateUtils.format((Date) value)));

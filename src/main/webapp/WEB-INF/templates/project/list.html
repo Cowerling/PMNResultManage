@@ -66,6 +66,8 @@
                                             <th th:text="#{project_list_table_status}">Status</th>
                                         </tr>
                                     </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
                                 </table>
 
                             </div>
@@ -244,11 +246,12 @@
                                         </div>
 
                                         <div sec:authorize="!hasRole('ROLE_ADMIN')" class="form-group">
-                                            <label for="search_project_creator" class="col-sm-2 control-label" th:text="#{project_list_search_project_creator}">creator</label>
+                                            <label for="search_project_creator_select" class="col-sm-2 control-label" th:text="#{project_list_search_project_creator}">creator</label>
 
                                             <div class="col-sm-10">
                                                 <div class="input-group">
-                                                    <input type="text" id="search_project_creator" class="form-control" th:placeholder="#{project_list_search_project_creator}">
+                                                    <input type="text" id="search_project_creator_alias" class="form-control" th:placeholder="#{project_list_search_project_creator}" readonly="readonly" />
+                                                    <input type="hidden" id="search_project_creator" />
                                                     <span class="input-group-btn">
                                                         <button id="search_project_creator_select" type="button" class="btn btn-primary user-search">
                                                             <i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -272,11 +275,12 @@
                                         </div>
 
                                         <div sec:authorize="!hasRole('ROLE_ADVAN_USER')" class="form-group">
-                                            <label for="search_project_manager" class="col-sm-2 control-label" th:text="#{project_list_search_project_manager}">manager</label>
+                                            <label for="search_project_manager_select" class="col-sm-2 control-label" th:text="#{project_list_search_project_manager}">manager</label>
 
                                             <div class="col-sm-10">
                                                 <div class="input-group">
-                                                    <input type="text" id="search_project_manager" class="form-control" th:placeholder="#{project_list_search_project_manager}">
+                                                    <input type="text" id="search_project_manager_alias" class="form-control" th:placeholder="#{project_list_search_project_manager}" readonly="readonly" />
+                                                    <input type="hidden" id="search_project_manager" />
                                                     <span class="input-group-btn">
                                                         <button id="search_project_manager_select" type="button" class="btn btn-primary user-search">
                                                             <i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -287,11 +291,12 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="search_project_principal" class="col-sm-2 control-label" th:text="#{project_list_search_project_principal}">principal</label>
+                                            <label for="search_project_principal_select" class="col-sm-2 control-label" th:text="#{project_list_search_project_principal}">principal</label>
 
                                             <div class="col-sm-10">
                                                 <div class="input-group">
-                                                    <input type="text" id="search_project_principal" class="form-control" th:placeholder="#{project_list_search_project_principal}">
+                                                    <input type="text" id="search_project_principal_alias" class="form-control" th:placeholder="#{project_list_search_project_principal}" readonly="readonly" />
+                                                    <input type="hidden" id="search_project_principal" />
                                                     <span class="input-group-btn">
                                                         <button id="search_project_principal_select" type="button" class="btn btn-primary user-search">
                                                             <i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -364,6 +369,7 @@
                                             <span th:text="#{project_detail_modal_unselected}">unselected</span>
                                         </span>
                                         <div>
+                                            <input type="hidden" class="input-user-alias" />
                                             <input type="hidden" class="input-user" />
                                         </div>
                                     </div>
