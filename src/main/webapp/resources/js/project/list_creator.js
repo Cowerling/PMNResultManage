@@ -3,8 +3,6 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $(".select2").select2();
-
     $.extend($.validator.messages, {
         required: "\u5fc5\u586b",    //必填
         maxlength: $.validator.format("\u6700\u591a\u53ef\u4ee5\u8f93\u5165{0}\u4e2a\u5b57\u7b26") //最多可以输入{0}个字符
@@ -43,7 +41,7 @@ $(document).ready(function () {
     });
 
     $("#search_project").click(function (event) {
-        $("#creator_list_table").find(".search-condition").val(JSON.stringify({
+        $(".data-table").find(".search-condition").val(JSON.stringify({
             name: $("#search_project_name").val() != "" ? $("#search_project_name").val().split("#") : [],
             category: $("#search_project_category").val(),
             createTime: $("#search_project_create_time").val().split(" - "),
@@ -53,7 +51,9 @@ $(document).ready(function () {
             status: $("#search_project_status").val()
         }));
 
-        $("#creator_list_table").DataTable().ajax.reload();
+        $(".data-table").DataTable().ajax.reload();
         $("#project_search_modal").modal("hide");
+
+        $("#clear_search").show();
     });
 });

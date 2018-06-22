@@ -38,6 +38,9 @@
                             <li sec:authorize="hasRole('ROLE_ADVAN_USER')" class="active"><a href="#manager_list_tab" data-toggle="tab"><i class="fa fa-cogs icon-right"></i><span th:text="#{project_list_manager}">manager</span></a></li>
                             <li sec:authorize="hasRole('ROLE_USER')" class="active"><a href="#principal_list_tab" data-toggle="tab"><i class="fa fa-eye icon-right"></i><span th:text="#{project_list_principal}">principal</span></a></li>
                             <li sec:authorize="hasRole('ROLE_USER')"><a href="#participator_list_tab" data-toggle="tab"><i class="fa fa-street-view icon-right"></i><span th:text="#{project_list_participator}">participator</span></a></li>
+                            <li>
+                                <button id="clear_search" class="btn btn-warning"><i class="fa fa-dot-circle-o icon-right" aria-hidden="true"></i><span th:text="#{project_clear_search}">clear search</span></button>
+                            </li>
                             <li class="pull-right">
                                 <button sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-success" data-toggle="modal" data-target="#project_add_modal"><i class="fa fa-external-link-square icon-right"></i><span th:text="#{project_list_add}">add</span></button>
                                 <button id="project_search" class="btn btn-primary" data-toggle="modal" data-target="#project_search_modal"><i class="fa fa-search icon-right"></i><span th:text="#{project_list_search}">search</span></button>
@@ -48,7 +51,7 @@
 
                             <div sec:authorize="hasRole('ROLE_ADMIN')" class="tab-pane active" id="creator_list_tab">
 
-                                <table id="creator_list_table" class="table table-bordered table-striped" style="width: 100%">
+                                <table id="creator_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
                                     <thead>
                                         <tr>
                                             <th th:text="#{project_list_table_name}">Name</th>
@@ -73,68 +76,74 @@
                             </div>
 
                             <div sec:authorize="hasRole('ROLE_ADVAN_USER')" class="tab-pane active" id="manager_list_tab">
-                                <table id="manager_list_table" class="table table-bordered table-striped" style="width: 100%">
+                                <table id="manager_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
                                     <thead>
-                                    <tr>
-                                        <th th:text="#{project_list_table_name}">Name</th>
-                                        <th th:text="#{project_list_table_category}">Category</th>
-                                        <th th:text="#{project_list_table_create_time}">Create Time</th>
-                                        <th th:text="#{project_list_table_status}">Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th th:text="#{project_list_table_name}">Name</th>
+                                            <th th:text="#{project_list_table_category}">Category</th>
+                                            <th th:text="#{project_list_table_create_time}">Create Time</th>
+                                            <th th:text="#{project_list_table_status}">Status</th>
+                                        </tr>
                                     </thead>
 
                                     <tfoot>
-                                    <tr>
-                                        <th th:text="#{project_list_table_name}">Name</th>
-                                        <th th:text="#{project_list_table_category}">Category</th>
-                                        <th th:text="#{project_list_table_create_time}">Create Time</th>
-                                        <th th:text="#{project_list_table_status}">Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th th:text="#{project_list_table_name}">Name</th>
+                                            <th th:text="#{project_list_table_category}">Category</th>
+                                            <th th:text="#{project_list_table_create_time}">Create Time</th>
+                                            <th th:text="#{project_list_table_status}">Status</th>
+                                        </tr>
                                     </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
                                 </table>
                             </div>
 
                             <div sec:authorize="hasRole('ROLE_USER')" class="tab-pane active" id="principal_list_tab">
-                                <table id="principal_list_table" class="table table-bordered table-striped" style="width: 100%">
+                                <table id="principal_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
                                     <thead>
-                                    <tr>
-                                        <th th:text="#{project_list_table_name}">Name</th>
-                                        <th th:text="#{project_list_table_category}">Category</th>
-                                        <th th:text="#{project_list_table_create_time}">Create Time</th>
-                                        <th th:text="#{project_list_table_status}">Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th th:text="#{project_list_table_name}">Name</th>
+                                            <th th:text="#{project_list_table_category}">Category</th>
+                                            <th th:text="#{project_list_table_create_time}">Create Time</th>
+                                            <th th:text="#{project_list_table_status}">Status</th>
+                                        </tr>
                                     </thead>
 
                                     <tfoot>
-                                    <tr>
-                                        <th th:text="#{project_list_table_name}">Name</th>
-                                        <th th:text="#{project_list_table_category}">Category</th>
-                                        <th th:text="#{project_list_table_create_time}">Create Time</th>
-                                        <th th:text="#{project_list_table_status}">Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th th:text="#{project_list_table_name}">Name</th>
+                                            <th th:text="#{project_list_table_category}">Category</th>
+                                            <th th:text="#{project_list_table_create_time}">Create Time</th>
+                                            <th th:text="#{project_list_table_status}">Status</th>
+                                        </tr>
                                     </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
                                 </table>
                             </div>
 
                             <div sec:authorize="hasRole('ROLE_USER')"  class="tab-pane" id="participator_list_tab">
-                                <table id="participator_list_table" class="table table-bordered table-striped" style="width: 100%">
+                                <table id="participator_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
                                     <thead>
-                                    <tr>
-                                        <th th:text="#{project_list_table_name}">Name</th>
-                                        <th th:text="#{project_list_table_category}">Category</th>
-                                        <th th:text="#{project_list_table_create_time}">Create Time</th>
-                                        <th th:text="#{project_list_table_status}">Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th th:text="#{project_list_table_name}">Name</th>
+                                            <th th:text="#{project_list_table_category}">Category</th>
+                                            <th th:text="#{project_list_table_create_time}">Create Time</th>
+                                            <th th:text="#{project_list_table_status}">Status</th>
+                                        </tr>
                                     </thead>
 
                                     <tfoot>
-                                    <tr>
-                                        <th th:text="#{project_list_table_name}">Name</th>
-                                        <th th:text="#{project_list_table_category}">Category</th>
-                                        <th th:text="#{project_list_table_create_time}">Create Time</th>
-                                        <th th:text="#{project_list_table_status}">Status</th>
-                                    </tr>
+                                        <tr>
+                                            <th th:text="#{project_list_table_name}">Name</th>
+                                            <th th:text="#{project_list_table_category}">Category</th>
+                                            <th th:text="#{project_list_table_create_time}">Create Time</th>
+                                            <th th:text="#{project_list_table_status}">Status</th>
+                                        </tr>
                                     </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
                                 </table>
                             </div>
 
@@ -290,7 +299,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group">
+                                        <div class="form-group principal-select">
                                             <label for="search_project_principal_select" class="col-sm-2 control-label" th:text="#{project_list_search_project_principal}">principal</label>
 
                                             <div class="col-sm-10">
