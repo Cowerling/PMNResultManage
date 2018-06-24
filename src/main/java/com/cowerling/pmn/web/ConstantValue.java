@@ -9,4 +9,7 @@ public final class ConstantValue {
     public static final String USER_GRADE_MANAGER = "manager";
     public static final String USER_GRADE_PRINCIPAL = "principal";
     public static final String USER_GRADE_PARTICIPATOR = "participator";
+
+    public static final String PROJECT_STATUS_PROGRESS = "PROGRESS";
+    public static final String PROJECT_STATUS_FINISH = "FINISH";
 }

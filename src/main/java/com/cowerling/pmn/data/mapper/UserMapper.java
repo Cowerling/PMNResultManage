@@ -50,6 +50,9 @@ public interface UserMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertUser(User user);
 
+    @Insert("INSERT INTO t_project_members(project, member) VALUES(#{projectId}, #{userId})")
+    void insertMemberIdByProjectId(@Param("userId") Long userId, @Param("projectId") Long projectId);
+
     @Update("UPDATE t_user " +
             "SET name = #{name}, password = #{password}, email = #{email}, alias = #{alias}, gender = (SELECT id FROM t_user_gender WHERE category = #{userGender}), birthday = #{birthday}, phone = #{phone}, register_date = #{registerDate}, photo = #{photo}, role = (SELECT id FROM t_user_role WHERE category = #{userRole}) " +
             "WHERE id = #{id}")

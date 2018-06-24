@@ -16,6 +16,7 @@
         <script type="text/javascript" th:src="@{/resources/js/project/detail.js}"></script>
         <script sec:authorize="hasRole('ROLE_ADMIN')" type="text/javascript" th:src="@{/resources/js/project/detail_creator.js}"></script>
         <script sec:authorize="hasRole('ROLE_ADVAN_USER')" type="text/javascript" th:src="@{/resources/js/project/detail_manager.js}"></script>
+        <script sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id}" type="text/javascript" th:src="@{/resources/js/project/detail_principal.js}"></script>
 
     </head>
 
@@ -71,6 +72,7 @@
                         </div>
 
                         <div class="col-md-3 col-sm-6 col-xs-12">
+
                             <div class="info-box">
                                 <span class="info-box-icon bg-green">
                                     <img class="project-user-img img-responsive img-circle" th:src="@{'/resources/image/user/'+ ${project.principal != null && project.principal.photo != null ? project.principal.photo : 'sample-160x160.png'}}" alt="principal picture">
@@ -82,6 +84,16 @@
                                     <span class="info-box-number" th:unless="${project.principal}">
                                         <span th:text="#{project_detail_unspecified}" class="text-danger">unspecified</span>
                                         <a sec:authorize="hasRole('ROLE_ADVAN_USER')" id="edit_principal" href="#" data-toggle="modal" data-target="#modal_select_user"><i class="fa fa-edit"></i></a>
+                                    </span>
+                                    <span class="info-box-number" sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).WAIT}">
+                                        <form th:action="@{settings/status}" method="post">
+                                            <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                                            <input type="hidden" name="status" value="progress" />
+                                            <a class="text-success" id="start_project" href="#">
+                                                <i class="fa fa-play-circle" aria-hidden="true"></i>
+                                                <span th:text="#{project_detail_start_project}" class="text-success">start project</span>
+                                            </a>
+                                        </form>
                                     </span>
                                 </div>
 
@@ -181,14 +193,32 @@
 
                             <div class="box box-warning">
                                 <div class="box-header with-border">
+                                    <i class="fa fa-users" aria-hidden="true"></i>
+
                                     <h3 class="box-title" th:text="#{project_detail_members}">members</h3>
+
+                                    <div class="box-tools pull-right">
+                                        <div class="label label-warning">
+                                            <span th:text="${project.members.size()}"></span>
+                                            <span th:text="#{project_detail_persons}">persons</span>
+                                        </div>
+                                        <div th:if="${memberError}" class="label label-danger">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span th:text="${memberError}"></span>
+                                            <span th:text="#{project_detail_member_error}">member error</span>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 <div class="box-body no-padding member-list">
                                     <ul class="users-list clearfix">
                                         <li th:each="member : ${project.members}">
                                             <img style="max-width: 50%" th:src="@{'/resources/image/user/'+ ${member.photo != null ? member.photo : 'sample-160x160.png'}}" alt="member picture">
-                                            <span class="users-list-name" th:text="${member.alias}">member alias</span>
+                                            <div class="users-list-name">
+                                                <span th:text="${member.alias}">member alias</span>
+                                                <a sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS}" id="remove_member" class="text-danger" href="#"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                            </div>
                                             <div class="users-list-date">
                                                 <span th:text="${member.department.name}">member department</span>
                                                 <span th:text="${member.phone}">member phone</span>
@@ -197,11 +227,8 @@
                                     </ul>
                                 </div>
 
-                                <div class="box-footer text-center">
-                                    <div class="label label-warning">
-                                        <span th:text="${project.members.size()}"></span>
-                                        <span th:text="#{project_detail_persons}">persons</span>
-                                    </div>
+                                <div sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS}" class="box-footer text-center">
+                                    <button id="edit_member" class="btn btn-primary pull-left" th:text="#{project_detail_edit_member}" data-toggle="modal" data-target="#modal_select_user">edit member</button>
                                 </div>
 
                             </div>

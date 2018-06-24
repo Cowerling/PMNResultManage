@@ -3,6 +3,7 @@ package com.cowerling.pmn.web.department;
 import com.cowerling.pmn.data.DepartmentRepository;
 import com.cowerling.pmn.data.UserRepository;
 import com.cowerling.pmn.domain.department.Department;
+import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.domain.user.UserRole;
 import com.cowerling.pmn.exception.EncoderServiceException;
@@ -54,7 +55,8 @@ public class DepartmentController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Department> list(@RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
-                                 @RequestParam(value = "userAlias", defaultValue = ConstantValue.EMPTY_PARAMETER) String userAlias) throws ResourceNotFoundException {
+                                 @RequestParam(value = "userAlias", defaultValue = ConstantValue.EMPTY_PARAMETER) String userAlias,
+                                 @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
         try {
             List<Department> departments = new ArrayList<>();
 
@@ -86,6 +88,10 @@ public class DepartmentController {
                         department.setSpecificNumber(userRepository.findUserCountByDepartment(department));
                     } else {
                         department.setSpecificNumber(userRepository.findUserCountByDepartment(department, userRole));
+
+                        if (userGrade.equals(ConstantValue.USER_GRADE_PARTICIPATOR) && loginUser.getDepartment().getId() == department.getId()) {
+                            department.setSpecificNumber(department.getSpecificNumber() - 1);
+                        }
                     }
                     department.setTag(generalEncoderService.staticEncrypt(department.getId()));
                 } catch (EncoderServiceException e) {
@@ -111,7 +117,9 @@ public class DepartmentController {
             if (userRole == UserRole.SUPER_ADMIN) {
                 return userRepository.findUsersByDepartmentId(departmentId);
             } else {
-                return userRepository.findUsersByDepartmentId(departmentId, userRole);
+                List<User> users = userRepository.findUsersByDepartmentId(departmentId, userRole);
+                users.removeIf(user -> user.getId() == loginUser.getId());
+                return users;
             }
         } catch (Exception e) {
             throw new ResourceNotFoundException();

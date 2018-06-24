@@ -4,8 +4,10 @@ import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.UserMapper;
 import com.cowerling.pmn.data.message.ExceptionMessage;
 import com.cowerling.pmn.domain.department.Department;
+import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.domain.user.UserRole;
+import com.cowerling.pmn.exception.DuplicateMemberException;
 import com.cowerling.pmn.exception.DuplicateUserException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -21,6 +23,7 @@ import static com.cowerling.pmn.data.provider.UserSqlProvider.*;
 @Repository
 public class MybatisUserRepository implements UserRepository {
     private static final String UNIQUE_CONSTRAINT_NAME_IN_USER  = "uc_name_in_user";
+    private static final String PRIMARY_KEY_PROJECT_MEMBERS = "pk_project_members";
 
     @Autowired
     @GenericData
@@ -136,6 +139,26 @@ public class MybatisUserRepository implements UserRepository {
         } catch (Exception e) {
             if (e.getMessage().contains(UNIQUE_CONSTRAINT_NAME_IN_USER)) {
                 throw new DuplicateUserException(ExceptionMessage.SAVE_USER_DUPLICATE);
+            }
+            else {
+                throw e;
+            }
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveMemberByProject(User user, Project project) throws DuplicateMemberException {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            userMapper.insertMemberIdByProjectId(user.getId(), project.getId());
+            sqlSession.commit();
+        } catch (Exception e) {
+            if (e.getMessage().contains(PRIMARY_KEY_PROJECT_MEMBERS)) {
+                throw new DuplicateMemberException();
             }
             else {
                 throw e;

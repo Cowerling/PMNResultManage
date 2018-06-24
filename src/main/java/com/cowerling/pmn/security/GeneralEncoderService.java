@@ -70,6 +70,10 @@ public class GeneralEncoderService {
         return staticEncrypt(content.toString());
     }
 
+    public String staticEncrypt(Integer content) throws EncoderServiceException {
+        return staticEncrypt(content.toString());
+    }
+
     public String decrypt(String content) throws EncoderServiceException {
         return baseDecrypt(content, keySeed());
     }

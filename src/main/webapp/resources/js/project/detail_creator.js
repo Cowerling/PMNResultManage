@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#modal_select_user").createUserSelectModal("\u9009\u62e9\u7ba1\u7406\u4eba", "settings/manager", "manager");
+    $("#modal_select_user").createDetailUserSelectModal("manager", false, "\u9009\u62e9\u7ba1\u7406\u4eba", "settings/manager", "manager");
 });
 
 $(document).ready(function () {

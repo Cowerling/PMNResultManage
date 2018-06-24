@@ -7,6 +7,8 @@ public class ProjectSettingsForm {
     private String principal;
     @Size(max = 200)
     private String remark;
+    private String status;
+    private String member;
 
     public String getManager() {
         return manager;
@@ -30,5 +32,21 @@ public class ProjectSettingsForm {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getMember() {
+        return member;
+    }
+
+    public void setMember(String member) {
+        this.member = member;
     }
 }

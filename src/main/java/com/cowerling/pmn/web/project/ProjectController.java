@@ -6,14 +6,17 @@ import com.cowerling.pmn.data.UserRepository;
 import com.cowerling.pmn.data.provider.ProjectSqlProvider;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.project.ProjectCategory;
+import com.cowerling.pmn.domain.project.ProjectStatus;
 import com.cowerling.pmn.domain.project.form.ProjectAddForm;
 import com.cowerling.pmn.domain.project.form.ProjectSettingsForm;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.domain.user.UserRole;
+import com.cowerling.pmn.exception.DuplicateMemberException;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.utils.DateUtils;
+import com.cowerling.pmn.web.ConstantValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
@@ -58,10 +61,11 @@ public class ProjectController {
     private static final String LIST_SEARCH_REMARK = "remark";
     private static final String LIST_SEARCH_STATUS = "status";
 
-
     private static final String SETTING_MANAGER = "manager";
     private static final String SETTING_PRINCIPAL = "principal";
     private static final String SETTING_REMARK = "remark";
+    private static final String SETTING_STATUS = "status";
+    private static final String SETTING_MEMBER = "member";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -237,12 +241,17 @@ public class ProjectController {
         return "/project/list";
     }
 
-    @RequestMapping("/{projectTag}")
-    public String detail(@PathVariable("projectTag") String projectTag, Model model) throws ResourceNotFoundException {
+    @RequestMapping(value = "/{projectTag}", method = RequestMethod.GET)
+    public String detail(@PathVariable("projectTag") String projectTag, @RequestParam(value = "memberError", defaultValue = ConstantValue.EMPTY_PARAMETER) String memberError,  Model model) throws ResourceNotFoundException {
         try {
             Project project = projectRepository.findProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
             project.setTag(projectTag);
             model.addAttribute(project);
+
+            if (StringUtils.isNotEmpty(memberError)) {
+                model.addAttribute("memberError", generalEncoderService.staticDecrypt(memberError));
+            }
+
             return "project/detail";
         } catch (Exception e) {
             throw new ResourceNotFoundException();
@@ -269,9 +278,33 @@ public class ProjectController {
     @RequestMapping(value = "/settings/{category}", method = RequestMethod.POST)
     @PreAuthorize("(#category == '" + SETTING_MANAGER + "' and hasRole('ROLE_ADMIN')) or " +
             "(#category == '" + SETTING_REMARK + "' and hasRole('ROLE_ADMIN')) or " +
-            "(#category == '" + SETTING_PRINCIPAL + "' and hasRole('ROLE_ADVAN_USER'))")
-    public String projectSettings(@PathVariable("category") String category, ProjectSettingsForm projectSettingsForm, String projectTag) throws EncoderServiceException {
+            "(#category == '" + SETTING_PRINCIPAL + "' and hasRole('ROLE_ADVAN_USER')) or " +
+            "(#category == '" + SETTING_STATUS + "' and hasRole('ROLE_ADMIN') and #projectSettingsForm.status.toUpperCase() == '" + ConstantValue.PROJECT_STATUS_FINISH + "') or " +
+            "(#category == '" + SETTING_STATUS + "' and hasRole('ROLE_USER') and #projectSettingsForm.status.toUpperCase() == '" + ConstantValue.PROJECT_STATUS_PROGRESS + "') or " +
+            "(#category == '" + SETTING_MEMBER + "' and hasRole('ROLE_USER'))")
+    public String projectSettings(@PathVariable("category") String category,
+                                  ProjectSettingsForm projectSettingsForm,
+                                  String projectTag,
+                                  @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException, EncoderServiceException {
         Project project = projectRepository.findProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
+
+        if (project == null) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (category.equals(SETTING_STATUS) && projectSettingsForm.getStatus().equals(ConstantValue.PROJECT_STATUS_FINISH) && project.getCreator().getId() != loginUser.getId()) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (category.equals(SETTING_STATUS) && projectSettingsForm.getStatus().equals(ConstantValue.PROJECT_STATUS_PROGRESS) && (project.getPrincipal() == null || project.getPrincipal().getId() != loginUser.getId())) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (category.equals(SETTING_MEMBER) && (project.getPrincipal() == null || project.getPrincipal().getId() != loginUser.getId())) {
+            throw new ResourceNotFoundException();
+        }
+
+        int duplicateMemberCount = 0;
 
         switch (category) {
             case SETTING_MANAGER:
@@ -286,10 +319,43 @@ public class ProjectController {
                 project.setRemark(projectSettingsForm.getRemark());
                 projectRepository.updateProject(project);
                 break;
+            case SETTING_STATUS:
+                project.setStatus(ProjectStatus.valueOf(projectSettingsForm.getStatus().toUpperCase()));
+                projectRepository.updateProject(project);
+                break;
+            case SETTING_MEMBER:
+                if (StringUtils.isNotEmpty(projectSettingsForm.getMember())) {
+                    JSONArray jsonArray = new JSONArray(projectSettingsForm.getMember());
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        User user = userRepository.findUserByName(jsonArray.getString(i));
+                        if (user != null) {
+                            try {
+                                userRepository.saveMemberByProject(user, project);
+                            } catch (DuplicateMemberException e) {
+                                duplicateMemberCount++;
+                            }
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }
 
-        return "redirect:/project/" + projectTag;
+        Map<String, String> additionMessageMap = new HashMap<>();
+        if (duplicateMemberCount != 0) {
+            additionMessageMap.put("memberError", generalEncoderService.staticEncrypt(duplicateMemberCount));
+        }
+
+        StringBuilder additionMessage = new StringBuilder();
+        for (String key : additionMessageMap.keySet()) {
+            if (additionMessage.length() > 0) {
+                additionMessage.append('&');
+            }
+
+            additionMessage.append(key + "=" + additionMessageMap.get(key));
+        }
+
+        return "redirect:/project/" + projectTag + (additionMessage.length() > 0 ? "?" + additionMessage.toString() : "");
     }
 }
