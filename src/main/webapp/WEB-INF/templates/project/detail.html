@@ -32,6 +32,14 @@
                     <h1>
                         <span th:text="${project.name}">name</span>
                         <small><i class="fa fa-th icon-right" aria-hidden="true"></i><span th:text="${project.category}">category</span></small>
+                        <small class="pull-right">
+                            <div th:if="${memberError}" class="label label-danger">
+                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                <span th:text="${memberError}"></span>
+                                <span th:text="#{project_detail_member_error}">member error</span>
+                                <a class="text-white message-remove" href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
+                            </div>
+                        </small>
                     </h1>
                 </section>
 
@@ -202,11 +210,6 @@
                                             <span th:text="${project.members.size()}"></span>
                                             <span th:text="#{project_detail_persons}">persons</span>
                                         </div>
-                                        <div th:if="${memberError}" class="label label-danger">
-                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                            <span th:text="${memberError}"></span>
-                                            <span th:text="#{project_detail_member_error}">member error</span>
-                                        </div>
                                     </div>
 
                                 </div>
@@ -217,7 +220,10 @@
                                             <img style="max-width: 50%" th:src="@{'/resources/image/user/'+ ${member.photo != null ? member.photo : 'sample-160x160.png'}}" alt="member picture">
                                             <div class="users-list-name">
                                                 <span th:text="${member.alias}">member alias</span>
-                                                <a sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS}" id="remove_member" class="text-danger" href="#"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                                <div sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS}" style="display: inline;">
+                                                    <input type="hidden" class="member-name" th:value="${member.name}" />
+                                                    <a class="member-remove text-danger" href="#"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                                </div>
                                             </div>
                                             <div class="users-list-date">
                                                 <span th:text="${member.department.name}">member department</span>
@@ -231,6 +237,31 @@
                                     <button id="edit_member" class="btn btn-primary pull-left" th:text="#{project_detail_edit_member}" data-toggle="modal" data-target="#modal_select_user">edit member</button>
                                 </div>
 
+                            </div>
+
+                            <!--delete memeber modal-->
+                            <div sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS}" class="modal fade" id="modal_remove_member">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h4 class="modal-title">
+                                                <i class="fa fa-exclamation-triangle icon-right text-danger"></i>
+                                                <span th:text="#{project_detail_confirm_remove_member}">confirm remove member</span>
+                                            </h4>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form th:action="@{settings/memberRemove}" method="post">
+                                                <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                                                <input type="hidden" name="member" />
+                                                <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{project_detail_remove_member_cancel}">cancel</button>
+                                                <button type="submit" class="btn btn-primary" th:text="#{project_detail_remove_member_ok}">ok</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

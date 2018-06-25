@@ -19,5 +19,6 @@ public interface UserRepository {
     int findUserCountByDepartment(Department department, UserRole userRole);
     void saveUser(User user) throws DuplicateUserException;
     void saveMemberByProject(User user, Project project) throws DuplicateMemberException;
+    void removeMemberByProject(User user, Project project);
     void updateUser(User user);
 }

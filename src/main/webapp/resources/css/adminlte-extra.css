@@ -133,6 +133,10 @@
     color: #00a65a;
 }
 
+.text-white {
+    color: #ffffff;
+}
+
 .project-wait {
     border-color: #c23321;
     background-color: #dd4b39 !important;

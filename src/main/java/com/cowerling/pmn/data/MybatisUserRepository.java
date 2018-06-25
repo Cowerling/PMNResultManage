@@ -169,6 +169,19 @@ public class MybatisUserRepository implements UserRepository {
     }
 
     @Override
+    public void removeMemberByProject(User user, Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            userMapper.deleteMemberIdByProjectId(user.getId(), project.getId());
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public void updateUser(User user)
     {
         SqlSession sqlSession = currentSession();

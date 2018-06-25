@@ -57,4 +57,7 @@ public interface UserMapper {
             "SET name = #{name}, password = #{password}, email = #{email}, alias = #{alias}, gender = (SELECT id FROM t_user_gender WHERE category = #{userGender}), birthday = #{birthday}, phone = #{phone}, register_date = #{registerDate}, photo = #{photo}, role = (SELECT id FROM t_user_role WHERE category = #{userRole}) " +
             "WHERE id = #{id}")
     void updateUser(User user);
+
+    @Delete("DELETE FROM t_project_members WHERE project = #{projectId} AND member = #{userId}")
+    void deleteMemberIdByProjectId(@Param("userId") Long userId, @Param("projectId") Long projectId);
 }

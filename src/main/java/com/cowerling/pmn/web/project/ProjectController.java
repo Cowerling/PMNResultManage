@@ -65,7 +65,10 @@ public class ProjectController {
     private static final String SETTING_PRINCIPAL = "principal";
     private static final String SETTING_REMARK = "remark";
     private static final String SETTING_STATUS = "status";
-    private static final String SETTING_MEMBER = "member";
+    private static final String SETTING_MEMBER_ADD = "memberAdd";
+    private static final String SETTING_MEMBER_REMOVE = "memberRemove";
+
+    private static final String MESSAGE_MEMBER_ERROR = "memberError";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -242,14 +245,18 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/{projectTag}", method = RequestMethod.GET)
-    public String detail(@PathVariable("projectTag") String projectTag, @RequestParam(value = "memberError", defaultValue = ConstantValue.EMPTY_PARAMETER) String memberError,  Model model) throws ResourceNotFoundException {
+    public String detail(@PathVariable("projectTag") String projectTag, @RequestParam(value = "message", defaultValue = ConstantValue.EMPTY_PARAMETER) String message,  Model model) throws ResourceNotFoundException {
         try {
             Project project = projectRepository.findProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
             project.setTag(projectTag);
             model.addAttribute(project);
 
-            if (StringUtils.isNotEmpty(memberError)) {
-                model.addAttribute("memberError", generalEncoderService.staticDecrypt(memberError));
+            if (StringUtils.isNotEmpty(message)) {
+                JSONObject jsonObject = new JSONObject(generalEncoderService.staticDecrypt(message));
+
+                if (jsonObject.has(MESSAGE_MEMBER_ERROR)) {
+                    model.addAttribute(MESSAGE_MEMBER_ERROR, jsonObject.getInt(MESSAGE_MEMBER_ERROR));
+                }
             }
 
             return "project/detail";
@@ -281,7 +288,8 @@ public class ProjectController {
             "(#category == '" + SETTING_PRINCIPAL + "' and hasRole('ROLE_ADVAN_USER')) or " +
             "(#category == '" + SETTING_STATUS + "' and hasRole('ROLE_ADMIN') and #projectSettingsForm.status.toUpperCase() == '" + ConstantValue.PROJECT_STATUS_FINISH + "') or " +
             "(#category == '" + SETTING_STATUS + "' and hasRole('ROLE_USER') and #projectSettingsForm.status.toUpperCase() == '" + ConstantValue.PROJECT_STATUS_PROGRESS + "') or " +
-            "(#category == '" + SETTING_MEMBER + "' and hasRole('ROLE_USER'))")
+            "(#category == '" + SETTING_MEMBER_ADD + "' and hasRole('ROLE_USER')) or " +
+            "(#category == '" + SETTING_MEMBER_REMOVE + "' and hasRole('ROLE_USER'))")
     public String projectSettings(@PathVariable("category") String category,
                                   ProjectSettingsForm projectSettingsForm,
                                   String projectTag,
@@ -300,7 +308,7 @@ public class ProjectController {
             throw new ResourceNotFoundException();
         }
 
-        if (category.equals(SETTING_MEMBER) && (project.getPrincipal() == null || project.getPrincipal().getId() != loginUser.getId())) {
+        if ((category.equals(SETTING_MEMBER_ADD) || category.equals(SETTING_MEMBER_REMOVE)) && (project.getPrincipal() == null || project.getPrincipal().getId() != loginUser.getId())) {
             throw new ResourceNotFoundException();
         }
 
@@ -323,7 +331,7 @@ public class ProjectController {
                 project.setStatus(ProjectStatus.valueOf(projectSettingsForm.getStatus().toUpperCase()));
                 projectRepository.updateProject(project);
                 break;
-            case SETTING_MEMBER:
+            case SETTING_MEMBER_ADD:
                 if (StringUtils.isNotEmpty(projectSettingsForm.getMember())) {
                     JSONArray jsonArray = new JSONArray(projectSettingsForm.getMember());
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -338,24 +346,25 @@ public class ProjectController {
                     }
                 }
                 break;
+            case SETTING_MEMBER_REMOVE:
+                if (StringUtils.isNotEmpty(projectSettingsForm.getMember())) {
+                    (new JSONArray(projectSettingsForm.getMember())).forEach(member -> {
+                        User user = userRepository.findUserByName((String) member);
+                        if (user != null) {
+                            userRepository.removeMemberByProject(user, project);
+                        }
+                    });
+                }
+                break;
             default:
                 break;
         }
 
-        Map<String, String> additionMessageMap = new HashMap<>();
+        JSONObject message = new JSONObject();
         if (duplicateMemberCount != 0) {
-            additionMessageMap.put("memberError", generalEncoderService.staticEncrypt(duplicateMemberCount));
+            message.put(MESSAGE_MEMBER_ERROR, duplicateMemberCount);
         }
 
-        StringBuilder additionMessage = new StringBuilder();
-        for (String key : additionMessageMap.keySet()) {
-            if (additionMessage.length() > 0) {
-                additionMessage.append('&');
-            }
-
-            additionMessage.append(key + "=" + additionMessageMap.get(key));
-        }
-
-        return "redirect:/project/" + projectTag + (additionMessage.length() > 0 ? "?" + additionMessage.toString() : "");
+        return "redirect:/project/" + projectTag + (message.length() > 0 ? "?message=" + generalEncoderService.staticEncrypt(message.toString()) : "");
     }
 }
