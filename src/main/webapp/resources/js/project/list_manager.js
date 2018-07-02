@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#manager_list_table").createDataTable("list/manager", false);
+    $("#manager_list_table").createProjectListTable("list/manager", false);
 });
 
 $(document).ready(function () {

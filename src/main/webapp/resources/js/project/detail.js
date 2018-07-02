@@ -10,3 +10,7 @@ $(document).ready(function () {
         $(this).parent().hide();
     });
 });
+
+$(document).ready(function () {
+
+});

@@ -1,0 +1,181 @@
+package com.cowerling.pmn.data.provider;
+
+import com.cowerling.pmn.utils.DateUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+public class DataSqlProvider {
+    public enum RecordField {
+        NAME("name"),
+        PROJECT("project"),
+        UPLOADER("uploader"),
+        UPLOAD_TIME("upload_time"),
+        START_UPLOAD_TIME("upload_time"),
+        END_UPLOAD_TIME("upload_time"),
+        STATUS("t_data_record_status.category"),
+        REMARK("remark"),
+        PROJECT_NAME("t_project.name"),
+        CREATOR("t_project.creator"),
+        MANAGER("t_project.manager"),
+        PRINCIPAL("t_project.principal"),
+        UPLOADER_NAME("t_user.name"),
+        PRINCIPAL_OR_UPLOADER;
+
+        private String sqlExpression;
+
+        RecordField() {}
+        RecordField(String sqlExpression) {
+            this.sqlExpression = sqlExpression;
+        }
+
+        @Override
+        public String toString() {
+            return sqlExpression;
+        }
+    }
+
+    public enum Order {
+        ASCENDING("ASC"), DESCENDING("DESC");
+
+        private String sqlExpression;
+
+        Order(String sqlExpression) {
+            this.sqlExpression = sqlExpression;
+        }
+
+        @Override
+        public String toString() {
+            return sqlExpression;
+        }
+    }
+
+    public String selectDataRecords(Map<String, Object> parameters) {
+        return new SQL() {
+            {
+                SELECT("t_data_record.id, t_data_record.name AS name, file, project, uploader, upload_time, t_data_record_status.category AS status, t_data_record.remark AS remark");
+                FROM("t_data_record");
+                LEFT_OUTER_JOIN("t_data_record_status ON t_data_record.status = t_data_record_status.id");
+                LEFT_OUTER_JOIN("t_project ON t_data_record.project = t_project.id");
+                LEFT_OUTER_JOIN("t_user ON t_data_record.uploader = t_user.id");
+                if (parameters.get("arg0") != null) {
+                    Map<RecordField, Object> filters = (Map<RecordField, Object>) parameters.get("arg0");
+
+                    filters.forEach((key, value) -> {
+                        switch (key) {
+                            case NAME:
+                                ((List<String>) value).forEach(item -> {
+                                    WHERE(String.format("%s LIKE '%%%s%%'", key, item));
+                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            case PROJECT:
+                            case UPLOADER:
+                            case CREATOR:
+                            case MANAGER:
+                            case PRINCIPAL:
+                                ((List<Long>) value).forEach(item -> {
+                                    WHERE(String.format("%s = %d", key, item));
+                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            case START_UPLOAD_TIME:
+                                WHERE(String.format("create_time >= '%s'", DateUtils.format((Date) value)));
+                                break;
+                            case END_UPLOAD_TIME:
+                                WHERE(String.format("create_time <= '%s'", DateUtils.format((Date) value)));
+                                break;
+                            case UPLOADER_NAME:
+                            case STATUS:
+                                ((List<String>) value).forEach(item -> {
+                                    WHERE(String.format("%s = '%s'", key, item));
+                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            case REMARK:
+                                WHERE(String.format("%s LIKE '%%%s%%'", key, value));
+                                break;
+                            case PRINCIPAL_OR_UPLOADER:
+                                ((List<Long>) value).forEach(item -> {
+                                    WHERE(String.format("%s = %d", RecordField.PRINCIPAL, item));
+                                    OR();
+                                    WHERE(String.format("%s = %d", RecordField.UPLOADER, item));
+                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+                if (parameters.get("arg1") != null) {
+                    List<Pair<RecordField, Order>> orders = (List<Pair<RecordField, Order>>) parameters.get("arg1");
+
+                    orders.forEach(order -> ORDER_BY(order.getKey() + " " + order.getValue()));
+                } else {
+                    ORDER_BY("t_data_record.upload_time");
+                }
+            }
+        }.toString();
+    }
+
+    public String selectDataRecordCount(Map<String, Object> parameters) {
+        return new SQL() {
+            {
+                SELECT("COUNT(*)");
+                FROM("t_data_record");
+                LEFT_OUTER_JOIN("t_project ON t_data_record.project = t_project.id");
+                if (parameters.get("arg0") != null) {
+                    Map<RecordField, Object> filters = (Map<RecordField, Object>) parameters.get("arg0");
+                    filters.forEach((key, value) -> {
+                        switch (key) {
+                            case PROJECT:
+                            case UPLOADER:
+                            case CREATOR:
+                            case MANAGER:
+                            case PRINCIPAL:
+                                ((List<Long>) value).forEach(item -> {
+                                    WHERE(String.format("%s = %d", key, item));
+                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            case UPLOADER_NAME:
+                                ((List<String>) value).forEach(item -> {
+                                    WHERE(String.format("%s = '%s'", key, item));
+                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            case PRINCIPAL_OR_UPLOADER:
+                                ((List<Long>) value).forEach(item -> {
+                                    WHERE(String.format("%s = %d", RecordField.PRINCIPAL, item));
+                                    OR();
+                                    WHERE(String.format("%s = %d", RecordField.UPLOADER, item));
+                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+            }
+        }.toString();
+    }
+}

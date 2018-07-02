@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#creator_list_table").createDataTable("list/creator", true);
+    $("#creator_list_table").createProjectListTable("list/creator", true);
 });
 
 $(document).ready(function () {

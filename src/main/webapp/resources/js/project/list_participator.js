@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#participator_list_table").createDataTable("list/participator", false);
+    $("#participator_list_table").createProjectListTable("list/participator", false);
 });
 
 $(document).ready(function () {

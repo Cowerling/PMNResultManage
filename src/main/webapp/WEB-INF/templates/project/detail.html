@@ -266,6 +266,47 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="box box-default">
+
+                                <div class="box-header with-border">
+                                    <i class="fa fa-table" aria-hidden="true"></i>
+                                    <h3 class="box-title" th:text="#{project_detail_data_list}">data list</h3>
+                                </div>
+
+                                <div class="box-body">
+
+                                    <table id="data_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                        <thead>
+                                            <tr>
+                                                <th th:text="#{project_detail_data_table_name}">Name</th>
+                                                <th th:text="#{project_detail_data_table_uploader}">Uploader</th>
+                                                <th th:text="#{project_detail_data_table_upload_time}">Upload Time</th>
+                                                <th th:text="#{project_detail_data_table_status}">Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tfoot>
+                                            <tr>
+                                                <th th:text="#{project_detail_data_table_name}">Name</th>
+                                                <th th:text="#{project_detail_data_table_uploader}">Uploader</th>
+                                                <th th:text="#{project_detail_data_table_upload_time}">Upload Time</th>
+                                                <th th:text="#{project_detail_data_table_status}">Status</th>
+                                            </tr>
+                                        </tfoot>
+
+                                        <input type="hidden" class="search-condition" th:value="${project.tag}" />
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
                 </section>
 
             </div>

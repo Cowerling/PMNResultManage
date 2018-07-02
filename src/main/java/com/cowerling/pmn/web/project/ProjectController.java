@@ -39,19 +39,10 @@ import static com.cowerling.pmn.data.provider.ProjectSqlProvider.Order.*;
 @RequestMapping("/project")
 @SessionAttributes({"loginUser"})
 public class ProjectController {
-    private static final String LIST_REQUEST_DRAW = "draw";
-    private static final String LIST_REQUEST_START = "start";
-    private static final String LIST_REQUEST_LENGTH = "length";
-    private static final String LIST_REQUEST_COLUMNS = "columns";
-    private static final String LIST_REQUEST_COLUMNS_NAME = "name";
     private static final String LIST_REQUEST_COLUMN_NAME = "name";
     private static final String LIST_REQUEST_COLUMN_CATEGORY = "category";
     private static final String LIST_REQUEST_COLUMN_CREATE_TIME = "create_time";
     private static final String LIST_REQUEST_COLUMN_STATUS = "status";
-    private static final String LIST_REQUEST_ORDER = "order";
-    private static final String LIST_REQUEST_ORDER_COLUMN = "column";
-    private static final String LIST_REQUEST_ORDER_DIR = "dir";
-    private static final String LIST_REQUEST_ORDER_ASC = "asc";
     private static final String LIST_SEARCH_NAME = "name";
     private static final String LIST_SEARCH_CATEGORY = "category";
     private static final String LIST_SEARCH_CREATE_TIME = "createTime";
@@ -101,15 +92,15 @@ public class ProjectController {
             authenticateUser(loginUser, findMode);
 
             JSONObject jsonObject = new JSONObject(request);
-            int draw = jsonObject.getInt(LIST_REQUEST_DRAW), start = jsonObject.getInt(LIST_REQUEST_START), length = jsonObject.getInt(LIST_REQUEST_LENGTH);
-            JSONArray tableColumns = jsonObject.getJSONArray(LIST_REQUEST_COLUMNS);
-            JSONArray tableOrders = jsonObject.getJSONArray(LIST_REQUEST_ORDER);
+            int draw = jsonObject.getInt(ConstantValue.LIST_REQUEST_DRAW), start = jsonObject.getInt(ConstantValue.LIST_REQUEST_START), length = jsonObject.getInt(ConstantValue.LIST_REQUEST_LENGTH);
+            JSONArray tableColumns = jsonObject.getJSONArray(ConstantValue.LIST_REQUEST_COLUMNS);
+            JSONArray tableOrders = jsonObject.getJSONArray(ConstantValue.LIST_REQUEST_ORDER);
 
             List<Pair<Field, Order>> orders = new ArrayList<>();
             tableOrders.forEach(item -> {
                 JSONObject tableOrder = (JSONObject) item;
-                String columnName = tableColumns.getJSONObject(tableOrder.getInt(LIST_REQUEST_ORDER_COLUMN)).getString(LIST_REQUEST_COLUMNS_NAME);
-                Order order = tableOrder.getString(LIST_REQUEST_ORDER_DIR).equals(LIST_REQUEST_ORDER_ASC) ? ASCENDING : DESCENDING;
+                String columnName = tableColumns.getJSONObject(tableOrder.getInt(ConstantValue.LIST_REQUEST_ORDER_COLUMN)).getString(ConstantValue.LIST_REQUEST_COLUMNS_NAME);
+                Order order = tableOrder.getString(ConstantValue.LIST_REQUEST_ORDER_DIR).equals(ConstantValue.LIST_REQUEST_ORDER_ASC) ? ASCENDING : DESCENDING;
 
                 switch (columnName) {
                     case LIST_REQUEST_COLUMN_NAME:
