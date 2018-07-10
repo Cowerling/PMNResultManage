@@ -4,7 +4,6 @@ import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.domain.data.DataRecord;
 import com.cowerling.pmn.domain.user.User;
-import com.cowerling.pmn.domain.user.UserRole;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
@@ -37,6 +36,7 @@ public class DataRecordController {
     private static final String LIST_REQUEST_COLUMN_STATUS = "status";
     private static final String LIST_REQUEST_COLUMN_REMARK = "remark";
     private static final String LIST_SEARCH_NAME = "name";
+    private static final String LIST_SEARCH_PROJECT_SINGLE = "projectSingle";
     private static final String LIST_SEARCH_PROJECT_TAG = "projectTag";
     private static final String LIST_SEARCH_UPLOADER_NAME = "uploaderName";
     private static final String LIST_SEARCH_UPLOAD_TIME = "uploadTime";
@@ -133,20 +133,6 @@ public class DataRecordController {
                 }).collect(Collectors.toList());
 
                 filters.put(RecordField.PROJECT, projects);
-            } else {
-                switch (loginUser.getUserRole()) {
-                    case ADMIN:
-                        filters.put(RecordField.CREATOR, loginUser.getId());
-                        break;
-                    case ADVAN_USER:
-                        filters.put(RecordField.MANAGER, loginUser.getId());
-                        break;
-                    case USER:
-                        filters.put(RecordField.PRINCIPAL_OR_UPLOADER, loginUser.getId());
-                        break;
-                    default:
-                        break;
-                }
             }
 
             if (searchJsonObject.has(LIST_SEARCH_UPLOADER_NAME)) {
@@ -154,25 +140,27 @@ public class DataRecordController {
                 filters.put(RecordField.UPLOADER_NAME, uploaders);
             }
 
-            List<DataRecord> dataRecords = dataRepository.findDataRecords(filters, orders, start, length);
+            List<DataRecord> dataRecords = dataRepository.findDataRecordsByUser(loginUser, filters, orders, start, length);
             dataRecords.forEach(dataRecord -> {
                 try {
-                    if ((loginUser.getUserRole() == UserRole.ADMIN && dataRecord.getProject().getCreator().getId() != loginUser.getId()) ||
-                            (loginUser.getUserRole() == UserRole.ADVAN_USER && dataRecord.getProject().getManager().getId() != loginUser.getId()) ||
-                            (loginUser.getUserRole() == UserRole.USER && (dataRecord.getProject().getPrincipal().getId() != loginUser.getId() || !dataRecord.getProject().getMembers().stream().anyMatch(member -> member.getId() == loginUser.getId()))))
-                        throw new RuntimeException();
-
+                    dataRecord.setAuthorities(dataRepository.findDataRecordAuthorities(dataRecord, loginUser));
                     dataRecord.setTag(generalEncoderService.staticEncrypt(dataRecord.getId()));
                 } catch (EncoderServiceException e) {
                     throw new RuntimeException();
                 }
             });
 
-            Long count = dataRepository.findDataRecordCount(filters);
-
             Map<String, Object> list = new HashMap<>();
+
+            if (searchJsonObject.has(LIST_SEARCH_PROJECT_SINGLE) && searchJsonObject.getBoolean(LIST_SEARCH_PROJECT_SINGLE)) {
+                Long count = dataRepository.findDataRecordCountByUser(loginUser, ((List<Long>) filters.get(RecordField.PROJECT)).get(0));
+                list.put("count", count);
+            } else {
+                Long count = dataRepository.findDataRecordCountByUser(loginUser);
+                list.put("count", count);
+            }
+
             list.put("draw", draw);
-            list.put("count", count);
             list.put("dataRecords", dataRecords);
 
             return list;

@@ -1,5 +1,6 @@
 package com.cowerling.pmn.data.provider;
 
+import com.cowerling.pmn.domain.data.DataRecordAuthority;
 import com.cowerling.pmn.utils.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.jdbc.SQL;
@@ -10,24 +11,19 @@ import java.util.Map;
 
 public class DataSqlProvider {
     public enum RecordField {
-        NAME("name"),
+        NAME("t_data_record.name"),
         PROJECT("project"),
         UPLOADER("uploader"),
         UPLOAD_TIME("upload_time"),
         START_UPLOAD_TIME("upload_time"),
         END_UPLOAD_TIME("upload_time"),
         STATUS("t_data_record_status.category"),
-        REMARK("remark"),
+        REMARK("t_data_record.remark"),
         PROJECT_NAME("t_project.name"),
-        CREATOR("t_project.creator"),
-        MANAGER("t_project.manager"),
-        PRINCIPAL("t_project.principal"),
-        UPLOADER_NAME("t_user.name"),
-        PRINCIPAL_OR_UPLOADER;
+        UPLOADER_NAME("t_user.name");
 
         private String sqlExpression;
 
-        RecordField() {}
         RecordField(String sqlExpression) {
             this.sqlExpression = sqlExpression;
         }
@@ -53,20 +49,27 @@ public class DataSqlProvider {
         }
     }
 
-    public String selectDataRecords(Map<String, Object> parameters) {
+    public String selectDataRecordsByUserId(Map<String, Object> parameters) {
+        Long userId = (Long) parameters.get("arg0");
+
         return new SQL() {
             {
                 SELECT("t_data_record.id, t_data_record.name AS name, file, project, uploader, upload_time, t_data_record_status.category AS status, t_data_record.remark AS remark");
                 FROM("t_data_record");
                 LEFT_OUTER_JOIN("t_data_record_status ON t_data_record.status = t_data_record_status.id");
+                LEFT_OUTER_JOIN("t_data_record_auth ON t_data_record.id = t_data_record_auth.record");
                 LEFT_OUTER_JOIN("t_project ON t_data_record.project = t_project.id");
                 LEFT_OUTER_JOIN("t_user ON t_data_record.uploader = t_user.id");
-                if (parameters.get("arg0") != null) {
-                    Map<RecordField, Object> filters = (Map<RecordField, Object>) parameters.get("arg0");
+                LEFT_OUTER_JOIN("t_data_record_auth_category ON t_data_record_auth.category = t_data_record_auth_category.id");
+                WHERE(String.format("t_data_record_auth_category.category = '%s'", DataRecordAuthority.BASIS.name()));
+                WHERE("associator = " + userId);
+                if (parameters.get("arg1") != null) {
+                    Map<RecordField, Object> filters = (Map<RecordField, Object>) parameters.get("arg1");
 
                     filters.forEach((key, value) -> {
                         switch (key) {
                             case NAME:
+                            case PROJECT_NAME:
                                 ((List<String>) value).forEach(item -> {
                                     WHERE(String.format("%s LIKE '%%%s%%'", key, item));
                                     if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
@@ -76,9 +79,6 @@ public class DataSqlProvider {
                                 break;
                             case PROJECT:
                             case UPLOADER:
-                            case CREATOR:
-                            case MANAGER:
-                            case PRINCIPAL:
                                 ((List<Long>) value).forEach(item -> {
                                     WHERE(String.format("%s = %d", key, item));
                                     if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
@@ -92,7 +92,6 @@ public class DataSqlProvider {
                             case END_UPLOAD_TIME:
                                 WHERE(String.format("create_time <= '%s'", DateUtils.format((Date) value)));
                                 break;
-                            case UPLOADER_NAME:
                             case STATUS:
                                 ((List<String>) value).forEach(item -> {
                                     WHERE(String.format("%s = '%s'", key, item));
@@ -104,23 +103,13 @@ public class DataSqlProvider {
                             case REMARK:
                                 WHERE(String.format("%s LIKE '%%%s%%'", key, value));
                                 break;
-                            case PRINCIPAL_OR_UPLOADER:
-                                ((List<Long>) value).forEach(item -> {
-                                    WHERE(String.format("%s = %d", RecordField.PRINCIPAL, item));
-                                    OR();
-                                    WHERE(String.format("%s = %d", RecordField.UPLOADER, item));
-                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
-                                break;
                             default:
                                 break;
                         }
                     });
                 }
-                if (parameters.get("arg1") != null) {
-                    List<Pair<RecordField, Order>> orders = (List<Pair<RecordField, Order>>) parameters.get("arg1");
+                if (parameters.get("arg2") != null) {
+                    List<Pair<RecordField, Order>> orders = (List<Pair<RecordField, Order>>) parameters.get("arg2");
 
                     orders.forEach(order -> ORDER_BY(order.getKey() + " " + order.getValue()));
                 } else {
@@ -130,50 +119,19 @@ public class DataSqlProvider {
         }.toString();
     }
 
-    public String selectDataRecordCount(Map<String, Object> parameters) {
+    public String selectDataRecordCountByUserId(Map<String, Object> parameters) {
+        Long userId = (Long) parameters.get("arg0");
+
         return new SQL() {
             {
                 SELECT("COUNT(*)");
                 FROM("t_data_record");
-                LEFT_OUTER_JOIN("t_project ON t_data_record.project = t_project.id");
-                if (parameters.get("arg0") != null) {
-                    Map<RecordField, Object> filters = (Map<RecordField, Object>) parameters.get("arg0");
-                    filters.forEach((key, value) -> {
-                        switch (key) {
-                            case PROJECT:
-                            case UPLOADER:
-                            case CREATOR:
-                            case MANAGER:
-                            case PRINCIPAL:
-                                ((List<Long>) value).forEach(item -> {
-                                    WHERE(String.format("%s = %d", key, item));
-                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
-                                break;
-                            case UPLOADER_NAME:
-                                ((List<String>) value).forEach(item -> {
-                                    WHERE(String.format("%s = '%s'", key, item));
-                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
-                                break;
-                            case PRINCIPAL_OR_UPLOADER:
-                                ((List<Long>) value).forEach(item -> {
-                                    WHERE(String.format("%s = %d", RecordField.PRINCIPAL, item));
-                                    OR();
-                                    WHERE(String.format("%s = %d", RecordField.UPLOADER, item));
-                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
-                                break;
-                            default:
-                                break;
-                        }
-                    });
+                LEFT_OUTER_JOIN("t_data_record_auth ON t_data_record.id = t_data_record_auth.record");
+                LEFT_OUTER_JOIN("t_data_record_auth_category ON t_data_record_auth.category = t_data_record_auth_category.id");
+                WHERE(String.format("t_data_record_auth_category.category = '%s'", DataRecordAuthority.BASIS.name()));
+                WHERE("associator = " + userId);
+                if (parameters.get("arg1") != null) {
+                    WHERE("project = " + parameters.get("arg1"));
                 }
             }
         }.toString();

@@ -5,6 +5,7 @@ import com.cowerling.pmn.domain.user.User;
 import org.apache.ibatis.type.Alias;
 
 import java.util.Date;
+import java.util.List;
 
 @Alias("dataRecord")
 public class DataRecord {
@@ -16,6 +17,7 @@ public class DataRecord {
     private Date uploadTime;
     private DataRecordStatus status;
     private String remark;
+    private List<DataRecordAuthority> authorities;
     private String tag;
 
     public DataRecord() {
@@ -85,6 +87,14 @@ public class DataRecord {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public List<DataRecordAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<DataRecordAuthority> authorities) {
+        this.authorities = authorities;
     }
 
     public String getTag() {
