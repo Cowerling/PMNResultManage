@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/datatables/1.10.16/css/dataTables.bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/css/daterangepicker.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-treeview/2.1.5/css/bootstrap-treeview.min.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.validate-1.17.0.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/moment.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/daterangepicker.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-treeview/2.1.5/js/bootstrap-treeview.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/data/list.js}"></script>
+    </head>
+
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+            <header class="main-header" th:replace="layout/page :: header"></header>
+
+            <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+            <div class="content-wrapper">
+
+                <section class="content">
+
+                    <div class="box box-default">
+
+                        <div class="box-header with-border">
+                            <button id="data_record_search" class="btn btn-primary" data-toggle="modal" data-target="#data_record_search_modal"><i class="fa fa-search icon-right"></i><span th:text="#{data_record_search}">record search</span></button>
+                            <button sec:authorize="hasRole('ROLE_USER')" class="btn btn-success pull-right"><i class="fa fa-external-link-square icon-right"></i><span th:text="#{project_list_add}">add</span></button>
+                        </div>
+
+                        <div class="box-body">
+
+                            <table id="data_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                <thead>
+                                <tr>
+                                    <th th:text="#{data_list_table_name}">Name</th>
+                                    <th th:text="#{data_list_table_project_name}">Project Name</th>
+                                    <th th:text="#{data_list_table_uploader}">Uploader</th>
+                                    <th th:text="#{data_list_table_upload_time}">Upload Time</th>
+                                    <th th:text="#{data_list_table_status}">Status</th>
+                                    <th th:text="#{data_list_table_operation}">Operation</th>
+                                </tr>
+                                </thead>
+
+                                <tfoot>
+                                <tr>
+                                    <th th:text="#{data_list_table_name}">Name</th>
+                                    <th th:text="#{data_list_table_project_name}">Project Name</th>
+                                    <th th:text="#{data_list_table_uploader}">Uploader</th>
+                                    <th th:text="#{data_list_table_upload_time}">Upload Time</th>
+                                    <th th:text="#{data_list_table_status}">Status</th>
+                                    <th th:text="#{data_list_table_operation}">Operation</th>
+                                </tr>
+                                </tfoot>
+
+                                <input type="hidden" class="search-condition" />
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+            <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>

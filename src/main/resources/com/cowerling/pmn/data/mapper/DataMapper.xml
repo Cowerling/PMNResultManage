@@ -10,8 +10,16 @@
         <result property="file" column="file" />
         <result property="uploadTime" column="upload_time" />
         <result property="status" column="status" />
+        <result property="category" column="category" />
         <result property="remark" column="remark" />
         <association property="project" column="project" select="com.cowerling.pmn.data.mapper.ProjectMapper.selectProjectById" />
         <association property="uploader" column="uploader" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
+    </resultMap>
+
+    <resultMap id="cpiBaseDataContentResult" type="cpiBaseDataContent">
+        <id property="id" column="id" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="h" column="h" />
     </resultMap>
 </mapper>

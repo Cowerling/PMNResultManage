@@ -16,6 +16,7 @@ public class DataRecord {
     private User uploader;
     private Date uploadTime;
     private DataRecordStatus status;
+    private DataRecordCategory category;
     private String remark;
     private List<DataRecordAuthority> authorities;
     private String tag;
@@ -79,6 +80,14 @@ public class DataRecord {
 
     public void setStatus(DataRecordStatus status) {
         this.status = status;
+    }
+
+    public DataRecordCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(DataRecordCategory category) {
+        this.category = category;
     }
 
     public String getRemark() {

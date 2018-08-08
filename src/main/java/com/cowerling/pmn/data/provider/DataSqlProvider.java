@@ -54,10 +54,11 @@ public class DataSqlProvider {
 
         return new SQL() {
             {
-                SELECT("t_data_record.id, t_data_record.name AS name, file, project, uploader, upload_time, t_data_record_status.category AS status, t_data_record.remark AS remark");
+                SELECT("t_data_record.id, t_data_record.name AS name, file, project, uploader, upload_time, t_data_record_status.category AS status, t_data_record_category.category AS category, t_data_record.remark AS remark");
                 FROM("t_data_record");
                 LEFT_OUTER_JOIN("t_data_record_status ON t_data_record.status = t_data_record_status.id");
                 LEFT_OUTER_JOIN("t_data_record_auth ON t_data_record.id = t_data_record_auth.record");
+                LEFT_OUTER_JOIN("t_data_record_category ON t_data_record.category = t_data_record_category.id");
                 LEFT_OUTER_JOIN("t_project ON t_data_record.project = t_project.id");
                 LEFT_OUTER_JOIN("t_user ON t_data_record.uploader = t_user.id");
                 LEFT_OUTER_JOIN("t_data_record_auth_category ON t_data_record_auth.category = t_data_record_auth_category.id");

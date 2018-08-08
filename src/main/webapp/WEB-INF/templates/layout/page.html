@@ -142,6 +142,19 @@
                             </ul>
                         </li>
 
+                        <li class="treeview menu-data">
+                            <a href="#">
+                                <i class="fa fa-database"></i>
+                                <span th:text="#{page_data}">Data</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="menu-data-list"><a th:href="@{/data/list}"><i class="fa fa-circle-o"></i><span th:text="#{page_data_list}">List</span></a></li>
+                            </ul>
+                        </li>
+
                     </ul>
 
                 </section>

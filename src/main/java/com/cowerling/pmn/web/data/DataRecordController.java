@@ -91,53 +91,58 @@ public class DataRecordController {
                 }
             });
 
-            Map<RecordField, Object> filters = new HashMap<>();
-            JSONObject searchJsonObject = new JSONObject(search);
+            Map<RecordField, Object> filters = null;
+            JSONObject searchJsonObject = null;
 
-            if (searchJsonObject.has(LIST_SEARCH_NAME)) {
-                JSONArray searchNames = searchJsonObject.getJSONArray(LIST_SEARCH_NAME);
-                List<String> names = searchNames.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
-                filters.put(RecordField.NAME, names);
-            }
+            if (StringUtils.isNotEmpty(search)) {
+                filters = new HashMap<>();
+                searchJsonObject = new JSONObject(search);
 
-            if (searchJsonObject.has(LIST_SEARCH_UPLOAD_TIME)) {
-                JSONArray searchUploadTimes = searchJsonObject.getJSONArray(LIST_SEARCH_UPLOAD_TIME);
-                Date startUploadTime = DateUtils.parse(searchUploadTimes.getString(0)), endUploadTime = DateUtils.parse(searchUploadTimes.getString(1));
-
-                if (startUploadTime.before(endUploadTime)) {
-                    filters.put(RecordField.START_UPLOAD_TIME, startUploadTime);
-                    filters.put(RecordField.END_UPLOAD_TIME, endUploadTime);
+                if (searchJsonObject.has(LIST_SEARCH_NAME)) {
+                    JSONArray searchNames = searchJsonObject.getJSONArray(LIST_SEARCH_NAME);
+                    List<String> names = searchNames.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
+                    filters.put(RecordField.NAME, names);
                 }
-            }
 
-            if (searchJsonObject.has(LIST_SEARCH_STATUS)) {
-                JSONArray searchStatus = searchJsonObject.getJSONArray(LIST_SEARCH_STATUS);
-                List<String> status = searchStatus.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
-                filters.put(RecordField.STATUS, status);
-            }
+                if (searchJsonObject.has(LIST_SEARCH_UPLOAD_TIME)) {
+                    JSONArray searchUploadTimes = searchJsonObject.getJSONArray(LIST_SEARCH_UPLOAD_TIME);
+                    Date startUploadTime = DateUtils.parse(searchUploadTimes.getString(0)), endUploadTime = DateUtils.parse(searchUploadTimes.getString(1));
 
-            if (searchJsonObject.has(LIST_SEARCH_REMARK)) {
-                String remark = searchJsonObject.getString(LIST_SEARCH_REMARK);
-                if (StringUtils.isNotEmpty(remark)) {
-                    filters.put(RecordField.REMARK, remark);
-                }
-            }
-
-            if (searchJsonObject.has(LIST_SEARCH_PROJECT_TAG)) {
-                List<Long> projects = searchJsonObject.getJSONArray(LIST_SEARCH_PROJECT_TAG).toList().stream().map(item -> {
-                    try {
-                        return Long.parseLong(generalEncoderService.staticDecrypt(item.toString()));
-                    } catch (EncoderServiceException e) {
-                        throw new RuntimeException();
+                    if (startUploadTime.before(endUploadTime)) {
+                        filters.put(RecordField.START_UPLOAD_TIME, startUploadTime);
+                        filters.put(RecordField.END_UPLOAD_TIME, endUploadTime);
                     }
-                }).collect(Collectors.toList());
+                }
 
-                filters.put(RecordField.PROJECT, projects);
-            }
+                if (searchJsonObject.has(LIST_SEARCH_STATUS)) {
+                    JSONArray searchStatus = searchJsonObject.getJSONArray(LIST_SEARCH_STATUS);
+                    List<String> status = searchStatus.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
+                    filters.put(RecordField.STATUS, status);
+                }
 
-            if (searchJsonObject.has(LIST_SEARCH_UPLOADER_NAME)) {
-                List<String> uploaders = searchJsonObject.getJSONArray(LIST_SEARCH_UPLOADER_NAME).toList().stream().map(Object::toString).collect(Collectors.toList());
-                filters.put(RecordField.UPLOADER_NAME, uploaders);
+                if (searchJsonObject.has(LIST_SEARCH_REMARK)) {
+                    String remark = searchJsonObject.getString(LIST_SEARCH_REMARK);
+                    if (StringUtils.isNotEmpty(remark)) {
+                        filters.put(RecordField.REMARK, remark);
+                    }
+                }
+
+                if (searchJsonObject.has(LIST_SEARCH_PROJECT_TAG)) {
+                    List<Long> projects = searchJsonObject.getJSONArray(LIST_SEARCH_PROJECT_TAG).toList().stream().map(item -> {
+                        try {
+                            return Long.parseLong(generalEncoderService.staticDecrypt(item.toString()));
+                        } catch (EncoderServiceException e) {
+                            throw new RuntimeException();
+                        }
+                    }).collect(Collectors.toList());
+
+                    filters.put(RecordField.PROJECT, projects);
+                }
+
+                if (searchJsonObject.has(LIST_SEARCH_UPLOADER_NAME)) {
+                    List<String> uploaders = searchJsonObject.getJSONArray(LIST_SEARCH_UPLOADER_NAME).toList().stream().map(Object::toString).collect(Collectors.toList());
+                    filters.put(RecordField.UPLOADER_NAME, uploaders);
+                }
             }
 
             List<DataRecord> dataRecords = dataRepository.findDataRecordsByUser(loginUser, filters, orders, start, length);
@@ -152,7 +157,7 @@ public class DataRecordController {
 
             Map<String, Object> list = new HashMap<>();
 
-            if (searchJsonObject.has(LIST_SEARCH_PROJECT_SINGLE) && searchJsonObject.getBoolean(LIST_SEARCH_PROJECT_SINGLE)) {
+            if (searchJsonObject != null && searchJsonObject.has(LIST_SEARCH_PROJECT_SINGLE) && searchJsonObject.getBoolean(LIST_SEARCH_PROJECT_SINGLE)) {
                 Long count = dataRepository.findDataRecordCountByUser(loginUser, ((List<Long>) filters.get(RecordField.PROJECT)).get(0));
                 list.put("count", count);
             } else {

@@ -13,11 +13,3 @@ $(document).ready(function () {
         }
     });
 });
-
-$(document).ready(function () {
-    $("#data_list_table").find(".search-condition").val(JSON.stringify({
-        projectTag: [$("#data_list_table").find(".search-condition").val()],
-        projectSingle: true
-    }));
-    $("#data_list_table").createDataListTable("../data/record/list", true, false);
-});

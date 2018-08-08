@@ -2,10 +2,12 @@ package com.cowerling.pmn.data;
 
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.DataMapper;
+import com.cowerling.pmn.domain.data.DataContent;
 import com.cowerling.pmn.domain.data.DataRecord;
 import com.cowerling.pmn.domain.data.DataRecordAuthority;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
+import com.cowerling.pmn.exception.NoSuchDataRecordCategoryException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
@@ -26,6 +28,18 @@ public class MybatisDataRepository implements DataRepository {
 
     private SqlSession currentSession() {
         return sqlSessionFactory.openSession();
+    }
+
+    @Override
+    public DataRecord findDataRecordsById(Long id) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+            return dataMapper.selectDataRecordsById(id);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     @Override
@@ -115,6 +129,24 @@ public class MybatisDataRepository implements DataRepository {
             DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
             dataMapper.updateDataRecord(dataRecord);
             sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<? extends DataContent> findDataContentsByDataRecord(DataRecord dataRecord) throws NoSuchDataRecordCategoryException {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+
+            switch (dataRecord.getCategory()) {
+                case CPI_BASE:
+                    return dataMapper.selectCPIBaseDataContentsByDataRecordId(dataRecord.getId());
+                default:
+                    throw new NoSuchDataRecordCategoryException();
+            }
         } finally {
             sqlSession.close();
         }
