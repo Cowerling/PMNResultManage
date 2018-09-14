@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-fileinput/4.5.0/css/fileinput.min.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/i18n/zh-CN.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-fileinput/4.5.0/js/fileinput.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-fileinput/4.5.0/js/locales/zh.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/data/upload.js}"></script>
+    </head>
+
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+            <header class="main-header" th:replace="layout/page :: header"></header>
+
+            <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+            <div class="content-wrapper">
+
+                <section class="content">
+
+                    <div class="box box-default">
+
+                        <div class="box-header with-border">
+                            <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                            <h3 class="box-title" th:text="#{data_upload_data_upload}">data upload</h3>
+                        </div>
+
+                        <div class="box-body">
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label th:text="#{data_upload_project}">project</label>
+                                        <select id="project_list" class="form-control select2" style="width: 100%;"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label th:text="#{data_upload_project_category}">project category</label>
+                                        <select class="form-control select2" multiple="multiple" id="search_project_category" style="width: 100%;">
+                                            <option th:each="category : ${T(com.cowerling.pmn.domain.project.ProjectCategory).values()}" th:text="${category}" th:value="${category.name()}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label th:text="#{data_upload_project_key_word}">key word</label>
+                                        <input id="search_project_name" type="text" class="form-control" th:placeholder="#{data_upload_project_key_word}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label th:text="#{data_upload_project_search}">project search</label>
+                                        <button id="project_search" class="form-control btn btn-primary"><i class="fa fa-search icon-right"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label th:text="#{data_upload_templet}">templet</label>
+                                        <div class="info-box">
+                                            <span class="info-box-icon bg-red"><i class="glyphicon glyphicon-paperclip" aria-hidden="true"></i></span>
+
+                                            <div class="info-box-content">
+                                                <span class="info-box-text">
+                                                    <select id="templet_list" class="select2" style="width: 100%">
+                                                        <option selected="selected" disabled="disabled" style="display: none;"></option>
+                                                        <option th:each="category : ${T(com.cowerling.pmn.domain.data.DataRecordCategory).values()}" th:text="${category}" th:value="${category.getTemplet()}"></option>
+                                                    </select>
+                                                </span>
+                                                <span class="info-box-number">
+                                                    <button id="templet_download" class="btn btn-primary" style="margin-top: 5px;">
+                                                        <i class="fa fa-download icon-right" aria-hidden="true"></i><span th:text="#{data_upload_templet_download}">templet download</span><a class="hidden"></a>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <form id="settingForm" class="form-horizontal" th:action="@{upload}" method="post" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <label th:text="#{data_upload_file}">file</label>
+                                            <input id="file" name="dataFile" type="file" multiple class="file-loading" data-allowed-file-extensions='["xls", "xlsx"]'>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+            <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>

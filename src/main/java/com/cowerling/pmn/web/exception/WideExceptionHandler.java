@@ -1,21 +1,27 @@
 package com.cowerling.pmn.web.exception;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
+import com.cowerling.pmn.exception.DataUploadException;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.exception.UserNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -78,5 +84,16 @@ public class WideExceptionHandler {
     @ExceptionHandler(IOException.class)
     public String ioHandler() {
         return "error/resource";
+    }
+
+    @ExceptionHandler(DataUploadException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody
+    Map<String, String> dataUploadHandler(DataUploadException e) {
+        return new HashMap<>() {
+            {
+                put("message", e.getMessage());
+            }
+        };
     }
 }

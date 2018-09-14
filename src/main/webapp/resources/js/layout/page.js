@@ -40,4 +40,9 @@ $(document).ready(function () {
         value: "../department/users",
         enumerable: true
     });
+
+    Object.defineProperty(CONSTANT, "DATA_TEMPLET_FILE_URL", {
+        value: "../resources/data/templet/",
+        enumerable: true
+    });
 });

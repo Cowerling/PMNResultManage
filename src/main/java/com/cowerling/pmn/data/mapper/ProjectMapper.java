@@ -1,7 +1,9 @@
 package com.cowerling.pmn.data.mapper;
 
 import com.cowerling.pmn.data.provider.ProjectSqlProvider;
+import com.cowerling.pmn.domain.data.DataRecordCategory;
 import com.cowerling.pmn.domain.project.Project;
+import com.cowerling.pmn.domain.project.ProjectCategory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
@@ -32,4 +34,11 @@ public interface ProjectMapper {
 
     @Delete("DELETE FROM t_project WHERE id = #{id}")
     void deleteProjectById(Long id);
+
+    @Select("SELECT t_data_record_category.category AS data_record_category " +
+            "FROM t_project_relate_data_record " +
+            "LEFT OUTER JOIN t_data_record_category ON t_project_relate_data_record.data_record_category = t_data_record_category.id " +
+            "LEFT OUTER JOIN t_project_category ON t_project_relate_data_record.project_category = t_project_category.id " +
+            "WHERE t_project_category.category = #{projectCategory}")
+    List<DataRecordCategory> selectDataRecordCategoriesByProjectCategory(ProjectCategory projectCategory);
 }

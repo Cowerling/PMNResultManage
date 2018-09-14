@@ -46,6 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().antMatchers("/resources/**", "/login", "/user/register", "/user/registerSuccess", "/geoservice/analyzekey").permitAll().anyRequest().authenticated()
                 .and()
+                .authorizeRequests().antMatchers("/temporary/**").denyAll().anyRequest().authenticated()
+                .and()
                 .rememberMe().tokenValiditySeconds(TOKEN_TIME).key("PMNResultManageKey");
     }
 }

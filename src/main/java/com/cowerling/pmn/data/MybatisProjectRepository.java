@@ -2,6 +2,7 @@ package com.cowerling.pmn.data;
 
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.ProjectMapper;
+import com.cowerling.pmn.domain.data.DataRecordCategory;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import org.apache.commons.lang3.tuple.Pair;
@@ -54,6 +55,19 @@ public class MybatisProjectRepository implements ProjectRepository {
     }
 
     @Override
+    public List<Project> findProjectsByUser(User user, FindMode findMode, Map<Field, Object> filters, List<Pair<Field, Order>> orders) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+
+            return projectMapper.selectProjectsByUserId(user.getId(), findMode, filters, orders, new RowBounds(0, Integer.MAX_VALUE));
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public Long findProjectCountByUser(User user, FindMode findMode) {
         SqlSession sqlSession = currentSession();
 
@@ -100,6 +114,19 @@ public class MybatisProjectRepository implements ProjectRepository {
             ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
             projectMapper.deleteProjectById(id);
             sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<DataRecordCategory> findDataRecordCategoriesByProject(Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+
+            return projectMapper.selectDataRecordCategoriesByProjectCategory(project.getCategory());
         } finally {
             sqlSession.close();
         }

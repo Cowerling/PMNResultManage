@@ -28,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,124 @@ public class ProjectController {
         }
     }
 
+    private List<Pair<Field, Order>> orders(JSONArray tableColumns, JSONArray tableOrders) {
+        List<Pair<Field, Order>> orders = new ArrayList<>();
+
+        tableOrders.forEach(item -> {
+            JSONObject tableOrder = (JSONObject) item;
+            String columnName = tableColumns.getJSONObject(tableOrder.getInt(ConstantValue.LIST_REQUEST_ORDER_COLUMN)).getString(ConstantValue.LIST_REQUEST_COLUMNS_NAME);
+            Order order = tableOrder.getString(ConstantValue.LIST_REQUEST_ORDER_DIR).equals(ConstantValue.LIST_REQUEST_ORDER_ASC) ? ASCENDING : DESCENDING;
+
+            switch (columnName) {
+                case LIST_REQUEST_COLUMN_NAME:
+                    orders.add(Pair.of(NAME, order));
+                    break;
+                case LIST_REQUEST_COLUMN_CATEGORY:
+                    orders.add(Pair.of(CATEGORY, order));
+                    break;
+                case LIST_REQUEST_COLUMN_CREATE_TIME:
+                    orders.add(Pair.of(CREATE_TIME, order));
+                    break;
+                case LIST_REQUEST_COLUMN_STATUS:
+                    orders.add(Pair.of(STATUS, order));
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        return orders;
+    }
+
+    private Map<Field, Object> filters(String search) throws ParseException {
+        Map<Field, Object> filters = null;
+
+        if (StringUtils.isNotEmpty(search)) {
+            filters = new HashMap<>();
+
+            JSONObject searchJsonObject = new JSONObject(search);
+
+            if (searchJsonObject.has(LIST_SEARCH_NAME)) {
+                JSONArray searchNames = searchJsonObject.getJSONArray(LIST_SEARCH_NAME);
+                List<String> names = searchNames.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
+                filters.put(Field.NAME, names);
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_CATEGORY)) {
+                JSONArray searchCategories = searchJsonObject.getJSONArray(LIST_SEARCH_CATEGORY);
+                List<String> categories = searchCategories.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
+                filters.put(Field.CATEGORY, categories);
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_CREATE_TIME)) {
+                JSONArray searchCreateTimes = searchJsonObject.getJSONArray(LIST_SEARCH_CREATE_TIME);
+                Date startCreateTime = DateUtils.parse(searchCreateTimes.getString(0)), endCreateTime = DateUtils.parse(searchCreateTimes.getString(1));
+
+                if (startCreateTime.before(endCreateTime)) {
+                    filters.put(Field.START_CREATE_TIME, startCreateTime);
+                    filters.put(Field.END_CREATE_TIME, endCreateTime);
+                }
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_STATUS)) {
+                JSONArray searchStatus = searchJsonObject.getJSONArray(LIST_SEARCH_STATUS);
+                List<String> status = searchStatus.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
+                filters.put(Field.STATUS, status);
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_REMARK)) {
+                String remark = searchJsonObject.getString(LIST_SEARCH_REMARK);
+                if (StringUtils.isNotEmpty(remark)) {
+                    filters.put(Field.REMARK, remark);
+                }
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_CREATOR)) {
+                List<Long> creators = searchJsonObject.getJSONArray(LIST_SEARCH_CREATOR).toList().stream().map(item -> {
+                    User user = userRepository.findUserByName(item.toString());
+
+                    if (user == null || user.getUserRole() != UserRole.ADMIN) {
+                        throw new RuntimeException();
+                    }
+
+                    return user.getId();
+                }).collect(Collectors.toList());
+
+                filters.put(Field.CREATOR, creators);
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_MANAGER)) {
+                List<Long> managers = searchJsonObject.getJSONArray(LIST_SEARCH_MANAGER).toList().stream().map(item -> {
+                    User user = userRepository.findUserByName(item.toString());
+
+                    if (user == null || user.getUserRole() != UserRole.ADVAN_USER) {
+                        throw new RuntimeException();
+                    }
+
+                    return user.getId();
+                }).collect(Collectors.toList());
+
+                filters.put(Field.MANAGER, managers);
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_PRINCIPAL)) {
+                List<Long> principals = searchJsonObject.getJSONArray(LIST_SEARCH_PRINCIPAL).toList().stream().map(item -> {
+                    User user = userRepository.findUserByName(item.toString());
+
+                    if (user == null || user.getUserRole() != UserRole.USER) {
+                        throw new RuntimeException();
+                    }
+
+                    return user.getId();
+                }).collect(Collectors.toList());
+
+                filters.put(Field.PRINCIPAL, principals);
+            }
+        }
+
+        return filters;
+    }
+
     @RequestMapping(value = "/list/{mode}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ToResourceNotFound
     public @ResponseBody Map<String, Object> listDetail(
@@ -96,103 +215,8 @@ public class ProjectController {
             JSONArray tableColumns = jsonObject.getJSONArray(ConstantValue.LIST_REQUEST_COLUMNS);
             JSONArray tableOrders = jsonObject.getJSONArray(ConstantValue.LIST_REQUEST_ORDER);
 
-            List<Pair<Field, Order>> orders = new ArrayList<>();
-            tableOrders.forEach(item -> {
-                JSONObject tableOrder = (JSONObject) item;
-                String columnName = tableColumns.getJSONObject(tableOrder.getInt(ConstantValue.LIST_REQUEST_ORDER_COLUMN)).getString(ConstantValue.LIST_REQUEST_COLUMNS_NAME);
-                Order order = tableOrder.getString(ConstantValue.LIST_REQUEST_ORDER_DIR).equals(ConstantValue.LIST_REQUEST_ORDER_ASC) ? ASCENDING : DESCENDING;
-
-                switch (columnName) {
-                    case LIST_REQUEST_COLUMN_NAME:
-                        orders.add(Pair.of(NAME, order));
-                        break;
-                    case LIST_REQUEST_COLUMN_CATEGORY:
-                        orders.add(Pair.of(CATEGORY, order));
-                        break;
-                    case LIST_REQUEST_COLUMN_CREATE_TIME:
-                        orders.add(Pair.of(CREATE_TIME, order));
-                        break;
-                    case LIST_REQUEST_COLUMN_STATUS:
-                        orders.add(Pair.of(STATUS, order));
-                        break;
-                    default:
-                        break;
-                }
-            });
-
-            Map<Field, Object> filters = null;
-
-            if (StringUtils.isNotEmpty(search)) {
-                filters = new HashMap<>();
-
-                JSONObject searchJsonObject = new JSONObject(search);
-                JSONArray searchNames = searchJsonObject.getJSONArray(LIST_SEARCH_NAME),
-                        searchCategories = searchJsonObject.getJSONArray(LIST_SEARCH_CATEGORY),
-                        searchCreateTimes = searchJsonObject.getJSONArray(LIST_SEARCH_CREATE_TIME),
-                        searchStatus = searchJsonObject.getJSONArray(LIST_SEARCH_STATUS);
-
-                List<String> names = searchNames.toList().stream().map(item -> item.toString()).collect(Collectors.toList()),
-                        categories = searchCategories.toList().stream().map(item -> item.toString()).collect(Collectors.toList()),
-                        status = searchStatus.toList().stream().map(item -> item.toString()).collect(Collectors.toList());
-
-                filters.put(Field.NAME, names);
-                filters.put(Field.CATEGORY, categories);
-                filters.put(Field.STATUS, status);
-
-                Date startCreateTime = DateUtils.parse(searchCreateTimes.getString(0)), endCreateTime = DateUtils.parse(searchCreateTimes.getString(1));
-
-                if (startCreateTime.before(endCreateTime)) {
-                    filters.put(Field.START_CREATE_TIME, startCreateTime);
-                    filters.put(Field.END_CREATE_TIME, endCreateTime);
-                }
-
-                String remark = searchJsonObject.getString(LIST_SEARCH_REMARK);
-                if (StringUtils.isNotEmpty(remark)) {
-                    filters.put(Field.REMARK, remark);
-                }
-
-                if (searchJsonObject.has(LIST_SEARCH_CREATOR)) {
-                    List<Long> creators = searchJsonObject.getJSONArray(LIST_SEARCH_CREATOR).toList().stream().map(item -> {
-                        User user = userRepository.findUserByName(item.toString());
-
-                        if (user == null || user.getUserRole() != UserRole.ADMIN) {
-                            throw new RuntimeException();
-                        }
-
-                        return user.getId();
-                    }).collect(Collectors.toList());
-
-                    filters.put(Field.CREATOR, creators);
-                }
-
-                if (searchJsonObject.has(LIST_SEARCH_MANAGER)) {
-                    List<Long> managers = searchJsonObject.getJSONArray(LIST_SEARCH_MANAGER).toList().stream().map(item -> {
-                        User user = userRepository.findUserByName(item.toString());
-
-                        if (user == null || user.getUserRole() != UserRole.ADVAN_USER) {
-                            throw new RuntimeException();
-                        }
-
-                        return user.getId();
-                    }).collect(Collectors.toList());
-
-                    filters.put(Field.MANAGER, managers);
-                }
-
-                if (searchJsonObject.has(LIST_SEARCH_PRINCIPAL)) {
-                    List<Long> principals = searchJsonObject.getJSONArray(LIST_SEARCH_PRINCIPAL).toList().stream().map(item -> {
-                        User user = userRepository.findUserByName(item.toString());
-
-                        if (user == null || user.getUserRole() != UserRole.USER) {
-                            throw new RuntimeException();
-                        }
-
-                        return user.getId();
-                    }).collect(Collectors.toList());
-
-                    filters.put(Field.PRINCIPAL, principals);
-                }
-            }
+            List<Pair<Field, Order>> orders = orders(tableColumns, tableOrders);
+            Map<Field, Object> filters = filters(search);
 
             List<Project> projects = projectRepository.findProjectsByUser(loginUser, findMode, filters, orders, start, length);
             projects.forEach(project -> {
@@ -211,6 +235,32 @@ public class ProjectController {
             listDetail.put("projects", projects);
 
             return listDetail;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/list/{mode}/summary", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ToResourceNotFound
+    public @ResponseBody List<Project> listDetail(
+            @PathVariable("mode") String mode,
+            @ModelAttribute("loginUser") final User loginUser,
+            @RequestParam(value = "search") String search) throws ResourceNotFoundException {
+        try {
+            ProjectSqlProvider.FindMode findMode = ProjectSqlProvider.FindMode.valueOf(mode.toUpperCase());
+
+            authenticateUser(loginUser, findMode);
+
+            List<Project> projects = projectRepository.findProjectsByUser(loginUser, findMode, filters(search), null);
+            projects.forEach(project -> {
+                try {
+                    project.setTag(generalEncoderService.staticEncrypt(project.getId()));
+                } catch (EncoderServiceException e) {
+                    throw new RuntimeException();
+                }
+            });
+
+            return projects;
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }

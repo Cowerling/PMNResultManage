@@ -11,7 +11,7 @@ import javax.servlet.*;
 public class PMNResultManageWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
     private static final String ACTIVE_PROFILES = "development";
     private static final int MEGA_BYTE_SIZE = 1024 * 1024;
-    private static final String MULTIPART_LOCATION = "/home/cowerling/IdeaProjects/PMNResultManage/target/PMNResultManage/resources/image";
+    private static final String MULTIPART_LOCATION = "/home/cowerling/IdeaProjects/PMNResultManage/target/PMNResultManage/temporary";
 
     @Override
     protected String[] getServletMappings() {

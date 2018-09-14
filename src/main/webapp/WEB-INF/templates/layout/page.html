@@ -152,6 +152,8 @@
                             </a>
                             <ul class="treeview-menu">
                                 <li class="menu-data-list"><a th:href="@{/data/list}"><i class="fa fa-circle-o"></i><span th:text="#{page_data_list}">List</span></a></li>
+                                <li sec:authorize="hasRole('ROLE_USER')" class="menu-data-upload"><a th:href="@{/data/upload}"><i class="fa fa-circle-o"></i><span th:text="#{page_data_upload}">Upload</span></a></li>
+                                <li sec:authorize="hasRole('ROLE_USER')" class="menu-data-verification"><a th:href="@{/data/verification}"><i class="fa fa-circle-o"></i><span th:text="#{page_data_verification}">Verification</span></a></li>
                             </ul>
                         </li>
 

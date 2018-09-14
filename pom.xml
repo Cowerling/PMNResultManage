@@ -29,6 +29,8 @@
         <fasterxml.jackson.version>2.9.5</fasterxml.jackson.version>
         <postgis.version>2.2.1</postgis.version>
         <apache.httpclient.version>4.5.5</apache.httpclient.version>
+        <org.json.version>20180130</org.json.version>
+        <org.apache.poi.version>4.0.0</org.apache.poi.version>
     </properties>
 
     <dependencies>
@@ -157,7 +159,17 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>${org.json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${org.apache.poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${org.apache.poi.version}</version>
         </dependency>
     </dependencies>
 
