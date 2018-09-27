@@ -36,12 +36,12 @@ public class DataRecordController {
     private static final String LIST_REQUEST_COLUMN_STATUS = "status";
     private static final String LIST_REQUEST_COLUMN_REMARK = "remark";
     private static final String LIST_SEARCH_NAME = "name";
-    private static final String LIST_SEARCH_PROJECT_SINGLE = "projectSingle";
     private static final String LIST_SEARCH_PROJECT_TAG = "projectTag";
     private static final String LIST_SEARCH_UPLOADER_NAME = "uploaderName";
     private static final String LIST_SEARCH_UPLOAD_TIME = "uploadTime";
     private static final String LIST_SEARCH_STATUS = "status";
     private static final String LIST_SEARCH_REMARK = "remark";
+    private static final String LIST_SEARCH_VERIFICATION_ONLY = "verificationOnly";
 
     @Autowired
     private DataRepository dataRepository;
@@ -145,7 +145,14 @@ public class DataRecordController {
                 }
             }
 
-            List<DataRecord> dataRecords = dataRepository.findDataRecordsByUser(loginUser, filters, orders, start, length);
+            final boolean verificationOnly = searchJsonObject != null && searchJsonObject.has(LIST_SEARCH_VERIFICATION_ONLY) && searchJsonObject.getBoolean(LIST_SEARCH_VERIFICATION_ONLY) ? true : false;
+
+            List<DataRecord> dataRecords = dataRepository
+                    .findDataRecordsByUser(loginUser, filters, orders, start, length)
+                    .stream().filter((DataRecord dataRecord) ->
+                    !verificationOnly || dataRecord.getProject().getPrincipal().getId() == loginUser.getId()
+            ).collect(Collectors.toList());
+
             dataRecords.forEach(dataRecord -> {
                 try {
                     dataRecord.setAuthorities(dataRepository.findDataRecordAuthorities(dataRecord, loginUser));
@@ -157,19 +164,11 @@ public class DataRecordController {
 
             Map<String, Object> list = new HashMap<>();
 
-            if (searchJsonObject != null && searchJsonObject.has(LIST_SEARCH_PROJECT_SINGLE) && searchJsonObject.getBoolean(LIST_SEARCH_PROJECT_SINGLE)) {
-                Long count = dataRepository.findDataRecordCountByUser(loginUser, ((List<Long>) filters.get(RecordField.PROJECT)).get(0));
-                list.put("count", count);
-            } else {
-                Long count = dataRepository.findDataRecordCountByUser(loginUser);
-                list.put("count", count);
-            }
-
+            list.put("count", dataRepository.findDataRecordCountByUser(loginUser, filters));
             list.put("draw", draw);
             list.put("dataRecords", dataRecords);
 
             return list;
-
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }

@@ -27,7 +27,7 @@ public interface DataMapper {
     List<DataRecord> selectDataRecordsByUserId(Long userId, Map<RecordField, Object> filters, List<Pair<RecordField, Order>> orders, RowBounds rowBounds);
 
     @SelectProvider(type = DataSqlProvider.class, method = "selectDataRecordCountByUserId")
-    Long selectDataRecordCountByUserId(Long userId, Long projectId);
+    Long selectDataRecordCountByUserId(Long userId, Map<RecordField, Object> filters);
 
     @Select("SELECT t_data_record_auth_category.category AS category " +
             "FROM t_data_record_auth " +
@@ -35,7 +35,12 @@ public interface DataMapper {
             "WHERE record = #{dataRecordId} AND associator = #{associatorId} AND t_data_record_auth_category.category <> 'BASIS'")
     List<DataRecordAuthority> selectDataRecordAuthoritiesByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("associatorId") Long associatorId);
 
-    @Insert("INSERT INTO t_data_record(name, file, project, uploader, upload_time, status, remark) VALUES(#{name}, #{file}, #{project.id}, #{uploader.id}, #{uploadTime}, (SELECT id FROM t_data_record_status WHERE category = #{status}), #{remark})")
+    @Insert("INSERT INTO t_data_record_auth(record, associator, category) " +
+            "VALUES(#{dataRecordId}, #{associatorId}, (SELECT id FROM t_data_record_auth_category WHERE category = #{dataRecordAuthority}))")
+    void insertDataRecordAuthorityByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("associatorId") Long associatorId, @Param("dataRecordAuthority") DataRecordAuthority dataRecordAuthority);
+
+    @Insert("INSERT INTO t_data_record(name, file, project, uploader, upload_time, status, category, remark) " +
+            "VALUES(#{name}, #{file}, #{project.id}, #{uploader.id}, #{uploadTime}, (SELECT id FROM t_data_record_status WHERE category = #{status}), (SELECT id FROM t_data_record_category WHERE category = #{category}), #{remark})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertDataRecord(DataRecord dataRecord);
 
@@ -49,4 +54,9 @@ public interface DataMapper {
             "WHERE data_record = #{dataRecordId}")
     @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.cpiBaseDataContentResult")
     List<CPIBaseDataContent> selectCPIBaseDataContentsByDataRecordId(Long dataRecordId);
+
+    @Insert("INSERT INTO t_data_content_cpi_base(data_record, x, y, h) " +
+            "VALUES(#{dataRecordId}, #{cpiBaseDataContent.x}, #{cpiBaseDataContent.y}, #{cpiBaseDataContent.h})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void insertCPIBaseDataContentByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("cpiBaseDataContent") CPIBaseDataContent cpiBaseDataContent);
 }

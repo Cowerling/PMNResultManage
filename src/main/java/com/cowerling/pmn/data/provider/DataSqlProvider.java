@@ -132,7 +132,22 @@ public class DataSqlProvider {
                 WHERE(String.format("t_data_record_auth_category.category = '%s'", DataRecordAuthority.BASIS.name()));
                 WHERE("associator = " + userId);
                 if (parameters.get("arg1") != null) {
-                    WHERE("project = " + parameters.get("arg1"));
+                    Map<RecordField, Object> filters = (Map<RecordField, Object>) parameters.get("arg1");
+
+                    filters.forEach((key, value) -> {
+                        switch (key) {
+                            case PROJECT:
+                                ((List<Long>) value).forEach(item -> {
+                                    WHERE(String.format("%s = %d", key, item));
+                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
+                                        OR();
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    });
                 }
             }
         }.toString();

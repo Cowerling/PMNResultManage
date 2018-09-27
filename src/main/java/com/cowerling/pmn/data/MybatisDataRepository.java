@@ -2,6 +2,7 @@ package com.cowerling.pmn.data;
 
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.DataMapper;
+import com.cowerling.pmn.domain.data.CPIBaseDataContent;
 import com.cowerling.pmn.domain.data.DataContent;
 import com.cowerling.pmn.domain.data.DataRecord;
 import com.cowerling.pmn.domain.data.DataRecordAuthority;
@@ -57,39 +58,13 @@ public class MybatisDataRepository implements DataRepository {
     }
 
     @Override
-    public Long findDataRecordCountByUser(User user, Project project) {
+    public Long findDataRecordCountByUser(User user, Map<RecordField, Object> filters) {
         SqlSession sqlSession = currentSession();
 
         try {
             DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
 
-            return dataMapper.selectDataRecordCountByUserId(user.getId(), project.getId());
-        } finally {
-            sqlSession.close();
-        }
-    }
-
-    @Override
-    public Long findDataRecordCountByUser(User user, Long projectId) {
-        SqlSession sqlSession = currentSession();
-
-        try {
-            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
-
-            return dataMapper.selectDataRecordCountByUserId(user.getId(), projectId);
-        } finally {
-            sqlSession.close();
-        }
-    }
-
-    @Override
-    public Long findDataRecordCountByUser(User user) {
-        SqlSession sqlSession = currentSession();
-
-        try {
-            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
-
-            return dataMapper.selectDataRecordCountByUserId(user.getId(), null);
+            return dataMapper.selectDataRecordCountByUserId(user.getId(), filters);
         } finally {
             sqlSession.close();
         }
@@ -105,6 +80,26 @@ public class MybatisDataRepository implements DataRepository {
             return dataMapper.selectDataRecordAuthoritiesByDataRecordId(dataRecord.getId(), associator.getId());
         } finally {
             sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveDataRecordAuthority(DataRecord dataRecord, User associator, DataRecordAuthority dataRecordAuthority) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+            dataMapper.insertDataRecordAuthorityByDataRecordId(dataRecord.getId(), associator.getId(), dataRecordAuthority);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveDataRecordAuthorities(DataRecord dataRecord, User associator, DataRecordAuthority[] dataRecordAuthorities) {
+        for (DataRecordAuthority dataRecordAuthority: dataRecordAuthorities) {
+            saveDataRecordAuthority(dataRecord ,associator, dataRecordAuthority);
         }
     }
 
@@ -149,6 +144,33 @@ public class MybatisDataRepository implements DataRepository {
             }
         } finally {
             sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveDataContentByDataRecord(DataRecord dataRecord, DataContent dataContent) throws NoSuchDataRecordCategoryException {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+
+            switch (dataRecord.getCategory()) {
+                case CPI_BASE:
+                    dataMapper.insertCPIBaseDataContentByDataRecordId(dataRecord.getId(), (CPIBaseDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                default:
+                    throw new NoSuchDataRecordCategoryException();
+            }
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveDataContentsByDataRecord(DataRecord dataRecord, List<? extends DataContent> dataContents) throws NoSuchDataRecordCategoryException {
+        for (DataContent dataContent: dataContents) {
+            saveDataContentByDataRecord(dataRecord, dataContent);
         }
     }
 }

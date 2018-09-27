@@ -27,6 +27,10 @@ $(document).ready(function () {
             for (let i = 0, length = result.length; i < length; i++) {
                 $("#project_list").append("<option value='" + result[i].tag + "'>" + result[i].name + "</option>");
             }
+
+            if (result.length != 0) {
+                $("#file").fileinput("unlock");
+            }
         });
     });
 
@@ -51,5 +55,5 @@ $(document).ready(function () {
                 projectTag: $("#project_list").val()
             };
         }
-    });
+    }).fileinput("lock");
 });

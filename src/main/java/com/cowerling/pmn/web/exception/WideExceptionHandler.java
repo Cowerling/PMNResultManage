@@ -87,12 +87,12 @@ public class WideExceptionHandler {
     }
 
     @ExceptionHandler(DataUploadException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody
-    Map<String, String> dataUploadHandler(DataUploadException e) {
+    Map<String, Object> dataUploadHandler(DataUploadException e) {
         return new HashMap<>() {
             {
-                put("message", e.getMessage());
+                put("error", e.getMessage());
+                put("append", true);
             }
         };
     }

@@ -2,19 +2,14 @@ package com.cowerling.pmn.web.data;
 
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.data.ProjectRepository;
-import com.cowerling.pmn.domain.data.DataContent;
-import com.cowerling.pmn.domain.data.DataRecord;
-import com.cowerling.pmn.domain.data.DataRecordAuthority;
-import com.cowerling.pmn.domain.data.DataRecordCategory;
+import com.cowerling.pmn.domain.data.*;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
-import com.cowerling.pmn.exception.DataUploadException;
-import com.cowerling.pmn.exception.EncoderServiceException;
-import com.cowerling.pmn.exception.ExceptionMessage;
-import com.cowerling.pmn.exception.ResourceNotFoundException;
+import com.cowerling.pmn.exception.*;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.utils.DataUtils;
 import com.cowerling.pmn.utils.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,7 +20,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +41,9 @@ import java.util.Map;
 @RequestMapping("/data")
 @SessionAttributes({"loginUser"})
 public class DataController {
+    private static final String DEFAULT_CHARSET = "utf-8";
+    private static final String CHINESE_SUITABLE_CHARSET = "iso-8859-1";
+
     @Autowired
     private DataRepository dataRepository;
 
@@ -51,7 +53,7 @@ public class DataController {
     @Autowired
     private GeneralEncoderService generalEncoderService;
 
-    @Value("${data.file.location}")
+    @Value("${file.data.location}")
     private String dataFileLocation;
 
     @RequestMapping("/list")
@@ -65,9 +67,9 @@ public class DataController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public void processUpload(@RequestParam("projectTag") String projectTag,
-                      @RequestParam("dataFile") MultipartFile dataFile,
-                      @ModelAttribute("loginUser") final User loginUser) throws DataUploadException {
+    public @ResponseBody Map<String, Object> processUpload(@RequestParam("projectTag") String projectTag,
+                                                           @RequestPart("dataFile") MultipartFile dataFile,
+                                                           @ModelAttribute("loginUser") final User loginUser) throws DataUploadException {
         try {
             Project project = projectRepository.findProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
             String dataFileExtension = FilenameUtils.getExtension(dataFile.getOriginalFilename());
@@ -82,7 +84,7 @@ public class DataController {
                 throw new RuntimeException(ExceptionMessage.DATA_UPLOAD_DATA_CATEGORY);
             }
 
-            String file = dataFileLocation + StringUtils.random() + "." + dataFileExtension;
+            String file = StringUtils.random() + "." + dataFileExtension;
             dataFile.transferTo(new File(dataFileLocation + file));
 
             DataRecord dataRecord = new DataRecord();
@@ -93,10 +95,30 @@ public class DataController {
             dataRecord.setCategory(dataRecordCategory);
 
             dataRepository.saveDataRecord(dataRecord);
+
+            dataRepository.saveDataRecordAuthorities(dataRecord, loginUser, new DataRecordAuthority[] {
+                    DataRecordAuthority.BASIS,
+                    DataRecordAuthority.VIEW,
+                    DataRecordAuthority.DOWNLOAD
+            });
+
+            dataRepository.saveDataRecordAuthorities(dataRecord, project.getPrincipal(), new DataRecordAuthority[] {
+                    DataRecordAuthority.BASIS,
+                    DataRecordAuthority.VIEW,
+                    DataRecordAuthority.DOWNLOAD
+            });
+
+            return new HashMap<>() {
+                {
+                    put("append", true);
+                }
+            };
         } catch (RuntimeException e) {
             throw new DataUploadException(e.getMessage());
         } catch (IOException | EncoderServiceException e) {
             throw new DataUploadException(ExceptionMessage.DATA_UPLOAD_UNKNOWN);
+        } catch (DataParseException e) {
+            throw new DataUploadException(ExceptionMessage.DATA_PARSE_CONTENT_INCONFORMITY);
         } catch (Exception e) {
             throw new DataUploadException(ExceptionMessage.DATA_UPLOAD_UNKNOWN);
         }
@@ -119,7 +141,13 @@ public class DataController {
                 throw new RuntimeException();
             }
 
-            List<? extends DataContent> dataContents = dataRepository.findDataContentsByDataRecord(dataRecord);
+            List<? extends DataContent> dataContents = dataRecord.getStatus() == DataRecordStatus.QUALIFIED ?
+                    dataRepository.findDataContentsByDataRecord(dataRecord) :
+                    DataUtils.getDataFileContents(dataRecord, dataFileLocation);
+
+            if (dataContents == null) {
+                throw new RuntimeException();
+            }
 
             JSONArray valuesJsonArray = new JSONArray();
             JSONArray attributeNamesJsonArray = new JSONArray();
@@ -136,6 +164,83 @@ public class DataController {
             model.addAttribute("values", valuesJsonArray.toString());
 
             return "data/detail";
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/download/{dataRecordTag}")
+    public ResponseEntity<byte[]> download(@PathVariable("dataRecordTag") String dataRecordTag,
+                                             @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null) {
+                throw new RuntimeException();
+            }
+
+            List<DataRecordAuthority> authorities = dataRepository.findDataRecordAuthorities(dataRecord, loginUser);
+
+            if (!authorities.contains(DataRecordAuthority.DOWNLOAD)) {
+                throw new RuntimeException();
+            }
+
+            byte[] bytes = null;
+
+            if (dataRecord.getStatus() == DataRecordStatus.UNAUDITED) {
+                File file = new File(dataFileLocation + dataRecord.getFile());
+                bytes = FileUtils.readFileToByteArray(file);
+            } else if (dataRecord.getStatus() == DataRecordStatus.QUALIFIED) {
+                List<? extends DataContent> dataContents = dataRepository.findDataContentsByDataRecord(dataRecord);
+                bytes = DataUtils.getDataFile(dataRecord.getCategory(), dataContents);
+            }
+
+            if (bytes == null) {
+                throw new RuntimeException();
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDispositionFormData("attachment", new String((dataRecord.getStatus() == DataRecordStatus.UNAUDITED ?
+                    dataRecord.getName() + "." + FilenameUtils.getExtension(dataRecord.getFile()) :
+                    dataRecord.getName() + "." + DataUtils.EXCEL_XLS_EXTENSION).getBytes(DEFAULT_CHARSET), CHINESE_SUITABLE_CHARSET));
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(bytes, headers, HttpStatus.CREATED);
+
+            return responseEntity;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping("/verification")
+    public String verification() {
+        return "/data/verification";
+    }
+
+    @RequestMapping(value = "/verification", method = RequestMethod.POST)
+    public String processVerification(String dataRecordTag,
+                                    String dataRecordStatus,
+                                    String remark,
+                                    @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null || dataRecord.getProject().getPrincipal().getId() != loginUser.getId()) {
+                throw new RuntimeException();
+            }
+
+            dataRecord.setStatus(DataRecordStatus.valueOf(dataRecordStatus.toUpperCase()));
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(remark)) {
+                dataRecord.setRemark(remark);
+            }
+
+            List<? extends DataContent> dataContents = DataUtils.getDataFileContents(dataRecord, dataFileLocation);
+
+            dataRepository.saveDataContentsByDataRecord(dataRecord, dataContents);
+            dataRepository.updateDataRecord(dataRecord);
+            dataRepository.saveDataRecordAuthorities(dataRecord, loginUser, new DataRecordAuthority[] {DataRecordAuthority.DELETE});
+
+            return "redirect:/data/verification";
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }
