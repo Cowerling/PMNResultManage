@@ -2,10 +2,7 @@ package com.cowerling.pmn.data;
 
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.DataMapper;
-import com.cowerling.pmn.domain.data.CPIBaseDataContent;
-import com.cowerling.pmn.domain.data.DataContent;
-import com.cowerling.pmn.domain.data.DataRecord;
-import com.cowerling.pmn.domain.data.DataRecordAuthority;
+import com.cowerling.pmn.domain.data.*;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.NoSuchDataRecordCategoryException;
@@ -104,6 +101,19 @@ public class MybatisDataRepository implements DataRepository {
     }
 
     @Override
+    public void removeDataRecordAuthorities(DataRecord dataRecord) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+            dataMapper.deleteDataRecordAuthoritiesByDataRecordId(dataRecord.getId());
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public void saveDataRecord(DataRecord dataRecord) {
         SqlSession sqlSession = currentSession();
 
@@ -127,6 +137,26 @@ public class MybatisDataRepository implements DataRepository {
         } finally {
             sqlSession.close();
         }
+    }
+
+    @Override
+    public void removeDataRecordSeparately(DataRecord dataRecord) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+            dataMapper.deleteDataRecord(dataRecord);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void removeDataRecord(DataRecord dataRecord) throws NoSuchDataRecordCategoryException {
+        removeDataRecordAuthorities(dataRecord);
+        removeDataContentsByDataRecord(dataRecord);
+        removeDataRecordSeparately(dataRecord);
     }
 
     @Override
@@ -171,6 +201,66 @@ public class MybatisDataRepository implements DataRepository {
     public void saveDataContentsByDataRecord(DataRecord dataRecord, List<? extends DataContent> dataContents) throws NoSuchDataRecordCategoryException {
         for (DataContent dataContent: dataContents) {
             saveDataContentByDataRecord(dataRecord, dataContent);
+        }
+    }
+
+    @Override
+    public void removeDataContentsByDataRecord(DataRecord dataRecord) throws NoSuchDataRecordCategoryException {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+
+            switch (dataRecord.getCategory()) {
+                case CPI_BASE:
+                    dataMapper.deleteCPIBaseDataContentsByDataRecordId(dataRecord.getId());
+                    sqlSession.commit();
+                    break;
+                default:
+                    throw new NoSuchDataRecordCategoryException();
+            }
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void removeDataContentById(DataRecordCategory dataRecordCategory, Long id) throws NoSuchDataRecordCategoryException {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+
+            switch (dataRecordCategory) {
+                case CPI_BASE:
+                    dataMapper.deleteCPIBaseDataContent(id);
+                    sqlSession.commit();
+                    break;
+                default:
+                    throw new NoSuchDataRecordCategoryException();
+            }
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void updateDataContent(DataRecordCategory dataRecordCategory, DataContent dataContent) throws NoSuchDataRecordCategoryException {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+
+            switch (dataRecordCategory) {
+                case CPI_BASE:
+                    dataMapper.updateCPIBaseDataContent((CPIBaseDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                default:
+                    throw new NoSuchDataRecordCategoryException();
+            }
+        } finally {
+            sqlSession.close();
         }
     }
 }

@@ -39,6 +39,10 @@ public interface DataMapper {
             "VALUES(#{dataRecordId}, #{associatorId}, (SELECT id FROM t_data_record_auth_category WHERE category = #{dataRecordAuthority}))")
     void insertDataRecordAuthorityByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("associatorId") Long associatorId, @Param("dataRecordAuthority") DataRecordAuthority dataRecordAuthority);
 
+    @Delete("DELETE FROM t_data_record_auth " +
+            "WHERE record = #{dataRecordId}")
+    void deleteDataRecordAuthoritiesByDataRecordId(Long dataRecordId);
+
     @Insert("INSERT INTO t_data_record(name, file, project, uploader, upload_time, status, category, remark) " +
             "VALUES(#{name}, #{file}, #{project.id}, #{uploader.id}, #{uploadTime}, (SELECT id FROM t_data_record_status WHERE category = #{status}), (SELECT id FROM t_data_record_category WHERE category = #{category}), #{remark})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
@@ -49,9 +53,14 @@ public interface DataMapper {
             "WHERE id = #{id}")
     void updateDataRecord(DataRecord dataRecord);
 
+    @Delete("DELETE FROM t_data_record " +
+            "WHERE id = #{id}")
+    void deleteDataRecord(DataRecord dataRecord);
+
     @Select("SELECT id, x, y, h " +
             "FROM t_data_content_cpi_base " +
-            "WHERE data_record = #{dataRecordId}")
+            "WHERE data_record = #{dataRecordId} " +
+            "ORDER BY id ASC")
     @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.cpiBaseDataContentResult")
     List<CPIBaseDataContent> selectCPIBaseDataContentsByDataRecordId(Long dataRecordId);
 
@@ -59,4 +68,17 @@ public interface DataMapper {
             "VALUES(#{dataRecordId}, #{cpiBaseDataContent.x}, #{cpiBaseDataContent.y}, #{cpiBaseDataContent.h})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertCPIBaseDataContentByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("cpiBaseDataContent") CPIBaseDataContent cpiBaseDataContent);
+
+    @Delete("DELETE FROM t_data_content_cpi_base " +
+            "WHERE data_record = #{dataRecordId}")
+    void deleteCPIBaseDataContentsByDataRecordId(Long dataRecordId);
+
+    @Delete("DELETE FROM t_data_content_cpi_base " +
+            "WHERE id = #{id}")
+    void deleteCPIBaseDataContent(@Param("id") Long id);
+
+    @Update("UPDATE t_data_content_cpi_base " +
+            "SET x = #{cpiBaseDataContent.x}, y = #{cpiBaseDataContent.y}, h = #{cpiBaseDataContent.h} " +
+            "WHERE id = #{cpiBaseDataContent.id}")
+    void updateCPIBaseDataContent(@Param("cpiBaseDataContent") CPIBaseDataContent cpiBaseDataContent);
 }

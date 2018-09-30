@@ -8,6 +8,10 @@ $(document).ready(function () {
         required: "\u5fc5\u586b",    //必填
         maxlength: $.validator.format("\u6700\u591a\u53ef\u4ee5\u8f93\u5165{0}\u4e2a\u5b57\u7b26") //最多可以输入{0}个字符
     });
+
+    $(".select2").select2({
+        language: "zh-CN"
+    });
 });
 
 $(document).ready(function () {
@@ -111,7 +115,15 @@ $(document).ready(function () {
         language: $.listTableLanguage
     });
 
-    $("#qualified_list_table").DataTable({
+    $("#qualified_list_table").on("draw.dt", function () {
+        $(".authority-edit").click(function (event) {
+            event.preventDefault();
+
+            $("#authority_edit_modal").modal("show");
+
+            //alert($(this).attr("href"));
+        });
+    }).DataTable({
         columns: columns,
         searching: false,
         serverSide: true,
@@ -136,6 +148,9 @@ $(document).ready(function () {
                     result.dataRecords[i].operation =
                         "<span class='label table-status label-primary' style='font-size: 100%; margin-right: 3px;'>" +
                         "<a class='text-white' href='../data/view/" + result.dataRecords[i].tag + "'>\u67e5\u9605</a>" +
+                        "</span>" +
+                        "<span class='label table-status label-success' style='font-size: 100%; margin-right: 3px;'>" +
+                        "<a class='text-white authority-edit' href='" + result.dataRecords[i].tag + "'><i class='fa fa-wrench icon-right'></i>\u6743\u9650</a>" +
                         "</span>"
                 }
 

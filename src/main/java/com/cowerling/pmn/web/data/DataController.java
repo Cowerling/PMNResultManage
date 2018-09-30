@@ -7,6 +7,7 @@ import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.*;
 import com.cowerling.pmn.security.GeneralEncoderService;
+import com.cowerling.pmn.utils.ClassUtils;
 import com.cowerling.pmn.utils.DataUtils;
 import com.cowerling.pmn.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
@@ -18,6 +19,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -33,9 +35,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.*;
 
 @Controller
 @RequestMapping("/data")
@@ -43,6 +45,9 @@ import java.util.Map;
 public class DataController {
     private static final String DEFAULT_CHARSET = "utf-8";
     private static final String CHINESE_SUITABLE_CHARSET = "iso-8859-1";
+    private static final String CHANGE_CONTENT_UPDATES = "updates";
+    private static final String CHANGE_CONTENT_INSERTS = "inserts";
+    private static final String CHANGE_CONTENT_DELETES = "deletes";
 
     @Autowired
     private DataRepository dataRepository;
@@ -149,10 +154,12 @@ public class DataController {
                 throw new RuntimeException();
             }
 
+            JSONArray idsJsonArray = new JSONArray();
             JSONArray valuesJsonArray = new JSONArray();
             JSONArray attributeNamesJsonArray = new JSONArray();
 
             dataContents.forEach(dataContent -> {
+                idsJsonArray.put(dataContent.getId());
                 valuesJsonArray.put(dataContent.values());
 
                 if (attributeNamesJsonArray.length() == 0) {
@@ -161,7 +168,9 @@ public class DataController {
             });
 
             model.addAttribute("attributeNames", attributeNamesJsonArray.toString());
+            model.addAttribute("ids", idsJsonArray);
             model.addAttribute("values", valuesJsonArray.toString());
+            model.addAttribute("editable", authorities.contains(DataRecordAuthority.EDIT));
 
             return "data/detail";
         } catch (Exception e) {
@@ -238,11 +247,158 @@ public class DataController {
 
             dataRepository.saveDataContentsByDataRecord(dataRecord, dataContents);
             dataRepository.updateDataRecord(dataRecord);
-            dataRepository.saveDataRecordAuthorities(dataRecord, loginUser, new DataRecordAuthority[] {DataRecordAuthority.DELETE});
+            dataRepository.saveDataRecordAuthorities(dataRecord, loginUser, new DataRecordAuthority[] {
+                    DataRecordAuthority.DELETE,
+                    DataRecordAuthority.EDIT
+            });
+            dataRepository.saveDataRecordAuthorities(dataRecord, dataRecord.getProject().getCreator(), new DataRecordAuthority[] {
+                    DataRecordAuthority.BASIS,
+                    DataRecordAuthority.VIEW,
+                    DataRecordAuthority.DOWNLOAD
+            });
+            dataRepository.saveDataRecordAuthorities(dataRecord, dataRecord.getProject().getManager(), new DataRecordAuthority[] {
+                    DataRecordAuthority.BASIS,
+                    DataRecordAuthority.VIEW,
+                    DataRecordAuthority.DOWNLOAD
+            });
 
             return "redirect:/data/verification";
         } catch (Exception e) {
             throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/delete/{dataRecordTag}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Map<String, Object> delete(
+            @PathVariable String dataRecordTag,
+            @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null) {
+                throw new RuntimeException();
+            }
+
+            List<DataRecordAuthority> authorities = dataRepository.findDataRecordAuthorities(dataRecord, loginUser);
+
+            if (!authorities.contains(DataRecordAuthority.DELETE)) {
+                throw new RuntimeException();
+            }
+
+            dataRepository.removeDataRecord(dataRecord);
+
+            return new HashMap<>() {
+                {
+                    put("dataRecordTag", dataRecordTag);
+                }
+            };
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/edit/{dataRecordTag}")
+    public String edit(@PathVariable("dataRecordTag") String dataRecordTag,
+                              @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null) {
+                throw new RuntimeException();
+            }
+
+            List<DataRecordAuthority> authorities = dataRepository.findDataRecordAuthorities(dataRecord, loginUser);
+
+            if (!authorities.contains(DataRecordAuthority.EDIT)) {
+                throw new RuntimeException();
+            }
+
+            return "redirect:/data/view/" + dataRecordTag;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/edit/{dataRecordTag}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Map<String, Object> processEdit(
+            @PathVariable String dataRecordTag,
+            @RequestParam(value = "changeContent") String changeContent,
+            @ModelAttribute("loginUser") final User loginUser) throws DataEditException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null) {
+                throw new RuntimeException();
+            }
+
+            List<DataRecordAuthority> authorities = dataRepository.findDataRecordAuthorities(dataRecord, loginUser);
+
+            if (!authorities.contains(DataRecordAuthority.EDIT)) {
+                throw new RuntimeException();
+            }
+
+            Class<?> dataContentClass = null;
+
+            switch (dataRecord.getCategory()) {
+                case CPI_BASE:
+                    dataContentClass = CPIBaseDataContent.class;
+                    break;
+                default:
+                    break;
+            }
+
+            List<Method> methods = new ArrayList<>();
+
+            for (String attributeName : ((DataContent) dataContentClass.getConstructor().newInstance()).attributeNames()) {
+                methods.add(ClassUtils.getMethod(dataContentClass, "set" + org.apache.commons.lang3.StringUtils.capitalize(attributeName)));
+            }
+
+            JSONObject changeContentJsonObject = new JSONObject(changeContent);
+            JSONArray updates = changeContentJsonObject.getJSONArray(CHANGE_CONTENT_UPDATES),
+                    inserts = changeContentJsonObject.getJSONArray(CHANGE_CONTENT_INSERTS),
+                    deletes = changeContentJsonObject.getJSONArray(CHANGE_CONTENT_DELETES);
+
+            for (Object update: updates.toList()) {
+                List values = (List) update;
+
+                DataContent dataContent = (DataContent) dataContentClass.getConstructor().newInstance();
+
+                for (int i = 0; i < values.size(); i++) {
+                    if (i == 0) {
+                        Integer id = (Integer) values.get(i);
+                        dataContent.setId((long) id);
+                    } else {
+                        ClassUtils.invokeMethod(methods.get(i - 1), dataContent, values.get(i));
+                    }
+                }
+
+                dataRepository.updateDataContent(dataRecord.getCategory(), dataContent);
+            }
+
+            for (Object insert: inserts.toList()) {
+                List values = (List) insert;
+
+                DataContent dataContent = (DataContent) dataContentClass.getConstructor().newInstance();
+
+                for (int i = 0; i < values.size(); i++) {
+                    ClassUtils.invokeMethod(methods.get(i), dataContent, values.get(i));
+                }
+
+                dataRepository.saveDataContentByDataRecord(dataRecord, dataContent);
+            }
+
+            for (Object delete: deletes.toList()) {
+                Integer id = (Integer) delete;
+                dataRepository.removeDataContentById(dataRecord.getCategory(), (long) id);
+            }
+
+            return new HashMap<>() {
+                {
+                    put("dataRecordTag", dataRecordTag);
+                }
+            };
+        } catch (Exception e) {
+            throw new DataEditException();
         }
     }
 }

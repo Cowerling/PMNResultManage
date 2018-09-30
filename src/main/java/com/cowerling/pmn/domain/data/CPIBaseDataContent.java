@@ -12,10 +12,12 @@ public class CPIBaseDataContent extends DataContent {
     private Double y;
     private Double h;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }

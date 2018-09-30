@@ -9,4 +9,5 @@ public final class ExceptionMessage {
     public final static String DATA_UPLOAD_DATA_CATEGORY = "数据文件格式不符合要求";
     public final static String DATA_UPLOAD_UNKNOWN = "未知错误";
     public final static String DATA_PARSE_CONTENT_INCONFORMITY = "数据文件内容不符合要求";
+    public final static String DATA_EDIT_SAVE = "数据保存失败，内容可能不符合要求";
 }

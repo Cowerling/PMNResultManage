@@ -67,6 +67,29 @@
 
                     </div>
 
+                    <div id="record_remove_modal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title">
+                                        <i class="fa fa-exclamation-triangle icon-right text-danger"></i>
+                                        <span th:text="#{data_list_confirm_remove_record}">confirm_remove_record</span>
+                                    </h4>
+                                </div>
+                                <div class="modal-footer">
+                                    <form th:action="@{''}" method="post">
+                                        <input type="hidden" class="record-tag">
+                                    </form>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{data_list_record_remove_cancel}">cancel</button>
+                                    <button type="button" class="btn btn-primary confirm-remove" th:text="#{data_list_record_remove_ok}">ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </section>
 
             </div>

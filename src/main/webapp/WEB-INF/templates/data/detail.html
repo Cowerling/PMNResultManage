@@ -8,6 +8,7 @@
 
         <script type="text/javascript" th:src="@{/resources/dependence/jexcel/1.5.4/js/jquery.jexcel.js}"></script>
         <script type="text/javascript" th:src="@{/resources/js/data/detail.js}"></script>
+        <script th:if="${editable}" type="text/javascript" th:src="@{/resources/js/data/detail_edit.js}"></script>
 
     </head>
 
@@ -29,16 +30,45 @@
                                 <div class="box-header with-border">
                                     <i class="fa fa-cubes" aria-hidden="true"></i>
                                     <h3 class="box-title" th:text="#{data_detail_data_content}">data content</h3>
+
+                                    <div class="pull-right">
+                                        <button th:if="${editable}" id="data_insert" class="btn btn-warning"><i class="fa fa-plus-circle icon-right" aria-hidden="true"></i><span th:text="#{data_detail_data_insert}">data insert</span></button>
+                                        <button th:if="${editable}" id="data_delete" class="btn btn-danger"><i class="fa fa-minus-circle icon-right" aria-hidden="true"></i><span th:text="#{data_detail_data_delete}">data delete</span></button>
+                                        <button th:if="${editable}" id="data_save" class="btn btn-success"><i class="fa fa-floppy-o icon-right" aria-hidden="true"></i><span th:text="#{data_detail_data_save}">data save</span></button>
+                                        <button id="map_display" class="btn btn-primary"><i class="fa fa-map-marker icon-right" aria-hidden="true"></i><span th:text="#{data_detail_map_display}">map display</span></button>
+                                    </div>
                                 </div>
 
                                 <div class="box-body">
-
-                                    <div id="data_spreadsheet" th:data-headers="${attributeNames}" th:data-values="${values}"></div>
-
+                                    <div id="data_spreadsheet" th:data-headers="${attributeNames}" th:data-values="${values}" th:data-ids="${ids}" th:data-editable="${editable}" data-change-content data-selection></div>
+                                    <form th:if="${editable}" class="data-save" th:action="@{''}" method="post"></form>
                                 </div>
 
                             </div>
 
+                        </div>
+                    </div>
+
+                    <div th:if="${editable}" id="edit_result_modal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title result-success">
+                                        <i class="fa fa-check-circle-o icon-right text-success"></i>
+                                        <span th:text="#{data_detail_save_success}">save success</span>
+                                    </h4>
+                                    <h4 class="modal-title result-failed">
+                                        <i class="fa fa-times-circle-o icon-right text-danger"></i>
+                                        <span th:text="#{data_detail_save_failed}">save failed</span>
+                                    </h4>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{data_detail_save_ok}">ok</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
