@@ -1,15 +1,18 @@
 $(document).ready(function () {
-    $("#modal_select_user").createDetailUserSelectModal("manager", false, "\u9009\u62e9\u7ba1\u7406\u4eba", "settings/manager", "manager");
+    $("#select_user_modal").siblings("form").attr("action", "settings/manager");
+    $("#select_user_modal").siblings("form").append("<input type='hidden' name='manager' />")
+
+    $("#select_user_modal").selectUserModal(CONSTANT.DEPARTMENT_USERS_URL, {
+        userGrade: "manager"
+    }, false, function (event) {
+        let selected_user_names = $("#select_user_modal").getSelectedUserNames();
+        if (selected_user_names.length == 1) {
+            $("#select_user_modal").siblings("form").find("input[name=manager]").val($("#select_user_modal").getSelectedUserNames()[0]);
+            $("#select_user_modal").siblings("form").submit();
+        }
+    }, "\u9009\u62e9\u7ba1\u7406\u4eba");
 });
 
 $(document).ready(function () {
-    $.extend($.validator.messages, {
-        maxlength: $.validator.format("\u6700\u591a\u53ef\u4ee5\u8f93\u5165{0}\u4e2a\u5b57\u7b26") //最多可以输入{0}个字符
-    });
-
-    $("#settings_remark").validate({
-        errorPlacement: function(error, element) {
-            error.appendTo(element.parent()).addClass("text-red");
-        }
-    });
+    $("#settings_remark").validate();
 });

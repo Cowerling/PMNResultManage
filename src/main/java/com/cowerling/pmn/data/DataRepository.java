@@ -22,6 +22,8 @@ public interface DataRepository {
     void saveDataRecordAuthority(DataRecord dataRecord, User associator, DataRecordAuthority dataRecordAuthority);
     void saveDataRecordAuthorities(DataRecord dataRecord, User associator, DataRecordAuthority[] dataRecordAuthorities);
     void removeDataRecordAuthorities(DataRecord dataRecord);
+    void removeDataRecordAuthorities(DataRecord dataRecord, User associator);
+    void updateDataRecordAuthorities(DataRecord dataRecord, User associator, DataRecordAuthority[] dataRecordAuthorities);
     void saveDataRecord(DataRecord dataRecord);
     void updateDataRecord(DataRecord dataRecord);
     void removeDataRecordSeparately(DataRecord dataRecord);

@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.cowerling.pmn.utils.SQLUtils.*;
+
 public class DataSqlProvider {
     public enum RecordField {
         NAME("t_data_record.name"),
@@ -71,37 +73,26 @@ public class DataSqlProvider {
                         switch (key) {
                             case NAME:
                             case PROJECT_NAME:
-                                ((List<String>) value).forEach(item -> {
-                                    WHERE(String.format("%s LIKE '%%%s%%'", key, item));
-                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
+                                INNER_OR_WHERE(this, (List<String>) value, "%s LIKE '%%%s%%'", key);
                                 break;
                             case PROJECT:
                             case UPLOADER:
-                                ((List<Long>) value).forEach(item -> {
-                                    WHERE(String.format("%s = %d", key, item));
-                                    if (((List<Long>) value).indexOf(item) != ((List<Long>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
+                                INNER_OR_WHERE(this, (List<Long>) value, "%s = %d", key);
                                 break;
                             case START_UPLOAD_TIME:
+                                AND();
                                 WHERE(String.format("create_time >= '%s'", DateUtils.format((Date) value)));
                                 break;
                             case END_UPLOAD_TIME:
+                                AND();
                                 WHERE(String.format("create_time <= '%s'", DateUtils.format((Date) value)));
                                 break;
+                            case UPLOADER_NAME:
                             case STATUS:
-                                ((List<String>) value).forEach(item -> {
-                                    WHERE(String.format("%s = '%s'", key, item));
-                                    if (((List<String>) value).indexOf(item) != ((List<String>) value).size() - 1) {
-                                        OR();
-                                    }
-                                });
+                                INNER_OR_WHERE(this, (List<String>) value, "%s = '%s'", key);
                                 break;
                             case REMARK:
+                                AND();
                                 WHERE(String.format("%s LIKE '%%%s%%'", key, value));
                                 break;
                             default:

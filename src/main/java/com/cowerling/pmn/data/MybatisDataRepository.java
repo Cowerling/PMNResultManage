@@ -114,6 +114,25 @@ public class MybatisDataRepository implements DataRepository {
     }
 
     @Override
+    public void removeDataRecordAuthorities(DataRecord dataRecord, User associator) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+            dataMapper.deleteDataRecordAuthoritiesByAssociatorId(dataRecord.getId(), associator.getId());
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void updateDataRecordAuthorities(DataRecord dataRecord, User associator, DataRecordAuthority[] dataRecordAuthorities) {
+        removeDataRecordAuthorities(dataRecord, associator);
+        saveDataRecordAuthorities(dataRecord, associator, dataRecordAuthorities);
+    }
+
+    @Override
     public void saveDataRecord(DataRecord dataRecord) {
         SqlSession sqlSession = currentSession();
 

@@ -32,7 +32,7 @@ public interface DataMapper {
     @Select("SELECT t_data_record_auth_category.category AS category " +
             "FROM t_data_record_auth " +
             "LEFT OUTER JOIN t_data_record_auth_category ON t_data_record_auth.category = t_data_record_auth_category.id " +
-            "WHERE record = #{dataRecordId} AND associator = #{associatorId} AND t_data_record_auth_category.category <> 'BASIS'")
+            "WHERE record = #{dataRecordId} AND associator = #{associatorId}")
     List<DataRecordAuthority> selectDataRecordAuthoritiesByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("associatorId") Long associatorId);
 
     @Insert("INSERT INTO t_data_record_auth(record, associator, category) " +
@@ -42,6 +42,10 @@ public interface DataMapper {
     @Delete("DELETE FROM t_data_record_auth " +
             "WHERE record = #{dataRecordId}")
     void deleteDataRecordAuthoritiesByDataRecordId(Long dataRecordId);
+
+    @Delete("DELETE FROM t_data_record_auth " +
+            "WHERE record = #{dataRecordId} AND associator = #{associatorId}")
+    void deleteDataRecordAuthoritiesByAssociatorId(@Param("dataRecordId") Long dataRecordId, @Param("associatorId") Long associatorId);
 
     @Insert("INSERT INTO t_data_record(name, file, project, uploader, upload_time, status, category, remark) " +
             "VALUES(#{name}, #{file}, #{project.id}, #{uploader.id}, #{uploadTime}, (SELECT id FROM t_data_record_status WHERE category = #{status}), (SELECT id FROM t_data_record_category WHERE category = #{category}), #{remark})")

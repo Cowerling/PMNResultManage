@@ -69,6 +69,6 @@ $(document).ready(function () {
             $("#edit_result_modal").find(".result-failed").show();
             $("#edit_result_modal").find(".result-success").hide();
             $("#edit_result_modal").modal("show");
-        })
+        });
     });
 });

@@ -9,8 +9,9 @@
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-treeview/2.1.5/css/bootstrap-treeview.min.css}">
 
         <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery.validation/1.17.0/jquery.validate.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery.validation/1.17.0/localization/messages_zh.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
-        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.validate-1.17.0.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/moment.min.js}"></script>
@@ -190,8 +191,8 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{project_list_project_cancel}">cancel</button>
-                                        <button type="submit" class="btn btn-success" th:text="#{project_list_project_ok}">ok</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                        <button type="submit" class="btn btn-success" th:text="#{ok}">ok</button>
                                     </div>
                                 </form>
                             </div>
@@ -213,8 +214,8 @@
                                 <div class="modal-footer">
                                     <form th:action="@{''}" method="post">
                                         <input type="hidden" class="project-tag" name="projectTag" />
-                                        <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{project_list_remove_cancel}">cancel</button>
-                                        <button type="submit" class="btn btn-primary" th:text="#{project_list_remove_ok}">ok</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                        <button type="submit" class="btn btn-primary" th:text="#{ok}">ok</button>
                                     </form>
                                 </div>
                             </div>
@@ -240,7 +241,7 @@
                                             <label for="search_project_name" class="col-sm-2 control-label" th:text="#{project_list_search_project_name}">name</label>
 
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="search_project_name" th:placeholder="#{project_list_search_project_name_split}">
+                                                <input type="text" class="form-control project-name" id="search_project_name" th:placeholder="#{project_list_search_project_name_split}">
                                             </div>
                                         </div>
 
@@ -248,7 +249,7 @@
                                             <label for="search_project_category" class="col-sm-2 control-label" th:text="#{project_list_search_project_category}">category</label>
 
                                             <div class="col-sm-10">
-                                                <select class="form-control select2" multiple="multiple" id="search_project_category" style="width: 100%;">
+                                                <select class="form-control select2 project-category" multiple="multiple" id="search_project_category" style="width: 100%;">
                                                     <option th:each="category : ${T(com.cowerling.pmn.domain.project.ProjectCategory).values()}" th:text="${category}" th:value="${category.name()}"></option>
                                                 </select>
                                             </div>
@@ -259,10 +260,10 @@
 
                                             <div class="col-sm-10">
                                                 <div class="input-group">
-                                                    <input type="text" id="search_project_creator_alias" class="form-control" th:placeholder="#{project_list_search_project_creator}" readonly="readonly" />
-                                                    <input type="hidden" id="search_project_creator" />
+                                                    <input type="text" class="form-control project-creator-alias" th:placeholder="#{project_list_search_project_creator}" readonly="readonly" />
+                                                    <input type="hidden" class="project-creator-name" />
                                                     <span class="input-group-btn">
-                                                        <button id="search_project_creator_select" type="button" class="btn btn-primary user-search">
+                                                        <button id="search_project_creator_select" type="button" class="btn btn-primary project-creator-select">
                                                             <i class="fa fa-user-plus" aria-hidden="true"></i>
                                                         </button>
                                                     </span>
@@ -278,7 +279,7 @@
                                                     <div class="input-group-addon">
                                                         <i class="fa fa-clock-o"></i>
                                                     </div>
-                                                    <input type="text" class="form-control pull-right date-range" id="search_project_create_time">
+                                                    <input type="text" class="form-control pull-right date-range project-create-time" id="search_project_create_time">
                                                 </div>
                                             </div>
                                         </div>
@@ -288,10 +289,10 @@
 
                                             <div class="col-sm-10">
                                                 <div class="input-group">
-                                                    <input type="text" id="search_project_manager_alias" class="form-control" th:placeholder="#{project_list_search_project_manager}" readonly="readonly" />
-                                                    <input type="hidden" id="search_project_manager" />
+                                                    <input type="text" class="form-control project-manager-alias" th:placeholder="#{project_list_search_project_manager}" readonly="readonly" />
+                                                    <input type="hidden" class="project-manager-name" />
                                                     <span class="input-group-btn">
-                                                        <button id="search_project_manager_select" type="button" class="btn btn-primary user-search">
+                                                        <button id="search_project_manager_select" type="button" class="btn btn-primary project-manager-select">
                                                             <i class="fa fa-user-plus" aria-hidden="true"></i>
                                                         </button>
                                                     </span>
@@ -304,10 +305,10 @@
 
                                             <div class="col-sm-10">
                                                 <div class="input-group">
-                                                    <input type="text" id="search_project_principal_alias" class="form-control" th:placeholder="#{project_list_search_project_principal}" readonly="readonly" />
-                                                    <input type="hidden" id="search_project_principal" />
+                                                    <input type="text" class="form-control project-principal-alias" th:placeholder="#{project_list_search_project_principal}" readonly="readonly" />
+                                                    <input type="hidden" class="project-principal-name" />
                                                     <span class="input-group-btn">
-                                                        <button id="search_project_principal_select" type="button" class="btn btn-primary user-search">
+                                                        <button id="search_project_principal_select" type="button" class="btn btn-primary project-principal-select">
                                                             <i class="fa fa-user-plus" aria-hidden="true"></i>
                                                         </button>
                                                     </span>
@@ -319,7 +320,7 @@
                                             <label for="search_project_remark" class="col-sm-2 control-label" th:text="#{project_list_search_project_remark}">remark</label>
 
                                             <div class="col-sm-10">
-                                                <textarea type="text" class="form-control text-area" id="search_project_remark"></textarea>
+                                                <textarea type="text" class="form-control text-area project-remark" id="search_project_remark"></textarea>
                                             </div>
                                         </div>
 
@@ -327,7 +328,7 @@
                                             <label for="search_project_status" class="col-sm-2 control-label" th:text="#{project_list_search_project_status}">status</label>
 
                                             <div class="col-sm-10">
-                                                <select class="form-control select2" multiple="multiple" id="search_project_status" style="width: 100%;">
+                                                <select class="form-control select2 project-status" multiple="multiple" id="search_project_status" style="width: 100%;">
                                                     <option th:each="status : ${T(com.cowerling.pmn.domain.project.ProjectStatus).values()}" th:text="${status}" th:value="${status.name()}"></option>
                                                 </select>
                                             </div>
@@ -339,56 +340,13 @@
                                 <div class="modal-footer">
                                     <input type="hidden" id="search_project_query" />
                                     <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{project_list_search_cancel}">cancel</button>
-                                    <button type="button" id="search_project" class="btn btn-primary" th:text="#{project_list_search_ok}">ok</button>
+                                    <button type="button" class="btn btn-primary ok" th:text="#{project_list_search_ok}">ok</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!--modal for selecting user-->
-                    <div class="modal fade" id="modal_select_user">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <h4 class="modal-title">modal</h4>
-                                </div>
-                                <div>
-                                    <div class="modal-body">
-                                        <div class="input-group margin-bottom-10">
-                                            <input type="text" class="form-control search-content">
-                                            <span class="input-group-btn">
-                                                <button type="button" class="btn btn-primary user-search">
-                                                    <i class="fa fa-search" aria-hidden="true"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <input type="hidden" class="user-grade" />
-                                            <div class="tree-view"></div>
-                                        </div>
-                                        <span class="label label-warning" style="font-size: 100%; font-weight: normal;">
-                                            <i class="fa fa-star-o width-8-per"></i>
-                                            <span class="user-message"></span>
-                                        </span>
-                                        <span class="label label-danger user-unselected" style="font-size: 100%; font-weight: normal;">
-                                            <i class="fa fa-exclamation-circle"></i>
-                                            <span th:text="#{project_detail_modal_unselected}">unselected</span>
-                                        </span>
-                                        <div>
-                                            <input type="hidden" class="input-user-alias" />
-                                            <input type="hidden" class="input-user" />
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{project_detail_modal_ok}">ok</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="select_user_modal"></div>
 
                 </section>
 

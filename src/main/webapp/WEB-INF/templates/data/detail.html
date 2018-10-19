@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+      xmlns:th="http://www.thymeleaf.org">
     <head th:replace="layout/page :: head(~{::link}, ~{::script})">
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/jexcel/1.5.4/css/jquery.jexcel.css}">
 
@@ -21,6 +20,25 @@
             <div class="content-wrapper">
 
                 <section class="content">
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="box box-default">
+
+                                <div class="box-header with-border">
+                                    <i class="fa fa-bell-o" aria-hidden="true"></i>
+                                    <h3 class="box-title" th:text="#{data_detail_remark}">remark</h3>
+                                </div>
+
+                                <div class="box-body">
+                                    <p class="text-muted" th:text="${remark}"></p>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
 
                     <div class="row">
                         <div class="col-md-12">

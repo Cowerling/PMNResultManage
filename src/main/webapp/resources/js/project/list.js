@@ -8,8 +8,6 @@ $(document).ready(function () {
 
     $(".select2").select2();
 
-    $("#modal_select_user").createMultiUsersSelectModal();
-
     $("#clear_search").hide().click(function (event) {
         $(".data-table").find(".search-condition").val("");
         $(".data-table").DataTable().ajax.reload();

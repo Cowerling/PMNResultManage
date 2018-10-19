@@ -2,6 +2,7 @@ package com.cowerling.pmn.web.data;
 
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.data.ProjectRepository;
+import com.cowerling.pmn.data.UserRepository;
 import com.cowerling.pmn.domain.data.*;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
@@ -12,17 +13,10 @@ import com.cowerling.pmn.utils.DataUtils;
 import com.cowerling.pmn.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,8 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -54,6 +46,9 @@ public class DataController {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private GeneralEncoderService generalEncoderService;
@@ -167,6 +162,7 @@ public class DataController {
                 }
             });
 
+            model.addAttribute("remark", dataRecord.getRemark());
             model.addAttribute("attributeNames", attributeNamesJsonArray.toString());
             model.addAttribute("ids", idsJsonArray);
             model.addAttribute("values", valuesJsonArray.toString());
@@ -196,12 +192,12 @@ public class DataController {
 
             byte[] bytes = null;
 
-            if (dataRecord.getStatus() == DataRecordStatus.UNAUDITED) {
-                File file = new File(dataFileLocation + dataRecord.getFile());
-                bytes = FileUtils.readFileToByteArray(file);
-            } else if (dataRecord.getStatus() == DataRecordStatus.QUALIFIED) {
+            if (dataRecord.getStatus() == DataRecordStatus.QUALIFIED) {
                 List<? extends DataContent> dataContents = dataRepository.findDataContentsByDataRecord(dataRecord);
                 bytes = DataUtils.getDataFile(dataRecord.getCategory(), dataContents);
+            } else {
+                File file = new File(dataFileLocation + dataRecord.getFile());
+                bytes = FileUtils.readFileToByteArray(file);
             }
 
             if (bytes == null) {
@@ -221,9 +217,9 @@ public class DataController {
         }
     }
 
-    @RequestMapping("/verification")
-    public String verification() {
-        return "/data/verification";
+    @RequestMapping("/verificationAndAuthority")
+    public String verificationAndAuthority() {
+        return "/data/verificationAndAuthority";
     }
 
     @RequestMapping(value = "/verification", method = RequestMethod.POST)
@@ -243,13 +239,23 @@ public class DataController {
                 dataRecord.setRemark(remark);
             }
 
-            List<? extends DataContent> dataContents = DataUtils.getDataFileContents(dataRecord, dataFileLocation);
+            if (dataRecord.getStatus() == DataRecordStatus.QUALIFIED) {
+                List<? extends DataContent> dataContents = DataUtils.getDataFileContents(dataRecord, dataFileLocation);
 
-            dataRepository.saveDataContentsByDataRecord(dataRecord, dataContents);
+                dataRepository.saveDataContentsByDataRecord(dataRecord, dataContents);
+                dataRepository.saveDataRecordAuthorities(dataRecord, loginUser, new DataRecordAuthority[] {
+                        DataRecordAuthority.EDIT
+                });
+
+                File deleteFile = new File(dataFileLocation + dataRecord.getFile());
+                if (deleteFile.exists() && deleteFile.isFile()) {
+                    deleteFile.delete();
+                }
+            }
+
             dataRepository.updateDataRecord(dataRecord);
             dataRepository.saveDataRecordAuthorities(dataRecord, loginUser, new DataRecordAuthority[] {
-                    DataRecordAuthority.DELETE,
-                    DataRecordAuthority.EDIT
+                    DataRecordAuthority.DELETE
             });
             dataRepository.saveDataRecordAuthorities(dataRecord, dataRecord.getProject().getCreator(), new DataRecordAuthority[] {
                     DataRecordAuthority.BASIS,
@@ -262,7 +268,7 @@ public class DataController {
                     DataRecordAuthority.DOWNLOAD
             });
 
-            return "redirect:/data/verification";
+            return "redirect:/data/verificationAndAuthority";
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }
@@ -285,6 +291,13 @@ public class DataController {
                 throw new RuntimeException();
             }
 
+            if (dataRecord.getStatus() == DataRecordStatus.UNQUALIFIED) {
+                File deleteFile = new File(dataFileLocation + dataRecord.getFile());
+                if (deleteFile.exists() && deleteFile.isFile()) {
+                    deleteFile.delete();
+                }
+            }
+
             dataRepository.removeDataRecord(dataRecord);
 
             return new HashMap<>() {
@@ -297,7 +310,7 @@ public class DataController {
         }
     }
 
-    @RequestMapping(value = "/edit/{dataRecordTag}")
+    @RequestMapping(value = "/edit/{dataRecordTag}", method = RequestMethod.GET)
     public String edit(@PathVariable("dataRecordTag") String dataRecordTag,
                               @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
         try {
@@ -399,6 +412,63 @@ public class DataController {
             };
         } catch (Exception e) {
             throw new DataEditException();
+        }
+    }
+
+    @RequestMapping(value = "/authority/{dataRecordTag}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody List<DataRecordAuthority> authority(
+            @PathVariable String dataRecordTag,
+            @RequestParam(value = "userName") String userName,
+            @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null || dataRecord.getProject().getPrincipal().getId() != loginUser.getId()) {
+                throw new RuntimeException();
+            }
+
+            return dataRepository.findDataRecordAuthorities(dataRecord, userRepository.findUserByName(userName));
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/authority/{dataRecordTag}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Map<String, Object> processAuthority(
+            @PathVariable String dataRecordTag,
+            @RequestParam(value = "userName") String userName,
+            @RequestParam(value = "allUser") boolean allUser,
+            @RequestParam(value = "authorities[]", required = false) String[] authorities,
+            @ModelAttribute("loginUser") final User loginUser) throws DataAuthorityEditException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord.getProject().getPrincipal().getId() != loginUser.getId()) {
+                throw new RuntimeException();
+            }
+
+            if (authorities == null) {
+                authorities = new String[] {};
+            }
+
+            DataRecordAuthority[] dataRecordAuthorities = Arrays.stream(authorities).map(authority -> DataRecordAuthority.valueOf(authority)).toArray(DataRecordAuthority[]::new);
+
+            if (allUser) {
+                for (User member : dataRecord.getProject().getMembers()) {
+                    dataRepository.updateDataRecordAuthorities(dataRecord, member, dataRecordAuthorities);
+                }
+            } else {
+                dataRepository.updateDataRecordAuthorities(dataRecord, userRepository.findUserByName(userName), dataRecordAuthorities);
+            }
+
+            return new HashMap<>() {
+                {
+                    put("dataRecordTag", dataRecordTag);
+                    put("authorities", dataRecordAuthorities);
+                }
+            };
+        } catch (Exception e) {
+            throw new DataAuthorityEditException();
         }
     }
 }

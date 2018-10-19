@@ -45,4 +45,24 @@ $(document).ready(function () {
         value: "../resources/data/templet/",
         enumerable: true
     });
+
+    Object.defineProperty(CONSTANT, "DATA_TEMPLET_FILE_URL", {
+        value: "../resources/data/templet/",
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "DEPARTMENT_PROJECT_USERS_URL", {
+        value: "../department/projectUsers",
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "DATA_RECORD_LIST_URL", {
+        value: "../data/record/list",
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "DATA_AUTHORITY_URL", {
+        value: "authority/",
+        enumerable: true
+    });
 });

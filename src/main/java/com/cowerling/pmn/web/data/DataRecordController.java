@@ -3,22 +3,18 @@ package com.cowerling.pmn.web.data;
 import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.domain.data.DataRecord;
-import com.cowerling.pmn.domain.data.DataRecordAuthority;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.utils.DateUtils;
 import com.cowerling.pmn.web.ConstantValue;
-import com.cowerling.pmn.web.message.ErrorMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -41,6 +37,7 @@ public class DataRecordController {
     private static final String LIST_REQUEST_COLUMN_REMARK = "remark";
     private static final String LIST_SEARCH_NAME = "name";
     private static final String LIST_SEARCH_PROJECT_TAG = "projectTag";
+    private static final String LIST_SEARCH_PROJECT_NAME = "projectName";
     private static final String LIST_SEARCH_UPLOADER_NAME = "uploaderName";
     private static final String LIST_SEARCH_UPLOAD_TIME = "uploadTime";
     private static final String LIST_SEARCH_STATUS = "status";
@@ -141,6 +138,11 @@ public class DataRecordController {
                     }).collect(Collectors.toList());
 
                     filters.put(RecordField.PROJECT, projects);
+                }
+
+                if (searchJsonObject.has(LIST_SEARCH_PROJECT_NAME)) {
+                    List<String> projects = searchJsonObject.getJSONArray(LIST_SEARCH_PROJECT_NAME).toList().stream().map(item -> item.toString()).collect(Collectors.toList());
+                    filters.put(RecordField.PROJECT_NAME, projects);
                 }
 
                 if (searchJsonObject.has(LIST_SEARCH_UPLOADER_NAME)) {

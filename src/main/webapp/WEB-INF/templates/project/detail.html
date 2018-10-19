@@ -9,15 +9,15 @@
 
         <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.slimscroll.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery.validation/1.17.0/jquery.validate.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery.validation/1.17.0/localization/messages_zh.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
-        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.validate-1.17.0.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-treeview/2.1.5/js/bootstrap-treeview.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/js/project/detail.js}"></script>
         <script sec:authorize="hasRole('ROLE_ADMIN')" type="text/javascript" th:src="@{/resources/js/project/detail_creator.js}"></script>
         <script sec:authorize="hasRole('ROLE_ADVAN_USER')" type="text/javascript" th:src="@{/resources/js/project/detail_manager.js}"></script>
         <script sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id}" type="text/javascript" th:src="@{/resources/js/project/detail_principal.js}"></script>
-
     </head>
 
     <body class="hold-transition skin-blue">
@@ -71,7 +71,7 @@
                                     <span class="info-box-number" th:text="${project.manager?.alias}">manager name</span>
                                     <span class="info-box-number" th:unless="${project.manager}">
                                         <span th:text="#{project_detail_unspecified}" class="text-danger">unspecified</span>
-                                        <a sec:authorize="hasRole('ROLE_ADMIN')" id="edit_manager" href="#" data-toggle="modal" data-target="#modal_select_user"><i class="fa fa-edit"></i></a>
+                                        <a sec:authorize="hasRole('ROLE_ADMIN')" href="#" data-toggle="modal" data-target="#select_user_modal"><i class="fa fa-edit"></i></a>
                                     </span>
                                 </div>
 
@@ -91,7 +91,7 @@
                                     <span class="info-box-number" th:text="${project.principal?.alias}">principal name</span>
                                     <span class="info-box-number" th:unless="${project.principal}">
                                         <span th:text="#{project_detail_unspecified}" class="text-danger">unspecified</span>
-                                        <a sec:authorize="hasRole('ROLE_ADVAN_USER')" id="edit_principal" href="#" data-toggle="modal" data-target="#modal_select_user"><i class="fa fa-edit"></i></a>
+                                        <a sec:authorize="hasRole('ROLE_ADVAN_USER')" href="#" data-toggle="modal" data-target="#select_user_modal"><i class="fa fa-edit"></i></a>
                                     </span>
                                     <span class="info-box-number" sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).WAIT}">
                                         <form th:action="@{settings/status}" method="post">
@@ -109,47 +109,11 @@
 
                         </div>
 
-                        <!--modal for selecting user-->
-                        <div class="modal fade" id="modal_select_user">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        <h4 class="modal-title">modal</h4>
-                                    </div>
-                                    <form th:action="@{''}" method="post">
-                                        <div class="modal-body">
-                                            <div class="input-group margin-bottom-10">
-                                                <input type="text" class="form-control search-content">
-                                                <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-primary user-search">
-                                                        <i class="fa fa-search" aria-hidden="true"></i>
-                                                    </button>
-                                                </span>
-                                            </div>
-                                            <div class="tree-view"></div>
-                                            <span class="label label-warning" style="font-size: 100%; font-weight: normal;">
-                                                <i class="fa fa-star-o width-8-per"></i>
-                                                <span class="user-message"></span>
-                                            </span>
-                                            <span class="label label-danger user-unselected" style="font-size: 100%; font-weight: normal;">
-                                                <i class="fa fa-exclamation-circle"></i>
-                                                <span th:text="#{project_detail_modal_unselected}">unselected</span>
-                                            </span>
-                                            <div>
-                                                <input type="hidden" class="input-user" />
-                                                <input type="hidden" name="projectTag" th:value="${project.tag}" />
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal" th:text="#{project_detail_modal_close}">close</button>
-                                            <button type="submit" class="btn btn-primary" th:text="#{project_detail_modal_ok}">ok</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                        <div>
+                            <div id="select_user_modal"></div>
+                            <form th:action="@{''}" method="post">
+                                <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                            </form>
                         </div>
 
                     </div>
@@ -184,10 +148,10 @@
                                         <p sec:authorize="!hasRole('ROLE_ADMIN')" class="text-muted" th:text="${project.remark}"></p>
                                         <div sec:authorize="hasRole('ROLE_ADMIN')">
                                             <form id="settings_remark" th:action="@{settings/remark}" method="post">
-                                                <textarea class="text-area" id="remark" name="remark" th:text="${project.remark}" th:placeholder="#{project_detail_remark_demand}" maxlength="200"></textarea>
+                                                <textarea class="text-area" name="remark" th:text="${project.remark}" th:placeholder="#{project_detail_remark_demand}" maxlength="200"></textarea>
                                                 <input type="hidden" name="projectTag" th:value="${project.tag}" />
-                                                <button type="reset" class="btn btn-danger" th:text="#{project_detail_clear}">clear</button>
-                                                <button type="submit" class="btn btn-primary" th:text="#{project_detail_modify}">modify</button>
+                                                <button type="reset" class="btn btn-danger" th:text="#{clear}">clear</button>
+                                                <button type="submit" class="btn btn-primary" th:text="#{modify}">modify</button>
                                             </form>
                                         </div>
                                     </div>
@@ -234,7 +198,7 @@
                                 </div>
 
                                 <div sec:authorize="hasRole('ROLE_USER')" th:if="${project.principal.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS}" class="box-footer text-center">
-                                    <button id="edit_member" class="btn btn-primary pull-left" th:text="#{project_detail_edit_member}" data-toggle="modal" data-target="#modal_select_user">edit member</button>
+                                    <button id="edit_member" class="btn btn-primary pull-left" th:text="#{project_detail_edit_member}" data-toggle="modal" data-target="#select_user_modal">edit member</button>
                                 </div>
 
                             </div>
@@ -281,21 +245,21 @@
                                     <table id="data_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
                                         <thead>
                                             <tr>
-                                                <th th:text="#{project_detail_data_table_name}">Name</th>
-                                                <th th:text="#{project_detail_data_table_uploader}">Uploader</th>
-                                                <th th:text="#{project_detail_data_table_upload_time}">Upload Time</th>
-                                                <th th:text="#{project_detail_data_table_status}">Status</th>
-                                                <th th:text="#{project_detail_data_table_operation}">Operation</th>
+                                                <th th:text="#{data_record_name}">Name</th>
+                                                <th th:text="#{uploader}">Uploader</th>
+                                                <th th:text="#{upload_time}">Upload Time</th>
+                                                <th th:text="#{data_record_status}">Status</th>
+                                                <th th:text="#{operation}">Operation</th>
                                             </tr>
                                         </thead>
 
                                         <tfoot>
                                             <tr>
-                                                <th th:text="#{project_detail_data_table_name}">Name</th>
-                                                <th th:text="#{project_detail_data_table_uploader}">Uploader</th>
-                                                <th th:text="#{project_detail_data_table_upload_time}">Upload Time</th>
-                                                <th th:text="#{project_detail_data_table_status}">Status</th>
-                                                <th th:text="#{project_detail_data_table_operation}">Operation</th>
+                                                <th th:text="#{data_record_name}">Name</th>
+                                                <th th:text="#{uploader}">Uploader</th>
+                                                <th th:text="#{upload_time}">Upload Time</th>
+                                                <th th:text="#{data_record_status}">Status</th>
+                                                <th th:text="#{operation}">Operation</th>
                                             </tr>
                                         </tfoot>
 

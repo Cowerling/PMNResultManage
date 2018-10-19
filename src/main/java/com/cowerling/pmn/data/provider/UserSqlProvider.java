@@ -56,7 +56,6 @@ public class UserSqlProvider {
                 FROM("t_user");
                 LEFT_OUTER_JOIN("t_user_gender ON t_user.gender = t_user_gender.id");
                 LEFT_OUTER_JOIN("t_user_role ON t_user.role = t_user_role.id");
-                LEFT_OUTER_JOIN("t_project_members ON t_user.id = t_project_members.member");
                 WHERE("department = " + departmentId);
                 if (parameters.get("arg1") != null) {
                     Map<Field, Object> filters = (Map<Field, Object>) parameters.get("arg1");

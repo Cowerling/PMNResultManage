@@ -1,7 +1,10 @@
 package com.cowerling.pmn.web.department;
 
+import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.data.DepartmentRepository;
+import com.cowerling.pmn.data.ProjectRepository;
 import com.cowerling.pmn.data.UserRepository;
+import com.cowerling.pmn.domain.data.DataRecord;
 import com.cowerling.pmn.domain.department.Department;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
@@ -10,6 +13,7 @@ import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.web.ConstantValue;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,9 @@ public class DepartmentController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private DataRepository dataRepository;
 
     @Autowired
     private GeneralEncoderService generalEncoderService;
@@ -105,7 +112,7 @@ public class DepartmentController {
         }
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> users(@RequestParam(value = "departmentTag") String departmentTag,
                             @RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
                             @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
@@ -121,6 +128,54 @@ public class DepartmentController {
                 users.removeIf(user -> user.getId() == loginUser.getId());
                 return users;
             }
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }*/
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, List<User>> users(@RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
+                                         @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            Map<String, List<User>> users = new HashMap<>();
+
+            for (Department department : departmentRepository.findDepartments()) {
+                List<User> subUsers = StringUtils.isNotEmpty(userGrade) ?
+                        userRepository.findUsersByDepartmentId(department.getId(), suitableUserRole(userGrade)) :
+                        userRepository.findUsersByDepartmentId(department.getId());
+                users.put(department.getName(), subUsers);
+            }
+
+            return users;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @RequestMapping(value = "/projectUsers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, List<User>> projectUsers(@RequestParam(value = "dataRecordTag") String dataRecordTag,
+                                          @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+        try {
+            DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+
+            if (dataRecord == null ||
+                    dataRecord.getProject() == null ||
+                    dataRecord.getProject().getPrincipal() == null ||
+                    dataRecord.getProject().getPrincipal().getId() != loginUser.getId()) {
+                throw new RuntimeException();
+            }
+
+            Map<String, List<User>> projectUsers = new HashMap<>();
+
+            for (User user: dataRecord.getProject().getMembers()) {
+                if (!projectUsers.containsKey(user.getDepartment().getName())) {
+                    projectUsers.put(user.getDepartment().getName(), new ArrayList<>());
+                }
+
+                projectUsers.get(user.getDepartment().getName()).add(user);
+            }
+
+            return projectUsers;
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }

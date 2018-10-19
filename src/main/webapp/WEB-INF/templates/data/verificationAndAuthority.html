@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/datatables/1.10.16/css/dataTables.bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/css/daterangepicker.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-treeview/2.1.5/css/bootstrap-treeview.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/icheck/1.0.2/skins/all.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/i18n/zh-CN.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/moment.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/daterangepicker.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-treeview/2.1.5/js/bootstrap-treeview.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/icheck/1.0.2/icheck.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/data/verificationAndAuthority.js}"></script>
+    </head>
+
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+            <header class="main-header" th:replace="layout/page :: header"></header>
+
+            <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+            <div class="content-wrapper">
+
+                <section class="content">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#unaudited_list_tab" data-toggle="tab"><i class="fa fa-tags icon-right" aria-hidden="true"></i><span th:text="#{data_verification_unaudited}">unaudited</span></a></li>
+                            <li><a href="#qualified_list_tab" data-toggle="tab"><i class="fa fa-check-circle-o icon-right"></i><span th:text="#{data_verification_qualified}">qualified</span></a></li>
+                            <li><a href="#unqualified_list_tab" data-toggle="tab"><i class="fa fa-times-circle-o icon-right"></i><span th:text="#{data_verification_unqualified}">unqualified</span></a></li>
+                            <li class="pull-right">
+                                <button id="data_record_search" class="btn btn-primary" data-toggle="modal" data-target="#data_record_search_modal"><i class="fa fa-search icon-right"></i><span th:text="#{data_record_search}">record search</span></button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+
+                            <div class="tab-pane active" id="unaudited_list_tab">
+                                <table id="unaudited_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th th:text="#{data_record_name}">Name</th>
+                                            <th th:text="#{project_name}">Project Name</th>
+                                            <th th:text="#{uploader}">Uploader</th>
+                                            <th th:text="#{upload_time}">Upload Time</th>
+                                            <th th:text="#{operation}">Operation</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tfoot>
+                                        <tr>
+                                            <th th:text="#{data_record_name}">Name</th>
+                                            <th th:text="#{project_name}">Project Name</th>
+                                            <th th:text="#{uploader}">Uploader</th>
+                                            <th th:text="#{upload_time}">Upload Time</th>
+                                            <th th:text="#{operation}">Operation</th>
+                                        </tr>
+                                    </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
+                                </table>
+                            </div>
+
+                            <div class="tab-pane" id="qualified_list_tab">
+                                <table id="qualified_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                    <thead>
+                                    <tr>
+                                        <th th:text="#{data_record_name}">Name</th>
+                                        <th th:text="#{project_name}">Project Name</th>
+                                        <th th:text="#{uploader}">Uploader</th>
+                                        <th th:text="#{upload_time}">Upload Time</th>
+                                        <th th:text="#{operation}">Operation</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tfoot>
+                                    <tr>
+                                        <th th:text="#{data_record_name}">Name</th>
+                                        <th th:text="#{project_name}">Project Name</th>
+                                        <th th:text="#{uploader}">Uploader</th>
+                                        <th th:text="#{upload_time}">Upload Time</th>
+                                        <th th:text="#{operation}">Operation</th>
+                                    </tr>
+                                    </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
+                                </table>
+                            </div>
+
+                            <div class="tab-pane" id="unqualified_list_tab">
+                                <table id="unqualified_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                    <thead>
+                                    <tr>
+                                        <th th:text="#{data_record_name}">Name</th>
+                                        <th th:text="#{project_name}">Project Name</th>
+                                        <th th:text="#{uploader}">Uploader</th>
+                                        <th th:text="#{upload_time}">Upload Time</th>
+                                        <th th:text="#{operation}">Operation</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tfoot>
+                                    <tr>
+                                        <th th:text="#{data_record_name}">Name</th>
+                                        <th th:text="#{project_name}">Project Name</th>
+                                        <th th:text="#{uploader}">Uploader</th>
+                                        <th th:text="#{upload_time}">Upload Time</th>
+                                        <th th:text="#{operation}">Operation</th>
+                                    </tr>
+                                    </tfoot>
+
+                                    <input type="hidden" class="search-condition" />
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div id="verification_modal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title qualified">
+                                        <i class="fa fa-check-circle-o icon-right text-success"></i>
+                                        <span th:text="#{data_verification_qualified}">qualified</span>
+                                    </h4>
+                                    <h4 class="modal-title unqualified">
+                                        <i class="fa fa-times-circle-o icon-right text-danger"></i>
+                                        <span th:text="#{data_verification_unqualified}">unqualified</span>
+                                    </h4>
+                                </div>
+                                <form class="form-horizontal" th:action="@{verification}" method="post">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="data_record_remark" class="col-sm-2 control-label" th:text="#{data_verification_remark}">remark</label>
+
+                                            <div class="col-sm-10">
+                                                <textarea type="text" class="form-control text-area" id="data_record_remark" name="remark" th:placeholder="#{data_verification_remark_demand}" maxlength="100"></textarea>
+                                                <input type="hidden" class="data-record-tag" name="dataRecordTag" />
+                                                <input type="hidden" class="data-record-status" name="dataRecordStatus" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{data_verification_cancel}">cancel</button>
+                                        <button type="submit" class="btn" th:text="#{data_verification_ok}">ok</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="authority_edit_modal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title">
+                                        <i class="fa fa-wrench icon-right text-success"></i>
+                                        <span th:text="#{data_verification_authority_edit}">authority edit</span>
+                                    </h4>
+                                </div>
+
+                                <div class="modal-body form-horizontal">
+                                    <div class="form-horizontal">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" th:text="#{data_verification_authority_edit_user}">user</label>
+
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control user-alias" th:placeholder="#{data_verification_authority_edit_user}" readonly="readonly" />
+                                                    <input type="hidden" class="user" />
+                                                    <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-primary user-select" data-toggle="modal" data-target="#authority_edit_select_user_modal">
+                                                        <i class="fa fa-user-plus" aria-hidden="true"></i>
+                                                    </button>
+                                                </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" th:text="#{data_verification_authority_edit_all}">all</label>
+
+                                            <div class="col-sm-10" style="padding-top: 7px;">
+                                                <input type="checkbox" class="form-control all-user" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" th:text="#{data_verification_authority_edit_user_authorities}">user authorities</label>
+
+                                            <div class="col-sm-10">
+                                                <input type="hidden" class="data-record-tag" />
+                                                <select class="form-control select2 authorities" multiple="multiple" style="width: 100%;">
+                                                    <option th:each="authority : ${T(com.cowerling.pmn.domain.data.DataRecordAuthority).values()}" th:text="${authority}" th:value="${authority.name()}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <form th:action="@{''}" method="post"></form>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{data_verification_cancel}">cancel</button>
+                                    <button type="button" class="btn btn-success apply" th:text="#{data_verification_apply}">apply</button>
+                                    <button type="button" class="btn btn-primary ok" data-dismiss="modal" th:text="#{data_verification_ok}">ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="authority_edit_result_modal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title result-success">
+                                        <i class="fa fa-check-circle-o icon-right text-success"></i>
+                                        <span th:text="#{data_verification_authority_edit_success}">edit success</span>
+                                    </h4>
+                                    <h4 class="modal-title result-failed">
+                                        <i class="fa fa-times-circle-o icon-right text-danger"></i>
+                                        <span th:text="#{data_verification_authority_edit_failed}">edit failed</span>
+                                    </h4>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" th:text="#{data_verification_ok}">ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="data_record_search_modal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">
+                                        <i class="fa fa-search icon-right text-primary"></i>
+                                        <span th:text="#{data_record_search}">search data record</span>
+                                    </h4>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="search_data_record_name" class="col-sm-2 control-label" th:text="#{data_record_name}">data record name</label>
+
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control data-record-name" id="search_data_record_name" th:placeholder="#{multiple_data_record_name_split}">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_project_name" class="col-sm-2 control-label" th:text="#{project_name}">project name</label>
+
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control project-name" id="search_project_name" th:placeholder="#{multiple_project_name_split}">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_uploader_select" class="col-sm-2 control-label" th:text="#{uploader}">uploader</label>
+
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control uploader-alias" th:placeholder="#{uploader}" readonly="readonly" />
+                                                    <input type="hidden" class="uploader-name" />
+                                                    <span class="input-group-btn">
+                                                        <button id="search_uploader_select" type="button" class="btn btn-primary uploader-select" data-toggle="modal" data-target="#data_record_search_select_user_modal">
+                                                            <i class="fa fa-user-plus" aria-hidden="true"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_upload_time" class="col-sm-2 control-label" th:text="#{upload_time}">upload time</label>
+
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control pull-right date-range upload-time" id="search_upload_time">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <input type="hidden" class="search_query" />
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                    <button type="button" class="btn btn-primary ok" data-dismiss="modal" th:text="#{ok}">ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="authority_edit_select_user_modal"></div>
+                    <div id="data_record_search_select_user_modal"></div>
+
+                </section>
+
+            </div>
+
+            <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+            <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>
