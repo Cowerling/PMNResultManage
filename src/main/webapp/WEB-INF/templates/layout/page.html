@@ -129,6 +129,13 @@
                             </a>
                         </li>
 
+                        <li class="menu-workbench">
+                            <a th:href="@{/workbench}">
+                                <i class="fa fa-newspaper-o"></i>
+                                <span th:text="#{workbench}">Workbench</span>
+                            </a>
+                        </li>
+
                         <li class="treeview menu-project">
                             <a href="#">
                                 <i class="fa fa-file-text-o"></i>
@@ -155,6 +162,13 @@
                                 <li sec:authorize="hasRole('ROLE_USER')" class="menu-data-upload"><a th:href="@{/data/upload}"><i class="fa fa-circle-o"></i><span th:text="#{page_data_upload}">Upload</span></a></li>
                                 <li sec:authorize="hasRole('ROLE_USER')" class="menu-data-verification"><a th:href="@{/data/verificationAndAuthority}"><i class="fa fa-circle-o"></i><span th:text="#{page_data_verification_and_authority}">Verification and Authority</span></a></li>
                             </ul>
+                        </li>
+
+                        <li class="menu-document">
+                            <a th:href="@{/document}">
+                                <i class="fa fa-book"></i>
+                                <span th:text="#{document}">document</span>
+                            </a>
                         </li>
 
                     </ul>

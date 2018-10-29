@@ -1,5 +1,7 @@
 package com.cowerling.pmn.utils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -14,7 +16,53 @@ public class ClassUtils {
         return null;
     }
 
-    public static void invokeMethod(Method method,Object object, Object value) throws IllegalAccessException, InvocationTargetException {
+    public static Method getMethod(Class<?> objectClass, Class<? extends Annotation> annotationClass) {
+        for (Method method: objectClass.getMethods()) {
+            if (method.isAnnotationPresent(annotationClass)) {
+                return method;
+            }
+        }
+
+        return null;
+    }
+
+    public static Field getDeclaredField(Class<?> objectClass, Class<? extends Annotation> annotationClass) {
+        for (Field field : objectClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(annotationClass)) {
+                return field;
+            }
+        }
+
+        return null;
+    }
+
+    public static <T> T getDeclaredFieldValue(Object object, Class<? extends Annotation> annotationClass) throws InvocationTargetException, IllegalAccessException {
+        Field field = ClassUtils.getDeclaredField(object.getClass(), annotationClass);
+
+        if (field == null) {
+            return null;
+        }
+
+        Method method = ClassUtils.getMethod(object.getClass(), "get" + org.apache.commons.lang3.StringUtils.capitalize(field.getName()));
+
+        if (method == null) {
+            return null;
+        }
+
+        return (T) method.invoke(object);
+    }
+
+    public static <T> T getDeclaredFieldValue(Object object, Field field) throws InvocationTargetException, IllegalAccessException {
+        Method method = ClassUtils.getMethod(object.getClass(), "get" + org.apache.commons.lang3.StringUtils.capitalize(field.getName()));
+
+        if (method == null) {
+            return null;
+        }
+
+        return (T) method.invoke(object);
+    }
+
+    public static void invokeMethod(Method method, Object object, Object value) throws IllegalAccessException, InvocationTargetException {
         Class<?> parameterType = method.getParameterTypes()[0];
 
         Object parameter = null;

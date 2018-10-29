@@ -58,7 +58,7 @@ $(document).ready(function () {
                 result.recordsTotal = result.count;
                 result.recordsFiltered = result.dataRecords.length;
 
-                for (let i =0, length = result.dataRecords.length; i < length; i++) {
+                for (let i = 0, length = result.dataRecords.length; i < length; i++) {
                     result.dataRecords[i].projectName = result.dataRecords[i].project.name;
                     result.dataRecords[i].uploaderAlias = result.dataRecords[i].uploader.alias;
                     result.dataRecords[i].uploadTime = $(new Date(result.dataRecords[i].uploadTime)).dateFormat("yyyy-MM-dd hh:mm:ss");

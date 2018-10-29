@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/fullcalendar/last/fullcalendar.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/fullcalendar/last/fullcalendar.print.min.css}" media="print">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.colorutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/chartjs/last/Chart.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/moment/last/moment-with-locales.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/fullcalendar/last/fullcalendar.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/fullcalendar/last/locale-all.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/workbench.js}"></script>
+    </head>
+
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+        <header class="main-header" th:replace="layout/page :: header"></header>
+
+        <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+        <div class="content-wrapper">
+
+            <section class="content">
+
+                <div class="row">
+                    <div class="col-lg-3 col-xs-6">
+                        <div class="small-box bg-green">
+                            <div class="inner">
+                                <h3 th:text="${notStartProjectCount}"></h3>
+                                <p th:text="#{not_start_project}">not start project</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-clipboard"></i>
+                            </div>
+                            <a th:href="@{/project/list}" class="small-box-footer"><span th:text="#{details}">details</span><i class="fa fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-xs-6">
+                        <div class="small-box bg-orange">
+                            <div class="inner">
+                                <h3 sec:authorize="hasRole('ROLE_ADMIN')" th:text="${noManagerProjectCount}"></h3>
+                                <p sec:authorize="hasRole('ROLE_ADMIN')" th:text="#{no_manager_project}">not manager project</p>
+                                <h3 sec:authorize="hasRole('ROLE_ADVAN_USER')" th:text="${noPrincipalProjectCount}"></h3>
+                                <p sec:authorize="hasRole('ROLE_ADVAN_USER')" th:text="#{no_principal_project}">not principal project</p>
+                                <h3 sec:authorize="hasRole('ROLE_USER')" th:text="${noMemberProjectCount}"></h3>
+                                <p sec:authorize="hasRole('ROLE_USER')" th:text="#{no_member_project}">not member project</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                            <a th:href="@{/project/list}" class="small-box-footer"><span th:text="#{details}">details</span><i class="fa fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+
+                    <div sec:authorize="hasRole('ROLE_USER')" class="col-lg-3 col-xs-6">
+                        <div class="small-box bg-blue">
+                            <div class="inner">
+                                <h3 th:text="${unauditedDataRecordCount}"></h3>
+                                <p th:text="#{unaudited_data_record}">unaudited data record</p>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-stats-bars"></i>
+                            </div>
+                            <a th:href="@{/data/verificationAndAuthority}" class="small-box-footer"><span th:text="#{details}">details</span><i class="fa fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="box box-danger">
+                            <div class="box-header with-border">
+                                <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                <h3 class="box-title" th:text="#{project_statistics}">project statistics</h3>
+                            </div>
+
+                            <div class="box-body">
+                                <div class="chart">
+                                    <canvas id="project_chart" style="height:400px" th:data-project-statistics="${projectStatistics}"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="box box-warning">
+                            <!--<div class="box-header with-border">
+                                <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                <h3 class="box-title" th:text="#{project_statistics}">project statistics</h3>
+                            </div>-->
+
+                            <div class="box-body no-padding">
+                                <div id="calendar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+
+        <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+        <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+        <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+    </div>
+    </body>
+</html>

@@ -11,6 +11,11 @@ $(document).ready(function () {
         enumerable: true
     });
 
+    Object.defineProperty(CONSTANT, "GEOSOURCE_TIANDITU_IMG", {
+        value: "http://t3.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}",
+        enumerable: true
+    });
+
     Object.defineProperty(CONSTANT, "GEOSOURCE_TIANDITU_CVA", {
         value: "http://t3.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}",
         enumerable: true

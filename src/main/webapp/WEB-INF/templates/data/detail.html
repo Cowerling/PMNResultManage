@@ -53,7 +53,7 @@
                                         <button th:if="${editable}" id="data_insert" class="btn btn-warning"><i class="fa fa-plus-circle icon-right" aria-hidden="true"></i><span th:text="#{data_detail_data_insert}">data insert</span></button>
                                         <button th:if="${editable}" id="data_delete" class="btn btn-danger"><i class="fa fa-minus-circle icon-right" aria-hidden="true"></i><span th:text="#{data_detail_data_delete}">data delete</span></button>
                                         <button th:if="${editable}" id="data_save" class="btn btn-success"><i class="fa fa-floppy-o icon-right" aria-hidden="true"></i><span th:text="#{data_detail_data_save}">data save</span></button>
-                                        <button id="map_display" class="btn btn-primary"><i class="fa fa-map-marker icon-right" aria-hidden="true"></i><span th:text="#{data_detail_map_display}">map display</span></button>
+                                        <a class="btn btn-primary" th:href="@{'/?dataRecordTag=' + ${tag} + '&dataRecordName=' + ${name}}"><i class="fa fa-map-marker icon-right" aria-hidden="true"></i><span th:text="#{data_detail_map_display}">map display</span></a>
                                     </div>
                                 </div>
 

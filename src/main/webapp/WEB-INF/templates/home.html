@@ -4,8 +4,11 @@
       xmlns:th="http://www.thymeleaf.org">
     <head th:replace="layout/page :: head(~{::link}, ~{::script})">
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/openlayer/4.6.5/ol.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/icheck/1.0.2/skins/all.css}">
 
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.urlutils.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/openlayer/4.6.5/ol.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/icheck/1.0.2/icheck.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/js/home.js}"></script>
         <script type="text/javascript" src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
     </head>
@@ -22,8 +25,43 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="box">
-                                <div class="box-body">
-                                    <div id="map"></div>
+                                <div class="box-body no-padding">
+                                    <div id="map">
+                                        <div class="ol-popup map-popup">
+                                            <a href="#" class="ol-popup-closer map-popup-closer"></a>
+                                            <div class="map-popup-content"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="map_tool">
+
+                                        <button class="minimap-shim base-map-source"></button>
+
+                                        <div class="box box-primary box-solid collapsed-box map-layer-tool" style="max-width: 250px">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">
+                                                    <i class="fa fa-briefcase icon-right" aria-hidden="true"></i>
+                                                    <span th:text="#{layer_control}">layer control</span>
+                                                </h3>
+
+                                                <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-navicon" aria-hidden="true"></i></button>
+                                                </div>
+                                            </div>
+
+                                            <div class="box-body" style="display: none;">
+                                                <div class="callout callout-warning" style="margin: 0px 0px 5px 0px; padding: 1px 1px 0px 1px;">
+                                                    <span th:text="#{base_layers}">base layers</span>
+                                                </div>
+                                                <div class="base-layer-list"></div>
+                                                <div class="callout callout-success" style="margin: 0px 0px 5px 0px; padding: 1px 1px 0px 1px;">
+                                                    <span th:text="#{custom_layers}">custom layers</span>
+                                                </div>
+                                                <div class="custom-layer-list"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,8 @@
 package com.cowerling.pmn.domain.data;
 
+import com.cowerling.pmn.annotation.CoordinateH;
+import com.cowerling.pmn.annotation.CoordinateX;
+import com.cowerling.pmn.annotation.CoordinateY;
 import org.apache.ibatis.type.Alias;
 
 import java.util.ArrayList;
@@ -7,19 +10,15 @@ import java.util.List;
 
 @Alias("cpiBaseDataContent")
 public class CPIBaseDataContent extends DataContent {
-    private Long id;
+    @CoordinateX
     private Double x;
+    @CoordinateY
     private Double y;
+    @CoordinateH
     private Double h;
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
+    public CPIBaseDataContent() {
+        this.crs = DataContent.EPSG_WGS84;
     }
 
     public Double getX() {
@@ -44,27 +43,5 @@ public class CPIBaseDataContent extends DataContent {
 
     public void setH(Double h) {
         this.h = h;
-    }
-
-    @Override
-    public List<String> attributeNames() {
-        return new ArrayList<>() {
-            {
-                add("x");
-                add("y");
-                add("h");
-            }
-        };
-    }
-
-    @Override
-    public List<Object> values() {
-        return new ArrayList<>() {
-            {
-                add(x);
-                add(y);
-                add(h);
-            }
-        };
     }
 }

@@ -162,6 +162,8 @@ public class DataController {
                 }
             });
 
+            model.addAttribute("tag", dataRecordTag);
+            model.addAttribute("name", dataRecord.getName());
             model.addAttribute("remark", dataRecord.getRemark());
             model.addAttribute("attributeNames", attributeNamesJsonArray.toString());
             model.addAttribute("ids", idsJsonArray);
