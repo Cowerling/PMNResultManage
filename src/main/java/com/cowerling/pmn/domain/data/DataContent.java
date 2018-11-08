@@ -1,9 +1,8 @@
 package com.cowerling.pmn.domain.data;
 
-import com.cowerling.pmn.annotation.CoordinateH;
-import com.cowerling.pmn.annotation.CoordinateX;
-import com.cowerling.pmn.annotation.CoordinateY;
+import com.cowerling.pmn.annotation.FieldOrder;
 import com.cowerling.pmn.utils.ClassUtils;
+import org.postgis.Geometry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -14,7 +13,6 @@ public abstract class DataContent {
     public static final String EPSG_WGS84 = "EPSG:4326";
 
     protected Long id;
-    protected String crs;
 
     public Long getId() {
         return id;
@@ -24,11 +22,13 @@ public abstract class DataContent {
         this.id = id;
     }
 
-    public String getCrs() {
-        return crs;
-    }
+    public abstract String getName();
 
-    public Double getCoordinateX() {
+    public abstract Geometry getGeometry();
+
+    public abstract String getTableName();
+
+    /*public Double getCoordinateX() {
         try {
             return ClassUtils.getDeclaredFieldValue(this, CoordinateX.class);
         } catch (InvocationTargetException e) {
@@ -48,27 +48,24 @@ public abstract class DataContent {
         }
     }
 
-    public Double getCoordinateH() {
+    public Double getCoordinateZ() {
         try {
-            return ClassUtils.getDeclaredFieldValue(this, CoordinateH.class);
+            return ClassUtils.getDeclaredFieldValue(this, CoordinateZ.class);
         } catch (InvocationTargetException e) {
             throw new RuntimeException();
         } catch (IllegalAccessException e) {
             throw new RuntimeException();
         }
-    }
+    }*/
 
-    public Map<String, Map.Entry<Class<?>, Object>> normalAttributes() {
+    public Map<String, Map.Entry<Class<?>, Object>> attributes() {
         try {
-            Map<String, Map.Entry<Class<?>, Object>> attributes = new HashMap<>();
+            Map<String, Map.Entry<Class<?>, Object>> attributes = new LinkedHashMap<>();
 
-            for (Field field : this.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(CoordinateX.class) ||
-                        field.isAnnotationPresent(CoordinateY.class) ||
-                        field.isAnnotationPresent(CoordinateH.class)) {
-                    continue;
-                }
+            List<Field> fields = Arrays.asList(this.getClass().getDeclaredFields());
+            fields.sort(Comparator.comparingInt(item -> item.getAnnotation(FieldOrder.class).order()));
 
+            for (Field field : fields) {
                 attributes.put(field.getName(), new AbstractMap.SimpleEntry(field.getType(), ClassUtils.getDeclaredFieldValue(this, field)));
             }
 
@@ -81,34 +78,11 @@ public abstract class DataContent {
     }
 
     public List<String> attributeNames() {
-        DataContent dataContent = this;
 
-        return new ArrayList<>() {
-            {
-                add(ClassUtils.getDeclaredField(dataContent.getClass(), CoordinateX.class).getName());
-                add(ClassUtils.getDeclaredField(dataContent.getClass(), CoordinateY.class).getName());
-                add(ClassUtils.getDeclaredField(dataContent.getClass(), CoordinateH.class).getName());
-                addAll(dataContent.normalAttributes().keySet());
-            }
-        };
+        return this.attributes().keySet().stream().collect(Collectors.toList());
     }
 
     public List<Object> values() {
-        try {
-            DataContent dataContent = this;
-
-            return new ArrayList<>() {
-                {
-                    add(ClassUtils.getDeclaredFieldValue(dataContent, ClassUtils.getDeclaredField(dataContent.getClass(), CoordinateX.class)));
-                    add(ClassUtils.getDeclaredFieldValue(dataContent, ClassUtils.getDeclaredField(dataContent.getClass(), CoordinateY.class)));
-                    add(ClassUtils.getDeclaredFieldValue(dataContent, ClassUtils.getDeclaredField(dataContent.getClass(), CoordinateH.class)));
-                    addAll(dataContent.normalAttributes().values().stream().map(value -> value.getValue()).collect(Collectors.toList()));
-                }
-            };
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException();
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException();
-        }
+        return this.attributes().values().stream().map(value -> value.getValue()).collect(Collectors.toList());
     }
 }

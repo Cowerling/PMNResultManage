@@ -5,6 +5,10 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    $("form").validate();
+});
+
+$(document).ready(function () {
     $(".message-remove").click(function (event) {
         event.preventDefault();
         $(this).parent().hide();

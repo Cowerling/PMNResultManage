@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateUtils {
-    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd hh:mm:ss";
+    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final int MILLISECOND_TO_SECOND = 1000;
     private static final int SECOND_TO_MINUTE = 60;
     private static final int MINUTE_TO_HOUR = 60;

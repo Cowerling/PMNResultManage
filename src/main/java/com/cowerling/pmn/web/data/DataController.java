@@ -5,11 +5,13 @@ import com.cowerling.pmn.data.ProjectRepository;
 import com.cowerling.pmn.data.UserRepository;
 import com.cowerling.pmn.domain.data.*;
 import com.cowerling.pmn.domain.project.Project;
+import com.cowerling.pmn.domain.project.ProjectStatus;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.*;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.utils.ClassUtils;
 import com.cowerling.pmn.utils.DataUtils;
+import com.cowerling.pmn.utils.GeoUtils;
 import com.cowerling.pmn.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -74,13 +76,13 @@ public class DataController {
             Project project = projectRepository.findProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
             String dataFileExtension = FilenameUtils.getExtension(dataFile.getOriginalFilename());
 
-            if (project == null || project.getMembers().stream().noneMatch(member -> member.getId() == loginUser.getId())) {
+            if (project.getStatus() != ProjectStatus.PROGRESS || project.getMembers().stream().noneMatch(member -> member.getId() == loginUser.getId())) {
                 throw new RuntimeException(ExceptionMessage.DATA_UPLOAD_PROJECT_MEMBER);
             }
 
-            DataRecordCategory dataRecordCategory = DataUtils.getDataFileCategory(dataFile);
+            Map.Entry<DataRecordCategory, Map<GeoUtils.GeoDefine, String>> dataRecordMeta = DataUtils.getDataFileCategory(dataFile);
 
-            if (!projectRepository.findDataRecordCategoriesByProject(project).contains(dataRecordCategory)) {
+            if (!projectRepository.findDataRecordCategoriesByProject(project).contains(dataRecordMeta.getKey())) {
                 throw new RuntimeException(ExceptionMessage.DATA_UPLOAD_DATA_CATEGORY);
             }
 
@@ -92,7 +94,11 @@ public class DataController {
             dataRecord.setFile(file);
             dataRecord.setProject(project);
             dataRecord.setUploader(loginUser);
-            dataRecord.setCategory(dataRecordCategory);
+            dataRecord.setCategory(dataRecordMeta.getKey());
+            dataRecord.setSourceProJ(dataRecordMeta.getValue().get(GeoUtils.GeoDefine.PROJ));
+            if (dataRecordMeta.getValue().get(GeoUtils.GeoDefine.H) != null) {
+                dataRecord.setRemark(GeoUtils.GeoDefine.H.toString() + ":" + dataRecordMeta.getValue().get(GeoUtils.GeoDefine.H));
+            }
 
             dataRepository.saveDataRecord(dataRecord);
 
@@ -130,6 +136,7 @@ public class DataController {
                               Model model) throws ResourceNotFoundException {
         try {
             DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
+            dataRecord.setTag(dataRecordTag);
 
             if (dataRecord == null) {
                 throw new RuntimeException();
@@ -162,9 +169,7 @@ public class DataController {
                 }
             });
 
-            model.addAttribute("tag", dataRecordTag);
-            model.addAttribute("name", dataRecord.getName());
-            model.addAttribute("remark", dataRecord.getRemark());
+            model.addAttribute(dataRecord);
             model.addAttribute("attributeNames", attributeNamesJsonArray.toString());
             model.addAttribute("ids", idsJsonArray);
             model.addAttribute("values", valuesJsonArray.toString());
@@ -355,8 +360,29 @@ public class DataController {
             Class<?> dataContentClass = null;
 
             switch (dataRecord.getCategory()) {
-                case CPI_BASE:
-                    dataContentClass = CPIBaseDataContent.class;
+                case CP0:
+                    dataContentClass = CP0DataContent.class;
+                    break;
+                case CPI_2D:
+                    dataContentClass = CPI2DDataContent.class;
+                    break;
+                case CPI_3D:
+                    dataContentClass = CPI3DDataContent.class;
+                    break;
+                case CPII:
+                    dataContentClass = CPIIDataContent.class;
+                    break;
+                case CPIII:
+                    dataContentClass = CPIIIDataContent.class;
+                    break;
+                case CPII_LE:
+                    dataContentClass = CPIILEDataContent.class;
+                    break;
+                case TSIT:
+                    dataContentClass = TSITDataContent.class;
+                    break;
+                case EC:
+                    dataContentClass = ECDataContent.class;
                     break;
                 default:
                     break;

@@ -32,6 +32,7 @@
         <org.json.version>20180130</org.json.version>
         <org.apache.poi.version>4.0.0</org.apache.poi.version>
         <org.geotools.version>20.0</org.geotools.version>
+        <org.hsqldb.version>2.4.1</org.hsqldb.version>
     </properties>
 
     <dependencies>
@@ -190,7 +191,7 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.4.1</version>
+            <version>${org.hsqldb.version}</version>
         </dependency>
     </dependencies>
 

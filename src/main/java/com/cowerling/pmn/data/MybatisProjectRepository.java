@@ -4,6 +4,7 @@ import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.ProjectMapper;
 import com.cowerling.pmn.domain.data.DataRecordCategory;
 import com.cowerling.pmn.domain.project.Project;
+import com.cowerling.pmn.domain.project.ProjectVerification;
 import com.cowerling.pmn.domain.user.User;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -68,13 +69,13 @@ public class MybatisProjectRepository implements ProjectRepository {
     }
 
     @Override
-    public Long findProjectCountByUser(User user, FindMode findMode) {
+    public Long findProjectCountByUser(User user, FindMode findMode, Map<Field, Object> filters) {
         SqlSession sqlSession = currentSession();
 
         try {
             ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
 
-            return projectMapper.selectProjectCountByUserId(user.getId(), findMode);
+            return projectMapper.selectProjectCountByUserId(user.getId(), findMode, filters);
         } finally {
             sqlSession.close();
         }
@@ -107,16 +108,22 @@ public class MybatisProjectRepository implements ProjectRepository {
     }
 
     @Override
-    public void removeProjectById(Long id) {
+    public void removeProjectSeparately(Project project) {
         SqlSession sqlSession = currentSession();
 
         try {
             ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
-            projectMapper.deleteProjectById(id);
+            projectMapper.deleteProjectById(project.getId());
             sqlSession.commit();
         } finally {
             sqlSession.close();
         }
+    }
+
+    @Override
+    public void removeProject(Project project) {
+        removeProjectVerification(project);
+        removeProjectSeparately(project);
     }
 
     @Override
@@ -127,6 +134,45 @@ public class MybatisProjectRepository implements ProjectRepository {
             ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
 
             return projectMapper.selectDataRecordCategoriesByProjectCategory(project.getCategory());
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void saveProjectVerification(Project project, ProjectVerification projectVerification) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+            projectMapper.insertProjectVerification(project.getId(), projectVerification);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void updateProjectVerification(Project project, ProjectVerification projectVerification) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+            projectMapper.updateProjectVerification(project.getId(), projectVerification);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void removeProjectVerification(Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            ProjectMapper projectMapper = sqlSession.getMapper(ProjectMapper.class);
+            projectMapper.deleteProjectVerificationByProjectId(project.getId());
+            sqlSession.commit();
         } finally {
             sqlSession.close();
         }

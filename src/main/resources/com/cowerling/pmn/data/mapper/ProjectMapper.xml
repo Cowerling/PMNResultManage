@@ -9,6 +9,7 @@
         <result property="name" column="name" />
         <result property="category" column="category" />
         <result property="createTime" column="create_time" />
+        <result property="finishTime" column="finish_time" />
         <result property="remark" column="remark" />
         <result property="category" column="category" />
         <result property="status" column="status" />
@@ -16,5 +17,15 @@
         <association property="manager" column="manager" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
         <association property="principal" column="principal" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
         <association property="members" column="id" select="com.cowerling.pmn.data.mapper.UserMapper.selectUsersByProjectId" />
+        <association property="verification" column="id" select="com.cowerling.pmn.data.mapper.ProjectMapper.selectProjectVerificationByProjectId" />
+    </resultMap>
+
+    <resultMap id="projectVerificationResult" type="projectVerification">
+        <result property="principalAdopt" column="principal_adopt" />
+        <result property="managerAdopt" column="manager_adopt" />
+        <result property="creatorAdopt" column="creator_adopt" />
+        <result property="principalRemark" column="principal_remark" />
+        <result property="managerRemark" column="manager_remark" />
+        <result property="creatorRemark" column="creator_remark" />
     </resultMap>
 </mapper>

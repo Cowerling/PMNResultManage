@@ -62,7 +62,7 @@ $(document).ready(function () {
             },
             dataSrc: function (result) {
                 result.recordsTotal = result.count;
-                result.recordsFiltered = result.dataRecords.length;
+                result.recordsFiltered = result.count;
 
                 for (let i =0, length = result.dataRecords.length; i < length; i++) {
                     result.dataRecords[i].projectName = result.dataRecords[i].project.name;

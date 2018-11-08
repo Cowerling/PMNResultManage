@@ -5,10 +5,13 @@
     <head th:replace="layout/page :: head(~{::link}, ~{::script})">
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/openlayer/4.6.5/ol.css}">
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/icheck/1.0.2/skins/all.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-treeview/2.1.5/css/bootstrap-treeview.min.css}">
 
         <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.urlutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.colorutils.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/openlayer/4.6.5/ol.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/icheck/1.0.2/icheck.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-treeview/2.1.5/js/bootstrap-treeview.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/js/home.js}"></script>
         <script type="text/javascript" src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
     </head>
@@ -45,19 +48,51 @@
                                                 </h3>
 
                                                 <div class="box-tools pull-right">
+                                                    <button type="button" class="btn btn-box-tool full-extent"><i class="fa fa-arrows-alt" aria-hidden="true"></i></button>
+                                                    <button type="button" class="btn btn-box-tool" data-toggle="modal" data-target="#add_custom_layer_modal"><i class="fa fa-plus-square" aria-hidden="true"></i></button>
                                                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-navicon" aria-hidden="true"></i></button>
                                                 </div>
                                             </div>
 
                                             <div class="box-body" style="display: none;">
-                                                <div class="callout callout-warning" style="margin: 0px 0px 5px 0px; padding: 1px 1px 0px 1px;">
+                                                <div class="callout callout-warning" style="margin: 0px 0px 5px 0px; padding: 3px 1px 3px 1px;">
                                                     <span th:text="#{base_layers}">base layers</span>
                                                 </div>
                                                 <div class="base-layer-list"></div>
-                                                <div class="callout callout-success" style="margin: 0px 0px 5px 0px; padding: 1px 1px 0px 1px;">
+                                                <div class="callout callout-success" style="margin: 0px 0px 5px 0px; padding: 3px 1px 3px 1px;">
                                                     <span th:text="#{custom_layers}">custom layers</span>
                                                 </div>
                                                 <div class="custom-layer-list"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade" id="add_custom_layer_modal">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title">
+                                                            <i class="fa fa-plus-square text-green" aria-hidden="true"></i>
+                                                            <span th:text="#{select_data_source}">select data source</span>
+                                                        </h4>
+                                                    </div>
+                                                    <div>
+                                                        <div class="modal-body">
+                                                            <div class="input-group margin-bottom-10">
+                                                                <input type="text" class="form-control search-content" />
+                                                                <span class="input-group-btn">
+                                                                    <button type="button" class="btn btn-primary search"><i class="fa fa-search" aria-hidden="true"></i></button>
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <div class="tree-view"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-primary ok" data-dismiss="modal" th:text="#{add}">add</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 

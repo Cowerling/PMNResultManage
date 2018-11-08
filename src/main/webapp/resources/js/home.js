@@ -30,7 +30,9 @@ $(document).ready(function () {
             zoom: 10,
             center: CONSTANT.INIT_CENTER
         }),
-        controls: ol.control.defaults().extend([
+        controls: ol.control.defaults({
+            attribution: false
+        }).extend([
             new ol.control.ZoomSlider(),
             new ol.control.ScaleLine({
                 units: "metric"
@@ -63,10 +65,7 @@ $(document).ready(function () {
                 content.empty();
                 content.append("<div class='callout callout-info' style='margin: 0px 0px 5px 0px; padding: 1px 1px 0px 1px;'><span>\u8be6\u7ec6\u4fe1\u606f</span></div>");
                 $.each(feature.getProperties(), function (key, value) {
-                    if (value instanceof ol.geom.Geometry) {
-                        let coordinates = ol.proj.transform(value.getCoordinates(), "EPSG:" + CONSTANT.MAP_EPSG, feature.get("crs"));
-                        content.append("<p><span class='lable label-status-min label-success'>\u6a2a\u5750\u6807</span><code>" + coordinates[0] + "</code><span class='lable label-status-min label-success'>\u7eb5\u5750\u6807</span><code>" + coordinates[1] + "</code></p>");
-                    } else {
+                    if (!(value instanceof ol.geom.Geometry)) {
                         content.append("<p><span class='lable label-status-min label-warning'>" + key + "</span><code>" + value + "</code></p>");
                     }
                 });
@@ -94,7 +93,7 @@ $(document).ready(function () {
         }
     }
 
-    $.get("geoservice/server", function (server) {
+    $.get(CONSTANT.GEOSERVICE_SERVER, function (server) {
         $("#map_tool").find("div.base-layer-list").bindLayer(new ol.layer.Tile({
             source: new ol.source.TileWMS({
                 url: server.url + "/wms",
@@ -222,45 +221,106 @@ $(document).ready(function () {
 
     $("#map_tool").find("button.base-map-source").click();
 
-    let data_record_tag = $.UrlUtils.getParament("dataRecordTag"), data_record_name = $.UrlUtils.getParament("dataRecordName");
-    if (data_record_tag != null && data_record_name != null) {
+    function addCustomLayer(data_record_tag, data_record_name) {
+        let color = $.getRandomColor();
+
         $("#map_tool").find("div.custom-layer-list").bindLayer(new ol.layer.Vector({
             source: new ol.source.Vector({
-                url: "geodata/wfs/" + data_record_tag,
+                url: CONSTANT.GEOTATA_WFS + data_record_tag,
                 format: new ol.format.GeoJSON()
             }),
             style: function (feature, resolution) {
-                return [
-                    new ol.style.Style({
-                        image: new ol.style.Icon({
-                            src: "resources/image/pin.png"
-                        }),
-                        text: new ol.style.Text({
-                            textAlign: "left",
-                            textBaseline: "bottom",
-                            font: "normal 20px KaiTi",
-                            text: feature.getId(),
-                            fill: new ol.style.Fill({
-                                color: "#aa3300"
-                            }),
-                            stroke: new ol.style.Stroke({
-                                color: "#ffcc33",
-                                width: 2
-                            })
-                        })
-                    })
-                ];
+                return $.createCustomLayerStyle(data_record_name + ":" + feature.get("name"), color, "#ffff00");
             },
             name: data_record_name,
             geometry_type: "point"
         }), function (layer) {
             map.addLayer(layer);
         }, function (layer) {
+            map.getView().fit(layer.getSource().getExtent(), map.getSize());
+        }, function (layer) {
             map.removeLayer(layer);
         });
     }
+
+    let data_record_tag = $.UrlUtils.getParament("dataRecordTag"), data_record_name = $.UrlUtils.getParament("dataRecordName");
+    if (data_record_tag != null && data_record_name != null) {
+        addCustomLayer(data_record_tag, data_record_name);
+    }
+
+    let $add_custom_layer_modal = $("#add_custom_layer_modal");
+
+    $add_custom_layer_modal.find("button.ok").click(function (event) {
+        $add_custom_layer_modal.getSelectedDataRecordTags().forEach((dataRecord) => {
+            addCustomLayer(dataRecord.tag, dataRecord.name);
+        });
+    });
+
+    $("#map_tool").find("button.full-extent").click(function (event) {
+        map.getView().fit(CONSTANT.FULL_EXTENT, map.getSize());
+    });
 });
 
 $(document).ready(function () {
+    let $add_custom_layer_modal = $("#add_custom_layer_modal");
 
+    $add_custom_layer_modal.on("show.bs.modal", function (event) {
+        $add_custom_layer_modal.find("div.tree-view").treeview({
+            levels: 1,
+            showTags: true,
+            searchResultBackColor: "#ffe500",
+            expandIcon: "glyphicon glyphicon-chevron-right",
+            collapseIcon: "glyphicon glyphicon-chevron-down",
+            multiSelect: true,
+            data: (function () {
+                let projects = []
+
+                $.ajax({
+                    url: CONSTANT.DATA_RECORD_LIST_SUMMARY_URL,
+                    data: {
+                        search: JSON.stringify({
+                            spatialOnly: true
+                        })
+                    },
+                    async: false,
+                    success: function(result){
+                        result.forEach((project) => {
+                            let dataRecords = [];
+
+                            project.dataRecords.forEach((dataRecord) => {
+                                if ($.inArray("VIEW", dataRecord.authorities) >= 0) {
+                                    $.extend(dataRecord, {
+                                        text: dataRecord.name,
+                                        selectable: true,
+                                        icon: "glyphicon glyphicon-tags"
+                                    });
+
+                                    dataRecords.push(dataRecord);
+                                }
+                            });
+
+                            $.extend(project, {
+                                text: project.name,
+                                tags: [project.dataRecords.length],
+                                selectable: false,
+                                icon: "glyphicon glyphicon-folder-open",
+                                nodes: dataRecords
+                            });
+
+                            projects.push(project);
+                        });
+                    }
+                });
+
+                return projects;
+            })()
+        });
+    });
+
+    $add_custom_layer_modal.find("button.search").click(function (event) {
+        $add_custom_layer_modal.find(".tree-view").treeview("search", [$add_custom_layer_modal.find("input.search-content").val(), {
+            exactMatch: false,
+            revealResults: true
+        }]);
+    });
 });

@@ -2,6 +2,7 @@ package com.cowerling.pmn.domain.data;
 
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
+import com.cowerling.pmn.utils.GeoUtils;
 import org.apache.ibatis.type.Alias;
 
 import java.util.Date;
@@ -20,6 +21,7 @@ public class DataRecord {
     private String remark;
     private List<DataRecordAuthority> authorities;
     private String tag;
+    private String sourceProJ;
 
     public DataRecord() {
         this.uploadTime = new Date();
@@ -112,5 +114,17 @@ public class DataRecord {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public Integer getTargetEPSG() {
+        return GeoUtils.WGS_84_EPSG;
+    }
+
+    public String getSourceProJ() {
+        return sourceProJ;
+    }
+
+    public void setSourceProJ(String sourceProJ) {
+        this.sourceProJ = sourceProJ;
     }
 }

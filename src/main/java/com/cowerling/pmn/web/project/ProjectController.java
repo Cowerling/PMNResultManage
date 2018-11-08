@@ -1,12 +1,16 @@
 package com.cowerling.pmn.web.project;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
+import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.data.ProjectRepository;
 import com.cowerling.pmn.data.UserRepository;
+import com.cowerling.pmn.data.provider.DataSqlProvider;
 import com.cowerling.pmn.data.provider.ProjectSqlProvider;
+import com.cowerling.pmn.domain.data.DataRecordStatus;
 import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.project.ProjectCategory;
 import com.cowerling.pmn.domain.project.ProjectStatus;
+import com.cowerling.pmn.domain.project.ProjectVerification;
 import com.cowerling.pmn.domain.project.form.ProjectAddForm;
 import com.cowerling.pmn.domain.project.form.ProjectSettingsForm;
 import com.cowerling.pmn.domain.user.User;
@@ -17,17 +21,21 @@ import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.utils.DateUtils;
 import com.cowerling.pmn.web.ConstantValue;
+import com.cowerling.pmn.web.message.ErrorMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +55,7 @@ public class ProjectController {
     private static final String LIST_SEARCH_NAME = "name";
     private static final String LIST_SEARCH_CATEGORY = "category";
     private static final String LIST_SEARCH_CREATE_TIME = "createTime";
+    private static final String LIST_SEARCH_FINISH_TIME = "finishTime";
     private static final String LIST_SEARCH_CREATOR = "creator";
     private static final String LIST_SEARCH_MANAGER = "manager";
     private static final String LIST_SEARCH_PRINCIPAL = "principal";
@@ -59,6 +68,9 @@ public class ProjectController {
     private static final String SETTING_STATUS = "status";
     private static final String SETTING_MEMBER_ADD = "memberAdd";
     private static final String SETTING_MEMBER_REMOVE = "memberRemove";
+    private static final String SETTING_VERIFICATION_PRINCIPAL = "verificationPrincipal";
+    private static final String SETTING_VERIFICATION_MANAGER = "verificationManager";
+    private static final String SETTING_VERIFICATION_CREATOR = "verificationCreator";
 
     private static final String MESSAGE_MEMBER_ERROR = "memberError";
 
@@ -69,7 +81,13 @@ public class ProjectController {
     private UserRepository userRepository;
 
     @Autowired
+    private DataRepository dataRepository;
+
+    @Autowired
     private GeneralEncoderService generalEncoderService;
+
+    @Value("${file.data.location}")
+    private String dataFileLocation;
 
     private void authenticateUser(User user, ProjectSqlProvider.FindMode findMode) {
         if ((findMode == ProjectSqlProvider.FindMode.CREATOR && user.getUserRole() != UserRole.ADMIN) ||
@@ -136,6 +154,16 @@ public class ProjectController {
                 if (startCreateTime.before(endCreateTime)) {
                     filters.put(Field.START_CREATE_TIME, startCreateTime);
                     filters.put(Field.END_CREATE_TIME, endCreateTime);
+                }
+            }
+
+            if (searchJsonObject.has(LIST_SEARCH_FINISH_TIME)) {
+                JSONArray searchFinishTimes = searchJsonObject.getJSONArray(LIST_SEARCH_FINISH_TIME);
+                Date startFinishTime = DateUtils.parse(searchFinishTimes.getString(0)), endFinishTime = DateUtils.parse(searchFinishTimes.getString(1));
+
+                if (startFinishTime.before(endFinishTime)) {
+                    filters.put(Field.START_FINISH_TIME, startFinishTime);
+                    filters.put(Field.END_FINISH_TIME, endFinishTime);
                 }
             }
 
@@ -227,7 +255,7 @@ public class ProjectController {
                 }
             });
 
-            Long count = projectRepository.findProjectCountByUser(loginUser, findMode);
+            Long count = projectRepository.findProjectCountByUser(loginUser, findMode, filters);
 
             Map<String, Object> listDetail = new HashMap<>();
             listDetail.put("draw", draw);
@@ -274,7 +302,7 @@ public class ProjectController {
 
             authenticateUser(loginUser, findMode);
 
-            return projectRepository.findProjectCountByUser(loginUser, findMode);
+            return projectRepository.findProjectCountByUser(loginUser, findMode, null);
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }
@@ -309,18 +337,58 @@ public class ProjectController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String add(ProjectAddForm projectAddForm, @ModelAttribute("loginUser") final User loginUser) {
-        Project project = new Project(projectAddForm.getName(), loginUser, ProjectCategory.valueOf(projectAddForm.getCategory()), projectAddForm.getRemark());
-        projectRepository.saveProject(project);
+        try {
+            Project project = new Project(projectAddForm.getName(), loginUser, ProjectCategory.valueOf(projectAddForm.getCategory()), projectAddForm.getRemark());
 
-        return "redirect:/project/list";
+            projectRepository.saveProject(project);
+            projectRepository.saveProjectVerification(project, new ProjectVerification());
+
+            return "redirect:/project/list";
+        } catch (Exception e) {
+            throw new AccessDeniedException(ErrorMessage.ADD_PROJECT_FAILED);
+        }
     }
 
     @RequestMapping(value = "/remove", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String remove(String projectTag) throws EncoderServiceException {
-        projectRepository.removeProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
+    public String remove(String projectTag,
+                         @ModelAttribute("loginUser") final User loginUser) throws AccessDeniedException {
+        try {
+            Project project = projectRepository.findProjectById(Long.parseLong(generalEncoderService.staticDecrypt(projectTag)));
 
-        return "redirect:/project/list";
+            if (project.getCreator().getId() != loginUser.getId()) {
+                throw new RuntimeException();
+            }
+
+            project.getMembers().forEach(member -> {
+                dataRepository.findDataRecordsByUser(member, new HashMap<>() {
+                    {
+                        put(DataSqlProvider.RecordField.PROJECT, new ArrayList<Long>() {
+                            {
+                                add(project.getId());
+                            }
+                        });
+                    }
+                }, null, 0, Integer.MAX_VALUE).forEach(dataRecord -> {
+                    if (dataRecord.getStatus() != DataRecordStatus.QUALIFIED) {
+                        File deleteFile = new File(dataFileLocation + dataRecord.getFile());
+                        if (deleteFile.exists() && deleteFile.isFile()) {
+                            deleteFile.delete();
+                        }
+                    }
+
+                    dataRepository.removeDataRecord(dataRecord);
+                });
+
+                userRepository.removeMemberByProject(member, project);
+            });
+
+            projectRepository.removeProject(project);
+
+            return "redirect:/project/list";
+        } catch (Exception e) {
+            throw new AccessDeniedException(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/settings/{category}", method = RequestMethod.POST)
@@ -330,7 +398,10 @@ public class ProjectController {
             "(#category == '" + SETTING_STATUS + "' and hasRole('ROLE_ADMIN') and #projectSettingsForm.status.toUpperCase() == '" + ConstantValue.PROJECT_STATUS_FINISH + "') or " +
             "(#category == '" + SETTING_STATUS + "' and hasRole('ROLE_USER') and #projectSettingsForm.status.toUpperCase() == '" + ConstantValue.PROJECT_STATUS_PROGRESS + "') or " +
             "(#category == '" + SETTING_MEMBER_ADD + "' and hasRole('ROLE_USER')) or " +
-            "(#category == '" + SETTING_MEMBER_REMOVE + "' and hasRole('ROLE_USER'))")
+            "(#category == '" + SETTING_MEMBER_REMOVE + "' and hasRole('ROLE_USER')) or " +
+            "(#category == '" + SETTING_VERIFICATION_PRINCIPAL + "' and hasRole('ROLE_USER')) or " +
+            "(#category == '" + SETTING_VERIFICATION_MANAGER + "' and hasRole('ROLE_ADVAN_USER')) or " +
+            "(#category == '" + SETTING_VERIFICATION_CREATOR + "' and hasRole('ROLE_ADMIN'))")
     public String projectSettings(@PathVariable("category") String category,
                                   ProjectSettingsForm projectSettingsForm,
                                   String projectTag,
@@ -349,7 +420,19 @@ public class ProjectController {
             throw new ResourceNotFoundException();
         }
 
-        if ((category.equals(SETTING_MEMBER_ADD) || category.equals(SETTING_MEMBER_REMOVE)) && (project.getPrincipal() == null || project.getPrincipal().getId() != loginUser.getId())) {
+        if ((category.equals(SETTING_MEMBER_ADD) || category.equals(SETTING_MEMBER_REMOVE)) && (project.getPrincipal() == null || project.getPrincipal().getId() != loginUser.getId() || project.getStatus() != ProjectStatus.PROGRESS)) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (category.equals(SETTING_VERIFICATION_PRINCIPAL) && !(project.getStatus() == ProjectStatus.PROGRESS && project.getVerification().getManagerAdopt() == false && project.getVerification().getCreatorAdopt() == false)) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (category.equals(SETTING_VERIFICATION_MANAGER) && !(project.getStatus() == ProjectStatus.PROGRESS && project.getVerification().getPrincipalAdopt() == true && project.getVerification().getCreatorAdopt() == false)) {
+            throw new ResourceNotFoundException();
+        }
+
+        if (category.equals(SETTING_VERIFICATION_CREATOR) && !(project.getStatus() == ProjectStatus.PROGRESS && project.getVerification().getPrincipalAdopt() == true && project.getVerification().getManagerAdopt() == true)) {
             throw new ResourceNotFoundException();
         }
 
@@ -370,6 +453,9 @@ public class ProjectController {
                 break;
             case SETTING_STATUS:
                 project.setStatus(ProjectStatus.valueOf(projectSettingsForm.getStatus().toUpperCase()));
+                if (project.getStatus() == ProjectStatus.FINISH) {
+                    project.setFinishTime(new Date());
+                }
                 projectRepository.updateProject(project);
                 break;
             case SETTING_MEMBER_ADD:
@@ -377,7 +463,7 @@ public class ProjectController {
                     JSONArray jsonArray = new JSONArray(projectSettingsForm.getMember());
                     for (int i = 0; i < jsonArray.length(); i++) {
                         User user = userRepository.findUserByName(jsonArray.getString(i));
-                        if (user != null) {
+                        if (user != null && user.getId() != loginUser.getId()) {
                             try {
                                 userRepository.saveMemberByProject(user, project);
                             } catch (DuplicateMemberException e) {
@@ -396,6 +482,31 @@ public class ProjectController {
                         }
                     });
                 }
+                break;
+            case SETTING_VERIFICATION_PRINCIPAL:
+                project.getVerification().setPrincipalAdopt(projectSettingsForm.getPrincipalAdopt());
+                project.getVerification().setPrincipalRemark(projectSettingsForm.getPrincipalRemark());
+                projectRepository.updateProjectVerification(project, project.getVerification());
+                break;
+            case SETTING_VERIFICATION_MANAGER:
+                if (projectSettingsForm.getManagerAdopt()) {
+                    project.getVerification().setManagerAdopt(projectSettingsForm.getManagerAdopt());
+                } else {
+                    project.getVerification().setPrincipalAdopt(projectSettingsForm.getManagerAdopt());
+                }
+
+                project.getVerification().setManagerRemark(projectSettingsForm.getManagerRemark());
+                projectRepository.updateProjectVerification(project, project.getVerification());
+                break;
+            case SETTING_VERIFICATION_CREATOR:
+                if (projectSettingsForm.getCreatorAdopt()) {
+                    project.getVerification().setCreatorAdopt(projectSettingsForm.getCreatorAdopt());
+                } else {
+                    project.getVerification().setManagerAdopt(projectSettingsForm.getCreatorAdopt());
+                }
+
+                project.getVerification().setCreatorRemark(projectSettingsForm.getCreatorRemark());
+                projectRepository.updateProjectVerification(project, project.getVerification());
                 break;
             default:
                 break;

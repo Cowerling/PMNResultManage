@@ -4,11 +4,6 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $.extend($.validator.messages, {
-        required: "\u5fc5\u586b",    //必填
-        maxlength: $.validator.format("\u6700\u591a\u53ef\u4ee5\u8f93\u5165{0}\u4e2a\u5b57\u7b26") //最多可以输入{0}个字符
-    });
-
     $(".select2").select2({
         language: "zh-CN"
     });
@@ -96,8 +91,8 @@ $(document).ready(function () {
                 });
             },
             dataSrc: function (result) {
-                result.recordsTotal = result.count
-                result.recordsFiltered = result.dataRecords.length;
+                result.recordsTotal = result.count;
+                result.recordsFiltered = result.count;
 
                 for (var i =0, length = result.dataRecords.length; i < length; i++) {
                     result.dataRecords[i].name = result.dataRecords[i].name;
@@ -163,8 +158,8 @@ $(document).ready(function () {
                 });
             },
             dataSrc: function (result) {
-                result.recordsTotal = result.count
-                result.recordsFiltered = result.dataRecords.length;
+                result.recordsTotal = result.count;
+                result.recordsFiltered = result.count;
 
                 for (var i =0, length = result.dataRecords.length; i < length; i++) {
                     result.dataRecords[i].name = result.dataRecords[i].name;
@@ -200,8 +195,8 @@ $(document).ready(function () {
                 });
             },
             dataSrc: function (result) {
-                result.recordsTotal = result.count
-                result.recordsFiltered = result.dataRecords.length;
+                result.recordsTotal = result.count;
+                result.recordsFiltered = result.count;
 
                 for (var i =0, length = result.dataRecords.length; i < length; i++) {
                     result.dataRecords[i].name = result.dataRecords[i].name;

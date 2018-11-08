@@ -20,6 +20,7 @@ public class Project {
     @JsonIgnore
     private User creator;
     private Date createTime;
+    private Date finishTime;
     @JsonIgnore
     private User manager;
     @JsonIgnore
@@ -29,6 +30,8 @@ public class Project {
     private String remark;
     private ProjectStatus status;
     private String tag;
+    @JsonIgnore
+    private ProjectVerification verification;
 
     public Project() {
         createTime = new Date();
@@ -83,6 +86,14 @@ public class Project {
         this.createTime = createTime;
     }
 
+    public Date getFinishTime() {
+        return finishTime;
+    }
+
+    public void setFinishTime(Date finishTime) {
+        this.finishTime = finishTime;
+    }
+
     public User getManager() {
         return manager;
     }
@@ -129,5 +140,13 @@ public class Project {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public ProjectVerification getVerification() {
+        return verification;
+    }
+
+    public void setVerification(ProjectVerification verification) {
+        this.verification = verification;
     }
 }

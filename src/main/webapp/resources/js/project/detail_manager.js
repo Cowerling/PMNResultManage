@@ -12,3 +12,15 @@ $(document).ready(function () {
         }
     }, "\u9009\u62e9\u8d1f\u8d23\u4eba");
 });
+
+$(document).ready(function () {
+    $("#verification_setting").find(".submit").click(function (event) {
+        $(this).siblings("input[name=managerAdopt]").val("true");
+        $(this).parent("form").submit();
+    });
+
+    $("#verification_setting").find(".reject").click(function (event) {
+        $(this).siblings("input[name=managerAdopt]").val("false");
+        $(this).parent("form").submit();
+    });
+});

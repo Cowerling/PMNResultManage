@@ -34,8 +34,11 @@ public class ProjectSqlProvider {
         PRINCIPAL("principal"),
         CATEGORY("t_project_category.category"),
         CREATE_TIME("create_time"),
+        FINISH_TIME("finish_time"),
         START_CREATE_TIME("create_time"),
         END_CREATE_TIME("create_time"),
+        START_FINISH_TIME("finish_time"),
+        END_FINISH_TIME("finish_time"),
         REMARK("remark"),
         STATUS("t_project_status.category");
 
@@ -66,10 +69,51 @@ public class ProjectSqlProvider {
         }
     }
 
+    private void FILTER_WHERE(SQL sql, Map<Field, Object> filters) {
+        filters.forEach((key, value) -> {
+            switch (key) {
+                case NAME:
+                    INNER_OR_WHERE(sql, (List<String>) value, "%s LIKE '%%%s%%'", key);
+                    break;
+                case CREATOR:
+                case MANAGER:
+                case PRINCIPAL:
+                    INNER_OR_WHERE(sql, (List<Long>) value, "%s = %d", key);
+                    break;
+                case REMARK:
+                    sql.AND();
+                    sql.WHERE(String.format("%s LIKE '%%%s%%'", key, value));
+                    break;
+                case CATEGORY:
+                case STATUS:
+                    INNER_OR_WHERE( sql, (List<String>) value, "%s = '%s'", key);
+                    break;
+                case START_CREATE_TIME:
+                    sql.AND();
+                    sql.WHERE(String.format("create_time >= '%s'", DateUtils.format((Date) value)));
+                    break;
+                case END_CREATE_TIME:
+                    sql.AND();
+                    sql.WHERE(String.format("create_time <= '%s'", DateUtils.format((Date) value)));
+                    break;
+                case START_FINISH_TIME:
+                    sql.AND();
+                    sql.WHERE(String.format("finish_time >= '%s' OR finish_time IS NULL", DateUtils.format((Date) value)));
+                    break;
+                case END_FINISH_TIME:
+                    sql.AND();
+                    sql.WHERE(String.format("finish_time <= '%s' OR finish_time IS NULL", DateUtils.format((Date) value)));
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
     public String selectProjectsById(final Long id) {
         return new SQL() {
             {
-                SELECT("t_project.id, name, t_project_category.category AS category, creator, create_time, manager, principal, remark, t_project_status.category AS status");
+                SELECT("t_project.id, name, t_project_category.category AS category, creator, create_time, finish_time, manager, principal, remark, t_project_status.category AS status");
                 FROM("t_project");
                 LEFT_OUTER_JOIN("t_project_category ON t_project.category = t_project_category.id");
                 LEFT_OUTER_JOIN("t_project_status ON t_project.status = t_project_status.id");
@@ -84,7 +128,7 @@ public class ProjectSqlProvider {
 
         return new SQL() {
             {
-                SELECT("t_project.id, name, t_project_category.category AS category, creator, create_time, manager, principal, remark, t_project_status.category AS status");
+                SELECT("t_project.id, name, t_project_category.category AS category, creator, create_time, finish_time, manager, principal, remark, t_project_status.category AS status");
                 FROM("t_project");
                 LEFT_OUTER_JOIN("t_project_category ON t_project.category = t_project_category.id");
                 LEFT_OUTER_JOIN("t_project_status ON t_project.status = t_project_status.id");
@@ -99,36 +143,7 @@ public class ProjectSqlProvider {
                 if (parameters.get("arg2") != null) {
                     Map<Field, Object> filters = (Map<Field, Object>) parameters.get("arg2");
 
-                    filters.forEach((key, value) -> {
-                        switch (key) {
-                            case NAME:
-                                INNER_OR_WHERE(this, (List<String>) value, "%s LIKE '%%%s%%'", key);
-                                break;
-                            case CREATOR:
-                            case MANAGER:
-                            case PRINCIPAL:
-                                INNER_OR_WHERE(this, (List<Long>) value, "%s = %d", key);
-                                break;
-                            case REMARK:
-                                AND();
-                                WHERE(String.format("%s LIKE '%%%s%%'", key, value));
-                                break;
-                            case CATEGORY:
-                            case STATUS:
-                                INNER_OR_WHERE( this, (List<String>) value, "%s = '%s'", key);
-                                break;
-                            case START_CREATE_TIME:
-                                AND();
-                                WHERE(String.format("create_time >= '%s'", DateUtils.format((Date) value)));
-                                break;
-                            case END_CREATE_TIME:
-                                AND();
-                                WHERE(String.format("create_time <= '%s'", DateUtils.format((Date) value)));
-                                break;
-                            default:
-                                break;
-                        }
-                    });
+                    FILTER_WHERE(this, filters);
                 }
                 if (parameters.get("arg3") != null) {
                     List<Pair<Field, Order>> orders = (List<Pair<Field, Order>>) parameters.get("arg3");
@@ -149,12 +164,22 @@ public class ProjectSqlProvider {
 
         return new SQL() {
             {
+                SELECT("COUNT(*)");
+                FROM("t_project");
+                LEFT_OUTER_JOIN("t_project_category ON t_project.category = t_project_category.id");
+                LEFT_OUTER_JOIN("t_project_status ON t_project.status = t_project_status.id");
+                if (findMode == FindMode.PARTICIPATOR) {
+                    LEFT_OUTER_JOIN("t_project_members ON t_project.id = t_project_members.project");
+                }
                 if (findMode != FindMode.PARTICIPATOR) {
-                    SELECT("COUNT(*) FROM t_project");
                     WHERE(findMode + " = " + userId);
                 } else {
-                    SELECT("COUNT(*) FROM t_project_members");
-                    WHERE("member = " + userId);
+                    WHERE("t_project_members.member = " + userId);
+                }
+                if (parameters.get("arg2") != null) {
+                    Map<Field, Object> filters = (Map<Field, Object>) parameters.get("arg2");
+
+                    FILTER_WHERE(this, filters);
                 }
             }
         }.toString();
@@ -172,6 +197,7 @@ public class ProjectSqlProvider {
                 }
                 SET("remark = #{remark}");
                 SET("status = (SELECT id FROM t_project_status WHERE category = #{status})");
+                SET("finish_time = #{finishTime}");
                 WHERE("id = #{id}");
             }
         }.toString();

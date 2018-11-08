@@ -12,14 +12,85 @@
         <result property="status" column="status" />
         <result property="category" column="category" />
         <result property="remark" column="remark" />
+        <result property="sourceProJ" column="source_proj" />
         <association property="project" column="project" select="com.cowerling.pmn.data.mapper.ProjectMapper.selectProjectById" />
         <association property="uploader" column="uploader" select="com.cowerling.pmn.data.mapper.UserMapper.selectUserById" />
     </resultMap>
 
-    <resultMap id="cpiBaseDataContentResult" type="cpiBaseDataContent">
+    <resultMap id="cp0DataContentResult" type="cp0DataContent">
         <id property="id" column="id" />
+        <result property="name" column="name" />
         <result property="x" column="x" />
         <result property="y" column="y" />
-        <result property="h" column="h" />
+        <result property="z" column="z" />
+        <result property="mx" column="mx" />
+        <result property="my" column="my" />
+        <result property="mz" column="mz" />
+    </resultMap>
+
+    <resultMap id="cpi2dDataContentResult" type="cpi2dDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="mx" column="mx" />
+        <result property="my" column="my" />
+        <result property="mp" column="mp" />
+    </resultMap>
+
+    <resultMap id="cpi3dDataContentResult" type="cpi3dDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="z" column="z" />
+        <result property="mx" column="mx" />
+        <result property="my" column="my" />
+        <result property="mz" column="mz" />
+    </resultMap>
+
+    <resultMap id="cpiiDataContentResult" type="cpiiDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="mx" column="mx" />
+        <result property="my" column="my" />
+        <result property="mp" column="mp" />
+    </resultMap>
+
+    <resultMap id="cpiiiDataContentResult" type="cpiiiDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="zenithHeight" column="zenith_height" />
+        <result property="prismHeight" column="prism_height" />
+    </resultMap>
+
+    <resultMap id="cpiileDataContentResult" type="cpiileDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="mx" column="mx" />
+        <result property="my" column="my" />
+        <result property="mp" column="mp" />
+    </resultMap>
+
+    <resultMap id="tsitDataContentResult" type="tsitDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="mx" column="mx" />
+        <result property="my" column="my" />
+    </resultMap>
+
+    <resultMap id="ecDataContentResult" type="ecDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="meanDeviation" column="mean_deviation" />
+        <result property="squareError" column="square_error" />
     </resultMap>
 </mapper>

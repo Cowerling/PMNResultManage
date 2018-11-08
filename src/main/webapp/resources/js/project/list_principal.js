@@ -35,7 +35,7 @@ $(document).ready(function () {
             },
             dataSrc: function (result) {
                 result.recordsTotal = result.count;
-                result.recordsFiltered = result.projects.length;
+                result.recordsFiltered = result.count;
 
                 for (let i =0, length = result.projects.length; i < length; i++) {
                     result.projects[i].name = $.createProjectName(result.projects[i].name, result.projects[i].tag);

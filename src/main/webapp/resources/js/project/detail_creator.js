@@ -14,5 +14,21 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $("#settings_remark").validate();
+    $("#verification_setting").find(".submit").click(function (event) {
+        $(this).siblings("input[name=creatorAdopt]").val("true");
+        $(this).parent("form").submit();
+    });
+
+    $("#verification_setting").find(".reject").click(function (event) {
+        $(this).siblings("input[name=creatorAdopt]").val("false");
+        $(this).parent("form").submit();
+    });
+});
+
+$(document).ready(function () {
+    $("#finish_project").click(function (event) {
+        event.preventDefault();
+
+        $("#finish_project").parent("form").submit();
+    });
 });

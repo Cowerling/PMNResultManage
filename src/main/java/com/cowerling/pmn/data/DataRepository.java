@@ -8,7 +8,9 @@ import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.NoSuchDataRecordCategoryException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.postgis.Point;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -35,4 +37,6 @@ public interface DataRepository {
     void removeDataContentsByDataRecord(DataRecord dataRecord) throws NoSuchDataRecordCategoryException;
     void removeDataContentById(DataRecordCategory dataRecordCategory, Long id) throws NoSuchDataRecordCategoryException;
     void updateDataContent(DataRecordCategory dataRecordCategory, DataContent dataContent) throws NoSuchDataRecordCategoryException;
+    String findDataContentsAsGeoJsonByDataRecord(DataRecord dataRecord) throws NoSuchDataRecordCategoryException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException;
+    Point findDataContentTransformPointByDataRecord(DataRecord dataRecord, DataContent dataContent) throws NoSuchDataRecordCategoryException;
 }

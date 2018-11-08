@@ -55,6 +55,17 @@
                                 <div class="info-box-content">
                                     <span class="info-box-text" th:text="#{project_detail_creator}">creator</span>
                                     <span class="info-box-number" th:text="${project.creator.alias}">creator name</span>
+
+                                    <span class="info-box-number" sec:authorize="hasRole('ROLE_ADMIN')" th:if="${project.creator.id == loginUser.id and project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.verification.creatorAdopt == true and project.verification.managerAdopt == true and project.verification.principalAdopt == true}">
+                                        <form th:action="@{settings/status}" method="post">
+                                            <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                                            <input type="hidden" name="status" value="finish" />
+                                            <a class="text-success" id="finish_project" href="#">
+                                                <i class="fa fa-play-circle" aria-hidden="true"></i>
+                                                <span th:text="#{finish_project}" class="text-success">finish project</span>
+                                            </a>
+                                        </form>
+                                    </span>
                                 </div>
                             </div>
 
@@ -148,7 +159,7 @@
                                         <p sec:authorize="!hasRole('ROLE_ADMIN')" class="text-muted" th:text="${project.remark}"></p>
                                         <div sec:authorize="hasRole('ROLE_ADMIN')">
                                             <form id="settings_remark" th:action="@{settings/remark}" method="post">
-                                                <textarea class="text-area" name="remark" th:text="${project.remark}" th:placeholder="#{project_detail_remark_demand}" maxlength="200"></textarea>
+                                                <textarea class="text-area" name="remark" th:text="${project.remark}" th:placeholder="#{200_remark_demand}" maxlength="200"></textarea>
                                                 <input type="hidden" name="projectTag" th:value="${project.tag}" />
                                                 <button type="reset" class="btn btn-danger" th:text="#{clear}">clear</button>
                                                 <button type="submit" class="btn btn-primary" th:text="#{modify}">modify</button>
@@ -265,6 +276,83 @@
 
                                         <input type="hidden" class="search-condition" th:value="${project.tag}" />
                                     </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6" th:if="${project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS or project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).FINISH}">
+
+                            <div class="box box-warning">
+
+                                <div class="box-header with-border">
+                                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                                    <h3 class="box-title" th:text="#{verification}">verification</h3>
+                                </div>
+
+                                <div class="box-body">
+
+                                    <div id="verification_setting" class="row">
+
+                                        <div class="col-md-4">
+                                            <strong>
+                                                <i class="fa fa-file-text-o margin-r-5"></i>
+                                                <span th:text="#{creator_verification_remark}">creator verification remark</span>
+                                                <i th:if="${project.verification.creatorAdopt == true}" class="fa fa-check-circle-o text-success" aria-hidden="true"></i>
+                                                <i th:if="${project.verification.creatorAdopt == false}" class="fa fa-exclamation-circle text-orange" aria-hidden="true"></i>
+                                            </strong>
+                                            <p th:if="${!(project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.creator.id == loginUser.id and project.verification.creatorAdopt == false and project.verification.managerAdopt == true)}" class="text-muted text-success" th:text="${project.verification.creatorRemark}"></p>
+                                            <div th:if="${project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.creator.id == loginUser.id and project.verification.creatorAdopt == false and project.verification.managerAdopt == true}">
+                                                <form th:action="@{settings/verificationCreator}" method="post">
+                                                    <textarea class="text-area" style="min-height: 200px;" name="creatorRemark" th:text="${project.verification.creatorRemark}" th:placeholder="#{200_remark_demand}" maxlength="200" required></textarea>
+                                                    <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                                                    <input type="hidden" name="creatorAdopt" />
+                                                    <button type="button" class="btn btn-danger reject" th:text="#{reject_verification}">reject verification</button>
+                                                    <button type="button" class="btn btn-primary submit" th:text="#{submit_verification}">submit verification</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <strong>
+                                                <i class="fa fa-file-text-o margin-r-5"></i>
+                                                <span th:text="#{manager_verification_remark}">manager verification remark</span>
+                                                <i th:if="${project.verification.managerAdopt == true}" class="fa fa-check-circle-o text-success" aria-hidden="true"></i>
+                                                <i th:if="${project.verification.managerAdopt == false}" class="fa fa-exclamation-circle text-orange" aria-hidden="true"></i>
+                                            </strong>
+                                            <p th:if="${!(project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.manager.id == loginUser.id and project.verification.managerAdopt == false and project.verification.principalAdopt == true)}" class="text-muted text-success" th:text="${project.verification.managerRemark}"></p>
+                                            <div th:if="${project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.manager.id == loginUser.id and project.verification.managerAdopt == false and project.verification.principalAdopt == true}">
+                                                <form th:action="@{settings/verificationManager}" method="post">
+                                                    <textarea class="text-area" style="min-height: 200px;" name="managerRemark" th:text="${project.verification.managerRemark}" th:placeholder="#{200_remark_demand}" maxlength="200" required></textarea>
+                                                    <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                                                    <input type="hidden" name="managerAdopt" />
+                                                    <button type="button" class="btn btn-danger reject" th:text="#{reject_verification}">reject verification</button>
+                                                    <button type="button" class="btn btn-primary submit" th:text="#{submit_verification}">submit verification</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <strong>
+                                                <i class="fa fa-file-text-o margin-r-5"></i>
+                                                <span th:text="#{principal_verification_remark}">principal verification remark</span>
+                                                <i th:if="${project.verification.principalAdopt == true}" class="fa fa-check-circle-o text-success" aria-hidden="true"></i>
+                                                <i th:if="${project.verification.principalAdopt == false}" class="fa fa-exclamation-circle text-orange" aria-hidden="true"></i>
+                                            </strong>
+                                            <p th:if="${!(project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.principal.id == loginUser.id and project.verification.principalAdopt == false)}" class="text-muted text-success" th:text="${project.verification.principalRemark}"></p>
+                                            <div th:if="${project.status == T(com.cowerling.pmn.domain.project.ProjectStatus).PROGRESS and project.principal.id == loginUser.id and project.verification.principalAdopt == false}">
+                                                <form th:action="@{settings/verificationPrincipal}" method="post">
+                                                    <textarea class="text-area" style="min-height: 200px;" name="principalRemark" th:text="${project.verification.principalRemark}" th:placeholder="#{200_remark_demand}" maxlength="200" required></textarea>
+                                                    <input type="hidden" name="projectTag" th:value="${project.tag}" />
+                                                    <input type="hidden" name="principalAdopt" value="true" />
+                                                    <button type="submit" class="btn btn-primary" th:text="#{submit_verification}">submit verification</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                    </div>
 
                                 </div>
 

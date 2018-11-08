@@ -112,27 +112,6 @@ public class DepartmentController {
         }
     }
 
-    /*@RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> users(@RequestParam(value = "departmentTag") String departmentTag,
-                            @RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
-                            @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
-        try {
-            Long departmentId = Long.parseLong(generalEncoderService.staticDecrypt(departmentTag));
-
-            UserRole userRole = suitableUserRole(userGrade);
-
-            if (userRole == UserRole.SUPER_ADMIN) {
-                return userRepository.findUsersByDepartmentId(departmentId);
-            } else {
-                List<User> users = userRepository.findUsersByDepartmentId(departmentId, userRole);
-                users.removeIf(user -> user.getId() == loginUser.getId());
-                return users;
-            }
-        } catch (Exception e) {
-            throw new ResourceNotFoundException();
-        }
-    }*/
-
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, List<User>> users(@RequestParam(value = "userGrade", defaultValue = ConstantValue.EMPTY_PARAMETER) String userGrade,
                                          @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
@@ -154,14 +133,11 @@ public class DepartmentController {
 
     @RequestMapping(value = "/projectUsers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, List<User>> projectUsers(@RequestParam(value = "dataRecordTag") String dataRecordTag,
-                                          @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
+                                                @ModelAttribute("loginUser") final User loginUser) throws ResourceNotFoundException {
         try {
             DataRecord dataRecord = dataRepository.findDataRecordsById(Long.parseLong(generalEncoderService.staticDecrypt(dataRecordTag)));
 
-            if (dataRecord == null ||
-                    dataRecord.getProject() == null ||
-                    dataRecord.getProject().getPrincipal() == null ||
-                    dataRecord.getProject().getPrincipal().getId() != loginUser.getId()) {
+            if (dataRecord.getProject().getPrincipal().getId() != loginUser.getId()) {
                 throw new RuntimeException();
             }
 

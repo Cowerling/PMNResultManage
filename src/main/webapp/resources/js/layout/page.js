@@ -26,8 +26,28 @@ $(document).ready(function () {
         enumerable: true
     });
 
+    Object.defineProperty(CONSTANT, "WGS84_EPSG", {
+        value: 4326,
+        enumerable: true
+    });
+
     Object.defineProperty(CONSTANT, "INIT_CENTER", {
         value: [12955467.3459742, 4854848.3478852],
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "FULL_EXTENT", {
+        value: [8199793.691832532, 1817464.898135734, 15033697.231631598, 7085388.165495084],
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "GEOTATA_WFS", {
+        value: "geodata/wfs/",
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "GEOSERVICE_SERVER", {
+        value: "geoservice/server",
         enumerable: true
     });
 
@@ -63,6 +83,11 @@ $(document).ready(function () {
 
     Object.defineProperty(CONSTANT, "DATA_RECORD_LIST_URL", {
         value: "../data/record/list",
+        enumerable: true
+    });
+
+    Object.defineProperty(CONSTANT, "DATA_RECORD_LIST_SUMMARY_URL", {
+        value: "data/record/list/summary",
         enumerable: true
     });
 

@@ -6,13 +6,21 @@
     <head th:replace="layout/page :: head(~{::link}, ~{::script})">
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/fullcalendar/last/fullcalendar.min.css}">
         <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/fullcalendar/last/fullcalendar.print.min.css}" media="print">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/css/daterangepicker.css}">
 
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.colorutils.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/chartjs/last/Chart.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/moment/last/moment-with-locales.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/fullcalendar/last/fullcalendar.min.js}"></script>
-        <script type="text/javascript" th:src="@{/resources/dependence/fullcalendar/last/locale-all.js}"></script>
-        <script type="text/javascript" th:src="@{/resources/js/workbench.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/fullcalendar/last/locale/zh-cn.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/moment.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/daterangepicker.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/workbench/workbench.js}"></script>
+        <script sec:authorize="hasRole('ROLE_ADMIN')" type="text/javascript" th:src="@{/resources/js/workbench/workbench_creator.js}"></script>
+        <script sec:authorize="hasRole('ROLE_ADVAN_USER')" type="text/javascript" th:src="@{/resources/js/workbench/workbench_manager.js}"></script>
+        <script sec:authorize="hasRole('ROLE_USER')" type="text/javascript" th:src="@{/resources/js/workbench/workbench_principal.js}"></script>
+        <script sec:authorize="hasRole('ROLE_USER')" type="text/javascript" th:src="@{/resources/js/workbench/workbench_participator.js}"></script>
     </head>
 
     <body class="hold-transition skin-blue">
@@ -72,26 +80,97 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="box box-danger">
-                            <div class="box-header with-border">
-                                <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                                <h3 class="box-title" th:text="#{project_statistics}">project statistics</h3>
-                            </div>
 
-                            <div class="box-body">
-                                <div class="chart">
-                                    <canvas id="project_chart" style="height:400px" th:data-project-statistics="${projectStatistics}"></canvas>
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="box box-danger">
+                                    <div class="box-header with-border">
+                                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                        <h3 class="box-title" th:text="#{project_statistics}">project statistics</h3>
+                                    </div>
+
+                                    <div class="box-body">
+                                        <div class="row">
+
+                                            <div class="col-md-6">
+                                                <div class="chart">
+                                                    <canvas id="project_status_chart" style="height:400px" th:data-project-status-statistics="${projectStatusStatistics}"></canvas>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="chart">
+                                                    <canvas id="project_category_chart" style="height:400px" th:data-project-category-statistics="${projectCategoryStatistics}"></canvas>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="box box-success">
+                                    <div class="box-header with-border">
+                                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                        <h3 class="box-title" th:text="#{data_statistics}">data statistics</h3>
+                                    </div>
+
+                                    <div class="box-body">
+                                        <div id="data_record_chart_search" class="row">
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <label th:text="#{project_name}">project name</label>
+                                                    <input type="text" class="form-control project-name" th:placeholder="#{multiple_project_name_split}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <label th:text="#{create_time}">create time</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-clock-o"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control pull-right date-range create-time">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <label th:text="#{search}">search</label>
+                                                    <button class="form-control btn btn-primary search"><i class="fa fa-search icon-right"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="chart">
+                                                    <canvas id="data_record_chart" style="height:400px" th:data-project-statistics="${projectStatistics}"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="col-md-6">
                         <div class="box box-warning">
-                            <!--<div class="box-header with-border">
+                            <div class="box-header with-border">
                                 <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                                <h3 class="box-title" th:text="#{project_statistics}">project statistics</h3>
-                            </div>-->
+                                <h3 class="box-title" th:text="#{project_progress}">project progress</h3>
+                            </div>
 
                             <div class="box-body no-padding">
                                 <div id="calendar"></div>
