@@ -1,4 +1,4 @@
-package com.cowerling.pmn.web;
+package com.cowerling.pmn.web.spatial;
 
 import com.cowerling.pmn.geodata.GeoCityRepository;
 import org.springframework.beans.factory.annotation.Autowired;

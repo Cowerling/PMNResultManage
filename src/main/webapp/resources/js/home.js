@@ -80,18 +80,16 @@ $(document).ready(function () {
         this.getTargetElement().style.cursor = hit ? "pointer": "";
     });
 
+    let local_city = new T.LocalCity();
+
+    local_city.location(function (result) {
+        let view = map.getView();
+        view.setCenter(ol.proj.transform([result.lnglat.lng, result.lnglat.lat], "EPSG:" + CONSTANT.WGS84_EPSG, "EPSG:" + CONSTANT.MAP_EPSG));
+        view.setZoom(result.level);
+        map.render();
+    });
+
     map.updateSize();
-
-    function findLayer(map, layer_name) {
-        let layers = map.getLayers();
-
-        for (let i = 0, length = layers.getLength(); i < length; i++) {
-            let layer = layers.item(i);
-            if (layer.get("name") == layer_name) {
-                return layer;
-            }
-        }
-    }
 
     $.get(CONSTANT.GEOSERVICE_SERVER, function (server) {
         $("#map_tool").find("div.base-layer-list").bindLayer(new ol.layer.Tile({
@@ -165,37 +163,6 @@ $(document).ready(function () {
         }), function (layer) {
             map.addLayer(layer);
         });
-
-        $.ajax({
-            dataType: "jsonp",
-            url: CONSTANT.LOCATION_SERVER_URL,
-            success: function(result){
-                var city_name = result.city.slice(0, -1);
-
-                $.get(server.url + "/wfs", {
-                        service: "wfs",
-                        version: "1.0.0",
-                        request: "GetFeature",
-                        typeName: server.worksapce + ":city_point",
-                        maxFeatures: 1,
-                        outputFormat: "application/json",
-                        cql_filter: "name LIKE '%" + city_name + "%'",
-                        authkey: server.authkey
-                    },
-                    function (result) {
-                        if (result.totalFeatures == 0) {
-                            return;
-                        }
-
-                        let crs = result.crs.properties.name, epsg = crs.substr(crs.indexOf("EPSG::") + "EPSG::".length, 4);
-                        let geometry = result.features[0].geometry, coordinates = geometry.coordinates[0];
-
-                        let view = map.getView();
-                        view.setCenter(ol.proj.transform(coordinates, "EPSG:" + epsg, "EPSG:" + CONSTANT.MAP_EPSG));
-                        map.render();
-                    });
-            }
-        });
     });
 
     $("#map_tool")
@@ -230,7 +197,7 @@ $(document).ready(function () {
                 format: new ol.format.GeoJSON()
             }),
             style: function (feature, resolution) {
-                return $.createCustomLayerStyle(data_record_name + ":" + feature.get("name"), color, "#ffff00");
+                return $.createCustomLayerStyle("\u25c8" + feature.get("name"), color, "#ffff00");
             },
             name: data_record_name,
             geometry_type: "point"

@@ -28,36 +28,6 @@ public abstract class DataContent {
 
     public abstract String getTableName();
 
-    /*public Double getCoordinateX() {
-        try {
-            return ClassUtils.getDeclaredFieldValue(this, CoordinateX.class);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException();
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException();
-        }
-    }
-
-    public Double getCoordinateY() {
-        try {
-            return ClassUtils.getDeclaredFieldValue(this, CoordinateY.class);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException();
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException();
-        }
-    }
-
-    public Double getCoordinateZ() {
-        try {
-            return ClassUtils.getDeclaredFieldValue(this, CoordinateZ.class);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException();
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException();
-        }
-    }*/
-
     public Map<String, Map.Entry<Class<?>, Object>> attributes() {
         try {
             Map<String, Map.Entry<Class<?>, Object>> attributes = new LinkedHashMap<>();

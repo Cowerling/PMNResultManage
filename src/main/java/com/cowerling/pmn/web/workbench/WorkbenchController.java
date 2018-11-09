@@ -1,4 +1,4 @@
-package com.cowerling.pmn.web;
+package com.cowerling.pmn.web.workbench;
 
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.data.ProjectRepository;

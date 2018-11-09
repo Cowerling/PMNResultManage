@@ -14,6 +14,7 @@
         <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/i18n/zh-CN.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js}"></script>
         <script type="text/javascript" th:src="@{/resources/dependence/icheck/1.0.2/icheck.min.js}"></script>
+        <script type="text/javascript" src="http://api.tianditu.gov.cn/api?v=4.0&tk=b2dee1de61ae8c9c10c9d7c3545c01aa" ></script>
         <script type="text/javascript" th:src="@{/resources/js/user/profile.js}"></script>
     </head>
     <body class="hold-transition skin-blue">
@@ -44,7 +45,7 @@
                                             <b><i class="fa fa-calendar width-8-per"></i><span th:text="#{profile_registerDate}">register date</span></b><a class="pull-right" th:text="${#dates.format(loginUser.registerDate, 'yyyy-MM-dd')}"></a>
                                         </li>
                                         <li class="list-group-item">
-                                            <b><i class="fa fa-users width-8-per"></i><span th:text="#{profile_department}">department</span></b><a class="pull-right" th:text="${loginUser.department.name}"></a>
+                                            <b><i class="fa fa-users width-8-per"></i><span th:text="#{profile_department}">department</span></b><a class="pull-right" th:text="${loginUser.department != null ? loginUser.department.name : ''}"></a>
                                         </li>
                                         <li class="list-group-item">
                                             <b><i class="fa fa-map-marker width-8-per"></i><span th:text="#{profile_login_site}">login site</span></b><a class="pull-right" id="location"></a>

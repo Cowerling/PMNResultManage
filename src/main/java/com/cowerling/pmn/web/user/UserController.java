@@ -3,16 +3,23 @@ package com.cowerling.pmn.web.user;
 import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.data.DepartmentRepository;
 import com.cowerling.pmn.data.UserRepository;
+import com.cowerling.pmn.domain.document.Document;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.domain.user.UserGender;
+import com.cowerling.pmn.domain.user.UserRole;
 import com.cowerling.pmn.domain.user.form.UserProfileForm;
 import com.cowerling.pmn.domain.user.form.UserSecurityForm;
 import com.cowerling.pmn.exception.DuplicateUserException;
+import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ExceptionMessage;
+import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.geodata.GeoAuthenticationRepository;
 import com.cowerling.pmn.security.PasswordEncoderService;
 import com.cowerling.pmn.utils.ImageUtils;
+import com.cowerling.pmn.web.ConstantValue;
 import org.apache.commons.lang3.StringUtils;
+import org.hsqldb.lib.Collection;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -35,6 +42,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -135,5 +146,23 @@ public class UserController {
         }
 
         return "redirect:/user/profile";
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_SUPER_ADMIN')")
+    @ToResourceNotFound
+    public @ResponseBody Map<String, Object> list(@RequestParam(value = "request") String request) throws ResourceNotFoundException {
+        try {
+            JSONObject jsonObject = new JSONObject(request);
+            int draw = jsonObject.getInt(ConstantValue.LIST_REQUEST_DRAW);
+
+            Map<String, Object> list = new HashMap<>();
+            list.put("draw", draw);
+            list.put("users", userRepository.findUsers().stream().filter(user -> user.getUserRole() != UserRole.SUPER_ADMIN).collect(Collectors.toList()));
+
+            return list;
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
     }
 }

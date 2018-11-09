@@ -19,6 +19,12 @@ public interface UserMapper {
 
     @Select("SELECT t_user.id, name, password, email, alias, t_user_gender.category AS gender, birthday, phone, register_date, photo, t_user_role.category AS role, department FROM t_user " +
             "LEFT OUTER JOIN t_user_gender ON t_user.gender = t_user_gender.id " +
+            "LEFT OUTER JOIN t_user_role ON t_user.role = t_user_role.id")
+    @ResultMap("com.cowerling.pmn.data.mapper.UserMapper.userResult")
+    List<User> selectUsers();
+
+    @Select("SELECT t_user.id, name, password, email, alias, t_user_gender.category AS gender, birthday, phone, register_date, photo, t_user_role.category AS role, department FROM t_user " +
+            "LEFT OUTER JOIN t_user_gender ON t_user.gender = t_user_gender.id " +
             "LEFT OUTER JOIN t_user_role ON t_user.role = t_user_role.id " +
             "WHERE t_user.id = #{id}")
     @ResultMap("com.cowerling.pmn.data.mapper.UserMapper.userResult")
@@ -46,7 +52,7 @@ public interface UserMapper {
     @ResultMap("com.cowerling.pmn.data.mapper.UserMapper.userResult")
     List<User> selectUsersByDepartmentId(Long departmentId, Map<Field, Object> filters);
 
-    @Insert("INSERT INTO t_user(name, password, alias, phone, register_date, role) VALUES(#{name}, #{password}, #{alias}, #{phone}, #{registerDate}, (SELECT id FROM t_user_role WHERE category = #{userRole}))")
+    @Insert("INSERT INTO t_user(name, password, alias, phone, register_date, role, department) VALUES(#{name}, #{password}, #{alias}, #{phone}, #{registerDate}, (SELECT id FROM t_user_role WHERE category = #{userRole}), #{department.id})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertUser(User user);
 
@@ -54,9 +60,12 @@ public interface UserMapper {
     void insertMemberIdByProjectId(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     @Update("UPDATE t_user " +
-            "SET name = #{name}, password = #{password}, email = #{email}, alias = #{alias}, gender = (SELECT id FROM t_user_gender WHERE category = #{userGender}), birthday = #{birthday}, phone = #{phone}, register_date = #{registerDate}, photo = #{photo}, role = (SELECT id FROM t_user_role WHERE category = #{userRole}) " +
+            "SET name = #{name}, password = #{password}, email = #{email}, alias = #{alias}, gender = (SELECT id FROM t_user_gender WHERE category = #{userGender}), birthday = #{birthday}, phone = #{phone}, register_date = #{registerDate}, photo = #{photo}, role = (SELECT id FROM t_user_role WHERE category = #{userRole}), department = #{department.id} " +
             "WHERE id = #{id}")
     void updateUser(User user);
+
+    @Delete("DELETE FROM t_user WHERE id = #{id}")
+    void deleteUser(User user);
 
     @Delete("DELETE FROM t_project_members WHERE project = #{projectId} AND member = #{userId}")
     void deleteMemberIdByProjectId(@Param("userId") Long userId, @Param("projectId") Long projectId);

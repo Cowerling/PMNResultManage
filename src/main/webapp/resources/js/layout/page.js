@@ -1,23 +1,23 @@
 var CONSTANT = {}
 
 $(document).ready(function () {
-    Object.defineProperty(CONSTANT, "LOCATION_SERVER_URL", {
-        value: "http://whois.pconline.com.cn/ipJson.jsp",
+    Object.defineProperty(CONSTANT, "GEOSOURCE_TIANDITU_KEY", {
+        value: "b2dee1de61ae8c9c10c9d7c3545c01aa",
         enumerable: true
     });
 
     Object.defineProperty(CONSTANT, "GEOSOURCE_TIANDITU_VEC", {
-        value: "http://t3.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}",
+        value: "http://t3.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=" + CONSTANT.GEOSOURCE_TIANDITU_KEY,
         enumerable: true
     });
 
     Object.defineProperty(CONSTANT, "GEOSOURCE_TIANDITU_IMG", {
-        value: "http://t3.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}",
+        value: "http://t3.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=" + CONSTANT.GEOSOURCE_TIANDITU_KEY,
         enumerable: true
     });
 
     Object.defineProperty(CONSTANT, "GEOSOURCE_TIANDITU_CVA", {
-        value: "http://t3.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}",
+        value: "http://t3.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=" + CONSTANT.GEOSOURCE_TIANDITU_KEY,
         enumerable: true
     });
 

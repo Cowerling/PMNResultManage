@@ -3,10 +3,8 @@
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head th:replace="layout/page :: head(~{::link}, ~{::script})">
-    <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/datatables/1.10.16/css/dataTables.bootstrap.min.css}">
-
-    <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
-    <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
+    <link>
+    <script></script>
 </head>
 
 <body class="hold-transition skin-blue fixed">
@@ -21,7 +19,13 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <iframe th:src="@{/plugin/pdfjs/viewer.html(file=${file})}" style="width: 100%; height: 800px;"></iframe>
+
+                    <div class="box box-success">
+                        <div class="box-body no-padding">
+                            <iframe th:src="@{/resources/plugin/pdfjs/web/viewer.html(file= '../../../../file/document/' + ${file})}" style="width: 100%; height: 800px;"></iframe>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

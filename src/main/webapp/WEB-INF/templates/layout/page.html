@@ -41,38 +41,13 @@
                     <div class="collapse navbar-collapse pull-left">
                         <ul class="nav navbar-nav">
                             <li>
-                                <a href="https://www.baidu.com/">Baidu</a>
+                                <a href="http://www.crfsdi.com.cn/" th:text="#{crfsdi_home}"></a>
                             </li>
                         </ul>
                     </div>
 
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
-                            <li class="dropdown messages-menu">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                    <i class="fa fa-envelope-o"></i>
-                                    <span class="label label-success" id="message_remind_sub_count">4</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="header">
-                                        <span id="message_remind_count">4</span>
-                                        <span th:text="#{page_messages_to_read}"> messages</span>
-                                    </li>
-                                    <li>
-                                        <ul class="menu">
-                                            <li>
-                                                <a href="#">
-                                                    <div class="pull-left">
-                                                        <img th:src="@{'/resources/image/user/'+ ${loginUser.photo != null ? loginUser.photo : 'sample-160x160.png'}}" class="img-circle" alt="User Image">
-                                                    </div>
-                                                    <h4 id="message_remind_content"></h4>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="footer"><a href="#"><span th:text="#{page_see_all_messages}">See ALL Messages</span></a></li>
-                                </ul>
-                            </li>
 
                             <li class="dropdown user user-menu">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -129,14 +104,14 @@
                             </a>
                         </li>
 
-                        <li class="menu-workbench">
+                        <li sec:authorize="!hasRole('SUPER_ADMIN')" class="menu-workbench">
                             <a th:href="@{/workbench}">
                                 <i class="fa fa-newspaper-o"></i>
                                 <span th:text="#{workbench}">Workbench</span>
                             </a>
                         </li>
 
-                        <li class="treeview menu-project">
+                        <li sec:authorize="!hasRole('SUPER_ADMIN')" class="treeview menu-project">
                             <a href="#">
                                 <i class="fa fa-file-text-o"></i>
                                 <span th:text="#{page_project}">Project</span>
@@ -149,7 +124,7 @@
                             </ul>
                         </li>
 
-                        <li class="treeview menu-data">
+                        <li sec:authorize="!hasRole('SUPER_ADMIN')" class="treeview menu-data">
                             <a href="#">
                                 <i class="fa fa-database"></i>
                                 <span th:text="#{page_data}">Data</span>
@@ -167,8 +142,21 @@
                         <li class="menu-document">
                             <a th:href="@{/document}">
                                 <i class="fa fa-book"></i>
-                                <span th:text="#{document}">document</span>
+                                <span th:text="#{document}">Document</span>
                             </a>
+                        </li>
+
+                        <li sec:authorize="hasRole('SUPER_ADMIN')" class="treeview menu-manage">
+                            <a href="#">
+                                <i class="fa fa-cogs"></i>
+                                <span th:text="#{manage}">Manage</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="menu-manage-user"><a th:href="@{/manage/user}"><i class="fa fa-circle-o"></i><span th:text="#{user}">user</span></a></li>
+                            </ul>
                         </li>
 
                     </ul>

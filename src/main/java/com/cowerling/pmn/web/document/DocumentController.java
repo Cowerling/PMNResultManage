@@ -1,4 +1,4 @@
-package com.cowerling.pmn.web;
+package com.cowerling.pmn.web.document;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.data.DocumentRepository;
@@ -6,9 +6,9 @@ import com.cowerling.pmn.domain.document.Document;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
+import com.cowerling.pmn.web.ConstantValue;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,9 +27,6 @@ public class DocumentController {
 
     @Autowired
     private GeneralEncoderService generalEncoderService;
-
-    @Value("${file.document.location}")
-    private String documentFileLocation;
 
     @RequestMapping(method = RequestMethod.GET)
     public String list() {
@@ -72,7 +69,7 @@ public class DocumentController {
                 throw new RuntimeException();
             }
 
-            model.addAttribute("file", documentFileLocation + document.getFile());
+            model.addAttribute("file", document.getFile());
 
             return "document/view";
         } catch (Exception e) {

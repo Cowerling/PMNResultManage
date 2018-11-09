@@ -1,10 +1,8 @@
 $(document).ready(function () {
-    $.ajax({
-        dataType: "jsonp",
-        url: CONSTANT.LOCATION_SERVER_URL,
-        success: function(result){
-            $("#location").text(result.pro + " " + result.city + " " + result.region);
-        }
+    let local_city = new T.LocalCity();
+
+    local_city.location(function (result) {
+        $("#location").text(result.cityName);
     });
 
     $(".select2").select2();

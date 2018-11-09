@@ -88,7 +88,8 @@
 }
 
 .login-image-page {
-    background: url('../image/login-background2.jpg') no-repeat 100% 100%;
+    background: url('../image/login-background3.jpg') no-repeat fixed;
+    background-size: cover;
 }
 
 .compact {

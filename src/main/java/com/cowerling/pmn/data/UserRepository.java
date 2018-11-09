@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface UserRepository {
     User findUserByName(String name);
+    List<User> findUsers();
     User findUserById(Long id);
     List<User> findUsersByAlias(String alias);
     List<User> findUsersByDepartmentId(Long departmentId);
@@ -21,4 +22,5 @@ public interface UserRepository {
     void saveMemberByProject(User user, Project project) throws DuplicateMemberException;
     void removeMemberByProject(User user, Project project);
     void updateUser(User user);
+    void removeUser(User user);
 }

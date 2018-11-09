@@ -21,6 +21,19 @@ public class MybatisDepartmentRepository implements DepartmentRepository {
     }
 
     @Override
+    public Department findDepartmentById(Long id) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DepartmentMapper departmentMapper = sqlSession.getMapper(DepartmentMapper.class);
+
+            return departmentMapper.selectDepartmentById(id);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public Department findDepartmentByName(String name) {
         SqlSession sqlSession = currentSession();
 

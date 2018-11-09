@@ -34,4 +34,20 @@ public class MybatisGeoAuthenticationRepository implements GeoAuthenticationRepo
             sqlSession.close();
         }
     }
+
+    @Override
+    public void removeUser(String username) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            GeoAuthenticationMapper geoAuthenticationMapper = sqlSession.getMapper(GeoAuthenticationMapper.class);
+
+            geoAuthenticationMapper.deleteGroupMember(username);
+            geoAuthenticationMapper.deleteUser(username);
+
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

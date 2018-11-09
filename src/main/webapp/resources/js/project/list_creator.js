@@ -28,7 +28,7 @@ $(document).ready(function () {
             $(".project-remove-hint").find("form").attr("action", CONSTANT.PROJECT_REMOVE_URL);
             $(".project-remove-hint").find("input.project-tag").val(project_tag);
 
-            $(".project-remove-hint").modal("show")
+            $(".project-remove-hint").modal("show");
         });
 
         $(this).initProjectTools();

@@ -46,6 +46,18 @@ public class MybatisUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findUsers() {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            return userMapper.selectUsers();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
     public User findUserById(Long id) {
         SqlSession sqlSession = currentSession();
 
@@ -189,6 +201,19 @@ public class MybatisUserRepository implements UserRepository {
         try {
             UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
             userMapper.updateUser(user);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public void removeUser(User user) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+            userMapper.deleteUser(user);
             sqlSession.commit();
         } finally {
             sqlSession.close();

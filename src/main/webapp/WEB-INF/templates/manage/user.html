@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/page :: head(~{::link}, ~{::script})">
+    <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/datatables/1.10.16/css/dataTables.bootstrap.min.css}">
+
+    <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/i18n/zh-CN.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/js/manage/user.js}"></script>
+</head>
+
+<body class="hold-transition skin-blue fixed">
+<div class="wrapper">
+    <header class="main-header" th:replace="layout/page :: header"></header>
+
+    <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+    <div class="content-wrapper">
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-success">
+                        <div class="box-body">
+
+                            <table id="list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                <thead>
+                                <tr>
+                                    <th th:text="#{user_name}">User Name</th>
+                                    <th th:text="#{alias}">Alias</th>
+                                    <th th:text="#{register_date}">Register Date</th>
+                                    <th th:text="#{role}">Role</th>
+                                    <th th:text="#{department}">department</th>
+                                    <th th:text="#{operation}">operation</th>
+                                </tr>
+                                </thead>
+
+                                <tfoot>
+                                <tr>
+                                    <th th:text="#{user_name}">User Name</th>
+                                    <th th:text="#{alias}">Alias</th>
+                                    <th th:text="#{register_date}">Register Date</th>
+                                    <th th:text="#{role}">Role</th>
+                                    <th th:text="#{department}">department</th>
+                                    <th th:text="#{operation}">operation</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="user_edit_modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">
+                                <i class="fa fa-wrench icon-right text-danger" aria-hidden="true"></i>
+                                <span th:text="#{edit_user}">edit user</span>
+                            </h4>
+                        </div>
+                        <form id="project_add_form2" class="form-horizontal" th:action="@{user/edit}" method="post">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" th:text="#{alias}">alias</label>
+
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control alias" readonly="readonly">
+                                        <input type="hidden" name="userName">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" th:text="#{role}">Role</label>
+
+                                    <div class="col-sm-10">
+                                        <select class="form-control select2" style="width: 100%;" name="role">
+                                            <option th:each="userRole : ${T(com.cowerling.pmn.domain.user.UserRole).values()}" th:text="${userRole}" th:value="${userRole.name()}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" th:text="#{department}">department</label>
+
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="department" th:placeholder="#{department}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                <button type="submit" class="btn btn-success" th:text="#{ok}">ok</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="user_delete_modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">
+                                <i class="fa fa-exclamation-triangle icon-right text-danger"></i>
+                                <span th:text="#{delete_user}" style="margin-right: 5px;">delete user</span>
+                                <span class="alias">user</span>
+                            </h4>
+                        </div>
+                        <div class="modal-footer">
+                            <form th:action="@{user/delete}" method="post">
+                                <input type="hidden" name="userName" />
+                                <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                <button type="submit" class="btn btn-primary" th:text="#{ok}">ok</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+
+    <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+    <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+    <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+</div>
+</body>
+</html>
