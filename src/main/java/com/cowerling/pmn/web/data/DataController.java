@@ -96,9 +96,7 @@ public class DataController {
             dataRecord.setUploader(loginUser);
             dataRecord.setCategory(dataRecordMeta.getKey());
             dataRecord.setSourceProJ(dataRecordMeta.getValue().get(GeoUtils.GeoDefine.PROJ));
-            if (dataRecordMeta.getValue().get(GeoUtils.GeoDefine.H) != null) {
-                dataRecord.setRemark(GeoUtils.GeoDefine.H.toString() + ":" + dataRecordMeta.getValue().get(GeoUtils.GeoDefine.H));
-            }
+            dataRecord.setRemark(dataRecordMeta.getValue().get(GeoUtils.GeoDefine.ORIGIN));
 
             dataRepository.saveDataRecord(dataRecord);
 
@@ -201,7 +199,7 @@ public class DataController {
 
             if (dataRecord.getStatus() == DataRecordStatus.QUALIFIED) {
                 List<? extends DataContent> dataContents = dataRepository.findDataContentsByDataRecord(dataRecord);
-                bytes = DataUtils.getDataFile(dataRecord.getCategory(), dataContents);
+                bytes = DataUtils.getDataFile(dataRecord, dataContents);
             } else {
                 File file = new File(dataFileLocation + dataRecord.getFile());
                 bytes = FileUtils.readFileToByteArray(file);

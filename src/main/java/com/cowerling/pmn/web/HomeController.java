@@ -37,4 +37,9 @@ public class HomeController {
 
         return "home";
     }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String reAuthentication() {
+        return "redirect:/";
+    }
 }

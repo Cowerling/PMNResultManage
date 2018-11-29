@@ -231,13 +231,14 @@ public class DataUtils {
         }
     }
 
-    public static byte[] getDataFile(DataRecordCategory dataRecordCategory, List<? extends DataContent> dataContents) throws DataParseException {
+    public static byte[] getDataFile(DataRecord dataRecord, List<? extends DataContent> dataContents) throws DataParseException {
         try {
             Workbook workbook = new HSSFWorkbook();
             Sheet sheet = workbook.createSheet();
-            Row categoryRow = sheet.createRow(0), attributeRow = sheet.createRow(1);
-            Cell categoryCell = categoryRow.createCell(0);
-            categoryCell.setCellValue(dataRecordCategory.name());
+            Row categoryRow = sheet.createRow(0), sourceProJRow = sheet.createRow(1),  attributeRow = sheet.createRow(2);
+            Cell categoryCell = categoryRow.createCell(0), sourceProJCell = sourceProJRow.createCell(0);
+            categoryCell.setCellValue(dataRecord.getCategory().name());
+            sourceProJCell.setCellValue(dataRecord.getRemark() != null ? dataRecord.getRemark() : "");
 
             for (int i = 0; i < dataContents.size(); i++) {
                 DataContent dataContent = dataContents.get(i);

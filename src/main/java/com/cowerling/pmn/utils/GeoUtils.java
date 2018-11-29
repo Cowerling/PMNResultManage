@@ -14,18 +14,7 @@ public class GeoUtils {
     public static final Integer WGS_84_EPSG = 4326;
 
     public enum GeoDefine {
-        PROJ("ProJ定义"), H("大地高");
-
-        private String description;
-
-        GeoDefine(String description) {
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
+        PROJ, H, ORIGIN
     }
 
     public static Map<GeoDefine, String> getGeoDefines(String define) {
@@ -88,6 +77,7 @@ public class GeoUtils {
             {
                 put(GeoDefine.PROJ, PROJ);
                 put(GeoDefine.H, H);
+                put(GeoDefine.ORIGIN, define);
             }
         };
     }
