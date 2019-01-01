@@ -93,4 +93,61 @@
         <result property="meanDeviation" column="mean_deviation" />
         <result property="squareError" column="square_error" />
     </resultMap>
+
+    <resultMap id="horizontal3dDataContentResult" type="horizontal3dDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="z" column="z" />
+        <result property="grade" column="grade" />
+        <result property="period" column="period" />
+        <result property="finishDate" column="finish_date" />
+        <result property="team" column="team" />
+        <result property="updateX" column="update_x" />
+        <result property="updateY" column="update_y" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <resultMap id="horizontal2dDataContentResult" type="horizontal2dDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="grade" column="grade" />
+        <result property="period" column="period" />
+        <result property="finishDate" column="finish_date" />
+        <result property="team" column="team" />
+        <result property="updateX" column="update_x" />
+        <result property="updateY" column="update_y" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <resultMap id="elevationDataContentResult" type="elevationDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="adjustedValue" column="adjusted_value" />
+        <result property="grade" column="grade" />
+        <result property="period" column="period" />
+        <result property="finishDate" column="finish_date" />
+        <result property="team" column="team" />
+        <result property="update" column="update" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <resultMap id="cpiiielevationDataContentResult" type="cpiiielevationDataContent">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="x" column="x" />
+        <result property="y" column="y" />
+        <result property="zenithHeight" column="zenith_height" />
+        <result property="prismHeight" column="prism_height" />
+        <result property="period" column="period" />
+        <result property="finishDate" column="finish_date" />
+        <result property="team" column="team" />
+        <result property="updateX" column="update_x" />
+        <result property="updateY" column="update_y" />
+        <result property="updateH" column="update_h" />
+        <result property="remark" column="remark" />
+    </resultMap>
 </mapper>
