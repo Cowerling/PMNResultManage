@@ -9,10 +9,7 @@ import com.cowerling.pmn.domain.project.ProjectStatus;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.*;
 import com.cowerling.pmn.security.GeneralEncoderService;
-import com.cowerling.pmn.utils.ClassUtils;
-import com.cowerling.pmn.utils.DataUtils;
-import com.cowerling.pmn.utils.GeoUtils;
-import com.cowerling.pmn.utils.StringUtils;
+import com.cowerling.pmn.utils.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
@@ -32,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/data")
@@ -160,7 +158,7 @@ public class DataController {
 
             dataContents.forEach(dataContent -> {
                 idsJsonArray.put(dataContent.getId());
-                valuesJsonArray.put(dataContent.values());
+                valuesJsonArray.put(dataContent.values().stream().map(value -> value instanceof Date ? DateUtils.format((Date) value) : value).collect(Collectors.toList()));
 
                 if (attributeNamesJsonArray.length() == 0) {
                     dataContent.attributeNames().forEach(attributeName -> attributeNamesJsonArray.put(attributeName));
@@ -381,6 +379,18 @@ public class DataController {
                     break;
                 case EC:
                     dataContentClass = ECDataContent.class;
+                    break;
+                case H3D:
+                    dataContentClass = Horizontal3DDataContent.class;
+                    break;
+                case H2D:
+                    dataContentClass = Horizontal2DDataContent.class;
+                    break;
+                case E:
+                    dataContentClass = ElevationDataContent.class;
+                    break;
+                case CPIII_E:
+                    dataContentClass = CPIIIElevationDataContent.class;
                     break;
                 default:
                     break;

@@ -204,6 +204,14 @@ public class MybatisDataRepository implements DataRepository {
                     return dataMapper.selectTSITDataContentsByDataRecordId(dataRecord.getId());
                 case EC:
                     return dataMapper.selectECDataContentsByDataRecordId(dataRecord.getId());
+                case H3D:
+                    return dataMapper.selectHorizontal3DDataContentsByDataRecordId(dataRecord.getId());
+                case H2D:
+                    return dataMapper.selectHorizontal2DDataContentsByDataRecordId(dataRecord.getId());
+                case E:
+                    return dataMapper.selectElevationDataContentsByDataRecordId(dataRecord.getId());
+                case CPIII_E:
+                    return dataMapper.selectCPIIIElevationDataContentsByDataRecordId(dataRecord.getId());
                 default:
                     throw new NoSuchDataRecordCategoryException();
             }
@@ -250,6 +258,22 @@ public class MybatisDataRepository implements DataRepository {
                     break;
                 case EC:
                     dataMapper.insertECDataContentByDataRecordId(dataRecord.getId(), (ECDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case H3D:
+                    dataMapper.insertHorizontal3DDataContentByDataRecordId(dataRecord.getId(), (Horizontal3DDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case H2D:
+                    dataMapper.insertHorizontal2DDataContentByDataRecordId(dataRecord.getId(), (Horizontal2DDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case E:
+                    dataMapper.insertElevationDataContentByDataRecordId(dataRecord.getId(), (ElevationDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case CPIII_E:
+                    dataMapper.insertCPIIIElevationDataContentByDataRecordId(dataRecord.getId(), (CPIIIElevationDataContent) dataContent);
                     sqlSession.commit();
                     break;
                 default:
@@ -307,6 +331,22 @@ public class MybatisDataRepository implements DataRepository {
                     dataMapper.deleteECDataContentsByDataRecordId(dataRecord.getId());
                     sqlSession.commit();
                     break;
+                case H3D:
+                    dataMapper.deleteHorizontal3DDataContentsByDataRecordId(dataRecord.getId());
+                    sqlSession.commit();
+                    break;
+                case H2D:
+                    dataMapper.deleteHorizontal2DDataContentsByDataRecordId(dataRecord.getId());
+                    sqlSession.commit();
+                    break;
+                case E:
+                    dataMapper.deleteElevationDataContentsByDataRecordId(dataRecord.getId());
+                    sqlSession.commit();
+                    break;
+                case CPIII_E:
+                    dataMapper.deleteCPIIIElevationDataContentsByDataRecordId(dataRecord.getId());
+                    sqlSession.commit();
+                    break;
                 default:
                     throw new NoSuchDataRecordCategoryException();
             }
@@ -353,6 +393,22 @@ public class MybatisDataRepository implements DataRepository {
                     break;
                 case EC:
                     dataMapper.deleteECDataContent(id);
+                    sqlSession.commit();
+                    break;
+                case H3D:
+                    dataMapper.deleteHorizontal3DDataContent(id);
+                    sqlSession.commit();
+                    break;
+                case H2D:
+                    dataMapper.deleteHorizontal2DDataContent(id);
+                    sqlSession.commit();
+                    break;
+                case E:
+                    dataMapper.deleteElevationDataContent(id);
+                    sqlSession.commit();
+                    break;
+                case CPIII_E:
+                    dataMapper.deleteCPIIIElevationDataContent(id);
                     sqlSession.commit();
                     break;
                 default:
@@ -403,6 +459,22 @@ public class MybatisDataRepository implements DataRepository {
                     dataMapper.updateECDataContent((ECDataContent) dataContent);
                     sqlSession.commit();
                     break;
+                case H3D:
+                    dataMapper.updateHorizontal3DDataContent((Horizontal3DDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case H2D:
+                    dataMapper.updateHorizontal2DDataContent((Horizontal2DDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case E:
+                    dataMapper.updateElevationDataContent((ElevationDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
+                case CPIII_E:
+                    dataMapper.updateCPIIIElevationDataContent((CPIIIElevationDataContent) dataContent);
+                    sqlSession.commit();
+                    break;
                 default:
                     throw new NoSuchDataRecordCategoryException();
             }
@@ -443,6 +515,22 @@ public class MybatisDataRepository implements DataRepository {
                     break;
                 case TSIT:
                     dataContentClass = TSITDataContent.class;
+                    break;
+                case H3D:
+                    dataContentClass = Horizontal3DDataContent.class;
+                    dataContentProperties = "name, x, y, z, grade, period, finish_date, team, update_x, update_y, remark";
+                    break;
+                case H2D:
+                    dataContentClass = Horizontal2DDataContent.class;
+                    dataContentProperties = "name, x, y, grade, period, finish_date, team, update_x, update_y, remark";
+                    break;
+                case E:
+                    dataContentClass = ElevationDataContent.class;
+                    dataContentProperties = "name, adjusted_value, grade, period, finish_date, team, update, remark";
+                    break;
+                case CPIII_E:
+                    dataContentClass = CPIIIElevationDataContent.class;
+                    dataContentProperties = "name, x, y, zenith_height, prism_height, period, finish_date, team, update_x, update_y, update_h, remark";
                     break;
                 default:
                     throw new NoSuchDataRecordCategoryException();

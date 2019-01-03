@@ -58,6 +58,18 @@ public class DataUtils {
                 case EC:
                     dataContent = new ECDataContent();
                     break;
+                case H3D:
+                    dataContent = new Horizontal3DDataContent();
+                    break;
+                case H2D:
+                    dataContent = new Horizontal2DDataContent();
+                    break;
+                case E:
+                    dataContent = new ElevationDataContent();
+                    break;
+                case CPIII_E:
+                    dataContent = new CPIIIElevationDataContent();
+                    break;
                 default:
                     break;
             }
@@ -216,6 +228,87 @@ public class DataUtils {
 
                         ((List<ECDataContent>) dataContents).add(ecDataContent);
                         break;
+                    case H3D:
+                        if (dataContents == null) {
+                            dataContents = new ArrayList<Horizontal3DDataContent>();
+                        }
+
+                        Horizontal3DDataContent horizontal3dDataContent = new Horizontal3DDataContent();
+                        horizontal3dDataContent.setId((long) dataContents.size());
+                        horizontal3dDataContent.setName(row.getCell(0).getCellType() == CellType.STRING ? row.getCell(0).getStringCellValue() : Integer.toString((int) row.getCell(0).getNumericCellValue()));
+                        horizontal3dDataContent.setX(row.getCell(1).getNumericCellValue());
+                        horizontal3dDataContent.setY(row.getCell(2).getNumericCellValue());
+                        horizontal3dDataContent.setZ(row.getCell(3).getNumericCellValue());
+                        horizontal3dDataContent.setGrade(row.getCell(4).getStringCellValue());
+                        horizontal3dDataContent.setPeriod(row.getCell(5).getStringCellValue());
+                        horizontal3dDataContent.setFinishDate(row.getCell(6).getDateCellValue());
+                        horizontal3dDataContent.setTeam(row.getCell(7).getStringCellValue());
+                        horizontal3dDataContent.setUpdateX(row.getCell(8).getNumericCellValue());
+                        horizontal3dDataContent.setUpdateY(row.getCell(9).getNumericCellValue());
+                        horizontal3dDataContent.setRemark(row.getCell(10).getStringCellValue());
+
+                        ((List<Horizontal3DDataContent>) dataContents).add(horizontal3dDataContent);
+                        break;
+                    case H2D:
+                        if (dataContents == null) {
+                            dataContents = new ArrayList<Horizontal2DDataContent>();
+                        }
+
+                        Horizontal2DDataContent horizontal2dDataContent = new Horizontal2DDataContent();
+                        horizontal2dDataContent.setId((long) dataContents.size());
+                        horizontal2dDataContent.setName(row.getCell(0).getCellType() == CellType.STRING ? row.getCell(0).getStringCellValue() : Integer.toString((int) row.getCell(0).getNumericCellValue()));
+                        horizontal2dDataContent.setX(row.getCell(1).getNumericCellValue());
+                        horizontal2dDataContent.setY(row.getCell(2).getNumericCellValue());
+                        horizontal2dDataContent.setGrade(row.getCell(3).getStringCellValue());
+                        horizontal2dDataContent.setPeriod(row.getCell(4).getStringCellValue());
+                        horizontal2dDataContent.setFinishDate(row.getCell(5).getDateCellValue());
+                        horizontal2dDataContent.setTeam(row.getCell(6).getStringCellValue());
+                        horizontal2dDataContent.setUpdateX(row.getCell(7).getNumericCellValue());
+                        horizontal2dDataContent.setUpdateY(row.getCell(8).getNumericCellValue());
+                        horizontal2dDataContent.setRemark(row.getCell(9).getStringCellValue());
+
+                        ((List<Horizontal2DDataContent>) dataContents).add(horizontal2dDataContent);
+                        break;
+                    case E:
+                        if (dataContents == null) {
+                            dataContents = new ArrayList<ElevationDataContent>();
+                        }
+
+                        ElevationDataContent elevationDataContent = new ElevationDataContent();
+                        elevationDataContent.setId((long) dataContents.size());
+                        elevationDataContent.setName(row.getCell(0).getCellType() == CellType.STRING ? row.getCell(0).getStringCellValue() : Integer.toString((int) row.getCell(0).getNumericCellValue()));
+                        elevationDataContent.setAdjustedValue(row.getCell(1).getNumericCellValue());
+                        elevationDataContent.setGrade(row.getCell(2).getStringCellValue());
+                        elevationDataContent.setPeriod(row.getCell(3).getStringCellValue());
+                        elevationDataContent.setFinishDate(row.getCell(4).getDateCellValue());
+                        elevationDataContent.setTeam(row.getCell(5).getStringCellValue());
+                        elevationDataContent.setUpdate(row.getCell(6).getNumericCellValue());
+                        elevationDataContent.setRemark(row.getCell(7).getStringCellValue());
+
+                        ((List<ElevationDataContent>) dataContents).add(elevationDataContent);
+                        break;
+                    case CPIII_E:
+                        if (dataContents == null) {
+                            dataContents = new ArrayList<CPIIIElevationDataContent>();
+                        }
+
+                        CPIIIElevationDataContent cpiiielevationDataContent = new CPIIIElevationDataContent();
+                        cpiiielevationDataContent.setId((long) dataContents.size());
+                        cpiiielevationDataContent.setName(row.getCell(0).getCellType() == CellType.STRING ? row.getCell(0).getStringCellValue() : Integer.toString((int) row.getCell(0).getNumericCellValue()));
+                        cpiiielevationDataContent.setX(row.getCell(1).getNumericCellValue());
+                        cpiiielevationDataContent.setY(row.getCell(2).getNumericCellValue());
+                        cpiiielevationDataContent.setZenithHeight(row.getCell(3).getNumericCellValue());
+                        cpiiielevationDataContent.setPrismHeight(row.getCell(4).getNumericCellValue());
+                        cpiiielevationDataContent.setPeriod(row.getCell(5).getStringCellValue());
+                        cpiiielevationDataContent.setFinishDate(row.getCell(6).getDateCellValue());
+                        cpiiielevationDataContent.setTeam(row.getCell(7).getStringCellValue());
+                        cpiiielevationDataContent.setUpdateX(row.getCell(8).getNumericCellValue());
+                        cpiiielevationDataContent.setUpdateY(row.getCell(9).getNumericCellValue());
+                        cpiiielevationDataContent.setUpdateH(row.getCell(10).getNumericCellValue());
+                        cpiiielevationDataContent.setRemark(row.getCell(11).getStringCellValue());
+
+                        ((List<CPIIIElevationDataContent>) dataContents).add(cpiiielevationDataContent);
+                        break;
                     default:
                         break;
                 }
@@ -259,7 +352,7 @@ public class DataUtils {
                     } else if (value instanceof Boolean) {
                         cell.setCellValue((Boolean) dataContent.values().get(j));
                     } else if (value instanceof Date) {
-                        cell.setCellValue((Date) dataContent.values().get(j));
+                        cell.setCellValue(DateUtils.format((Date) dataContent.values().get(j)));
                     } else {
                         cell.setCellValue(dataContent.values().get(j).toString());
                     }

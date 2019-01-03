@@ -9,6 +9,7 @@ import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
 import com.cowerling.pmn.security.GeneralEncoderService;
 import com.cowerling.pmn.utils.DataUtils;
+import com.cowerling.pmn.utils.DateUtils;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,7 +45,7 @@ public class GeoDataController {
     @Value("${file.data.location}")
     private String dataFileLocation;
 
-    @RequestMapping(value = "/wfs/{dataRecordTag}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/wfs/{dataRecordTag}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public @ResponseBody String wfs(@PathVariable("dataRecordTag") String dataRecordTag,
                                      @ModelAttribute("loginUser") final User loginUser) throws Exception {
         try {
@@ -94,7 +96,7 @@ public class GeoDataController {
                         {
                             org.postgis.Point point = dataRepository.findDataContentTransformPointByDataRecord(dataRecord, dataContent);
                             add(geometryBuilder.point(point.x, point.y));
-                            addAll(normalAttributes.values().stream().map(value -> value.getValue()).collect(Collectors.toList()));
+                            addAll(normalAttributes.values().stream().map(value -> value.getValue() instanceof Date ? DateUtils.format((Date) value.getValue()) : value.getValue()).collect(Collectors.toList()));
                         }
                     };
 

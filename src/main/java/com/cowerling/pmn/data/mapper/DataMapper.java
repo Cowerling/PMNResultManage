@@ -274,4 +274,108 @@ public interface DataMapper {
             "SET name = #{ecDataContent.name}, mean_deviation = #{ecDataContent.meanDeviation}, square_error = #{ecDataContent.squareError} " +
             "WHERE id = #{ecDataContent.id}")
     void updateECDataContent(@Param("ecDataContent") ECDataContent ecDataContent);
+
+    /* Horizontal3DDataContent */
+    @Select("SELECT id, name, x, y, z, grade, period, finish_date, team, update_x, update_y, remark " +
+            "FROM t_data_content_horizontal_three_dimension " +
+            "WHERE data_record = #{dataRecordId} " +
+            "ORDER BY id ASC")
+    @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.horizontal3dDataContentResult")
+    List<Horizontal3DDataContent> selectHorizontal3DDataContentsByDataRecordId(Long dataRecordId);
+
+    @Insert("INSERT INTO t_data_content_horizontal_three_dimension(data_record, name, x, y, z, grade, period, finish_date, team, update_x, update_y, remark, geometry) " +
+            "VALUES(#{dataRecordId}, #{horizontal3dDataContent.name}, #{horizontal3dDataContent.x}, #{horizontal3dDataContent.y}, #{horizontal3dDataContent.z}, #{horizontal3dDataContent.grade}, #{horizontal3dDataContent.period}, #{horizontal3dDataContent.finishDate}, #{horizontal3dDataContent.team}, #{horizontal3dDataContent.updateX}, #{horizontal3dDataContent.updateY}, #{horizontal3dDataContent.remark}, #{horizontal3dDataContent.geometry})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void insertHorizontal3DDataContentByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("horizontal3dDataContent") Horizontal3DDataContent horizontal3dDataContent);
+
+    @Delete("DELETE FROM t_data_content_horizontal_three_dimension " +
+            "WHERE data_record = #{dataRecordId}")
+    void deleteHorizontal3DDataContentsByDataRecordId(Long dataRecordId);
+
+    @Delete("DELETE FROM t_data_content_horizontal_three_dimension " +
+            "WHERE id = #{id}")
+    void deleteHorizontal3DDataContent(@Param("id") Long id);
+
+    @Update("UPDATE t_data_content_horizontal_three_dimension " +
+            "SET name = #{horizontal3dDataContent.name}, x = #{horizontal3dDataContent.x}, y = #{horizontal3dDataContent.y}, z = #{horizontal3dDataContent.z}, grade = #{horizontal3dDataContent.grade}, period = #{horizontal3dDataContent.period}, finish_date = #{horizontal3dDataContent.finishDate}, team = #{horizontal3dDataContent.team}, update_x = #{horizontal3dDataContent.updateX}, update_y = #{horizontal3dDataContent.updateY}, remark = #{horizontal3dDataContent.remark}, geometry = #{horizontal3dDataContent.geometry} " +
+            "WHERE id = #{horizontal3dDataContent.id}")
+    void updateHorizontal3DDataContent(@Param("horizontal3dDataContent") Horizontal3DDataContent horizontal3dDataContent);
+
+    /* Horizontal2DDataContent */
+    @Select("SELECT id, name, x, y, grade, period, finish_date, team, update_x, update_y, remark " +
+            "FROM t_data_content_horizontal_two_dimension " +
+            "WHERE data_record = #{dataRecordId} " +
+            "ORDER BY id ASC")
+    @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.horizontal2dDataContentResult")
+    List<Horizontal2DDataContent> selectHorizontal2DDataContentsByDataRecordId(Long dataRecordId);
+
+    @Insert("INSERT INTO t_data_content_horizontal_two_dimension(data_record, name, x, y, grade, period, finish_date, team, update_x, update_y, remark, geometry) " +
+            "VALUES(#{dataRecordId}, #{horizontal2dDataContent.name}, #{horizontal2dDataContent.x}, #{horizontal2dDataContent.y}, #{horizontal2dDataContent.grade}, #{horizontal2dDataContent.period}, #{horizontal2dDataContent.finishDate}, #{horizontal2dDataContent.team}, #{horizontal2dDataContent.updateX}, #{horizontal2dDataContent.updateY}, #{horizontal2dDataContent.remark}, #{horizontal2dDataContent.geometry})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void insertHorizontal2DDataContentByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("horizontal2dDataContent") Horizontal2DDataContent horizontal2dDataContent);
+
+    @Delete("DELETE FROM t_data_content_horizontal_two_dimension " +
+            "WHERE data_record = #{dataRecordId}")
+    void deleteHorizontal2DDataContentsByDataRecordId(Long dataRecordId);
+
+    @Delete("DELETE FROM t_data_content_horizontal_two_dimension " +
+            "WHERE id = #{id}")
+    void deleteHorizontal2DDataContent(@Param("id") Long id);
+
+    @Update("UPDATE t_data_content_horizontal_two_dimension " +
+            "SET name = #{horizontal2dDataContent.name}, x = #{horizontal2dDataContent.x}, y = #{horizontal2dDataContent.y}, grade = #{horizontal2dDataContent.grade}, period = #{horizontal2dDataContent.period}, finish_date = #{horizontal2dDataContent.finishDate}, team = #{horizontal2dDataContent.team}, update_x = #{horizontal2dDataContent.updateX}, update_y = #{horizontal2dDataContent.updateY}, remark = #{horizontal2dDataContent.remark}, geometry = #{horizontal2dDataContent.geometry} " +
+            "WHERE id = #{horizontal2dDataContent.id}")
+    void updateHorizontal2DDataContent(@Param("horizontal2dDataContent") Horizontal2DDataContent horizontal2dDataContent);
+
+    /* ElevationDataContent */
+    @Select("SELECT id, name, adjusted_value, grade, period, finish_date, team, update, remark " +
+            "FROM t_data_content_elevation " +
+            "WHERE data_record = #{dataRecordId} " +
+            "ORDER BY id ASC")
+    @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.elevationDataContentResult")
+    List<ElevationDataContent> selectElevationDataContentsByDataRecordId(Long dataRecordId);
+
+    @Insert("INSERT INTO t_data_content_elevation(data_record, name, adjusted_value, grade, period, finish_date, team, update, remark) " +
+            "VALUES(#{dataRecordId}, #{elevationDataContent.name}, #{elevationDataContent.adjustedValue}, #{elevationDataContent.grade}, #{elevationDataContent.period}, #{elevationDataContent.finishDate}, #{elevationDataContent.team}, #{elevationDataContent.update}, #{elevationDataContent.remark})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void insertElevationDataContentByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("elevationDataContent") ElevationDataContent elevationDataContent);
+
+    @Delete("DELETE FROM t_data_content_elevation " +
+            "WHERE data_record = #{dataRecordId}")
+    void deleteElevationDataContentsByDataRecordId(Long dataRecordId);
+
+    @Delete("DELETE FROM t_data_content_elevation " +
+            "WHERE id = #{id}")
+    void deleteElevationDataContent(@Param("id") Long id);
+
+    @Update("UPDATE t_data_content_elevation " +
+            "SET name = #{elevationDataContent.name}, adjusted_value = #{elevationDataContent.adjustedValue}, grade = #{elevationDataContent.grade}, period = #{elevationDataContent.period}, finish_date = #{elevationDataContent.finishDate}, team = #{elevationDataContent.team}, update = #{elevationDataContent.update}, remark = #{elevationDataContent.remark} " +
+            "WHERE id = #{elevationDataContent.id}")
+    void updateElevationDataContent(@Param("elevationDataContent") ElevationDataContent elevationDataContent);
+
+    /* CPIIIElevationDataContent */
+    @Select("SELECT id, name, x, y, zenith_height, prism_height, period, finish_date, team, update_x, update_y, update_h, remark " +
+            "FROM t_data_content_cpiii_elevation " +
+            "WHERE data_record = #{dataRecordId} " +
+            "ORDER BY id ASC")
+    @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.cpiiielevationDataContentResult")
+    List<CPIIIElevationDataContent> selectCPIIIElevationDataContentsByDataRecordId(Long dataRecordId);
+
+    @Insert("INSERT INTO t_data_content_cpiii_elevation(data_record, name, x, y, zenith_height, prism_height, period, finish_date, team, update_x, update_y, update_h, remark, geometry) " +
+            "VALUES(#{dataRecordId}, #{cpiiielevationDataContent.name}, #{cpiiielevationDataContent.x}, #{cpiiielevationDataContent.y}, #{cpiiielevationDataContent.zenithHeight}, #{cpiiielevationDataContent.prismHeight}, #{cpiiielevationDataContent.period}, #{cpiiielevationDataContent.finishDate}, #{cpiiielevationDataContent.team}, #{cpiiielevationDataContent.updateX}, #{cpiiielevationDataContent.updateY}, #{cpiiielevationDataContent.updateH}, #{cpiiielevationDataContent.remark}, #{cpiiielevationDataContent.geometry})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void insertCPIIIElevationDataContentByDataRecordId(@Param("dataRecordId") Long dataRecordId, @Param("cpiiielevationDataContent") CPIIIElevationDataContent cpiiielevationDataContent);
+
+    @Delete("DELETE FROM t_data_content_cpiii_elevation " +
+            "WHERE data_record = #{dataRecordId}")
+    void deleteCPIIIElevationDataContentsByDataRecordId(Long dataRecordId);
+
+    @Delete("DELETE FROM t_data_content_cpiii_elevation " +
+            "WHERE id = #{id}")
+    void deleteCPIIIElevationDataContent(@Param("id") Long id);
+
+    @Update("UPDATE t_data_content_cpiii_elevation " +
+            "SET name = #{cpiiielevationDataContent.name}, x = #{cpiiielevationDataContent.x}, y = #{cpiiielevationDataContent.y}, zenith_height = #{cpiiielevationDataContent.zenithHeight}, prism_height = #{cpiiielevationDataContent.prismHeight}, period = #{cpiiielevationDataContent.period}, finish_date = #{cpiiielevationDataContent.finishDate}, team = #{cpiiielevationDataContent.team}, update_x = #{cpiiielevationDataContent.updateX}, update_y = #{cpiiielevationDataContent.updateY}, update_h = #{cpiiielevationDataContent.updateH}, remark = #{cpiiielevationDataContent.remark}, geometry = #{cpiiielevationDataContent.geometry} " +
+            "WHERE id = #{cpiiielevationDataContent.id}")
+    void updateCPIIIElevationDataContent(@Param("cpiiielevationDataContent") CPIIIElevationDataContent cpiiielevationDataContent);
 }

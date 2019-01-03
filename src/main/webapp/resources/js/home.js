@@ -15,6 +15,8 @@ $(document).ready(function () {
         visible: false
     });
 
+    let filter_draw_source = new ol.source.Vector();
+
     let map = new ol.Map({
         target: "map",
         layers: [
@@ -24,6 +26,9 @@ $(document).ready(function () {
                 source: new ol.source.XYZ({
                     url: CONSTANT.GEOSOURCE_TIANDITU_CVA
                 })
+            }),
+            new ol.layer.Vector({
+                source: filter_draw_source
             })
         ],
         view: new ol.View({
@@ -56,6 +61,10 @@ $(document).ready(function () {
     });
 
     map.on("singleclick", function(event) {
+        if ($("#map_tool").find("button.filter").hasClass("active")) {
+            return;
+        }
+
         let feature_popup = this.getOverlayById("feature_popup");
 
         this.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
@@ -79,17 +88,6 @@ $(document).ready(function () {
         let hit = this.hasFeatureAtPixel(this.getEventPixel(event.originalEvent));
         this.getTargetElement().style.cursor = hit ? "pointer": "";
     });
-
-    let local_city = new T.LocalCity();
-
-    local_city.location(function (result) {
-        let view = map.getView();
-        view.setCenter(ol.proj.transform([result.lnglat.lng, result.lnglat.lat], "EPSG:" + CONSTANT.WGS84_EPSG, "EPSG:" + CONSTANT.MAP_EPSG));
-        view.setZoom(result.level);
-        map.render();
-    });
-
-    map.updateSize();
 
     $.get(CONSTANT.GEOSERVICE_SERVER, function (server) {
         $("#map_tool").find("div.base-layer-list").bindLayer(new ol.layer.Tile({
@@ -191,7 +189,7 @@ $(document).ready(function () {
     function addCustomLayer(data_record_tag, data_record_name) {
         let color = $.getRandomColor();
 
-        $("#map_tool").find("div.custom-layer-list").bindLayer(new ol.layer.Vector({
+        let layer = new ol.layer.Vector({
             source: new ol.source.Vector({
                 url: CONSTANT.GEOTATA_WFS + data_record_tag,
                 format: new ol.format.GeoJSON()
@@ -200,19 +198,40 @@ $(document).ready(function () {
                 return $.createCustomLayerStyle("\u25c8" + feature.get("name"), color, "#ffff00");
             },
             name: data_record_name,
-            geometry_type: "point"
-        }), function (layer) {
+            geometry_type: "point",
+            filterable: true
+        });
+
+        $("#map_tool").find("div.custom-layer-list").bindLayer(layer,
+            function (layer) {
             map.addLayer(layer);
         }, function (layer) {
             map.getView().fit(layer.getSource().getExtent(), map.getSize());
         }, function (layer) {
             map.removeLayer(layer);
         });
+
+        return layer;
     }
 
     let data_record_tag = $.UrlUtils.getParament("dataRecordTag"), data_record_name = $.UrlUtils.getParament("dataRecordName");
     if (data_record_tag != null && data_record_name != null) {
-        addCustomLayer(data_record_tag, data_record_name);
+        addCustomLayer(data_record_tag, data_record_name).on("change", function (event) {
+            map.getView().fit(this.getSource().getExtent(), map.getSize());
+        });
+
+        map.updateSize();
+    } else {
+        let local_city = new T.LocalCity();
+
+        local_city.location(function (result) {
+            let view = map.getView();
+            view.setCenter(ol.proj.transform([result.lnglat.lng, result.lnglat.lat], "EPSG:" + CONSTANT.WGS84_EPSG, "EPSG:" + CONSTANT.MAP_EPSG));
+            view.setZoom(result.level);
+            map.render();
+        });
+
+        map.updateSize();
     }
 
     let $add_custom_layer_modal = $("#add_custom_layer_modal");
@@ -225,6 +244,75 @@ $(document).ready(function () {
 
     $("#map_tool").find("button.full-extent").click(function (event) {
         map.getView().fit(CONSTANT.FULL_EXTENT, map.getSize());
+    });
+
+    let filter_draw = new ol.interaction.Draw({
+        source: filter_draw_source,
+        type: "Polygon",
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: "rgba(30, 144, 255, 0.2)"
+            }),
+            stroke: new ol.style.Stroke({
+                color: "#ffcc33",
+                width: 2
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: "#ffcc33"
+                })
+            })
+        })
+    });
+
+    filter_draw.on("drawend",function(event) {
+        let geometry = event.feature.getGeometry();
+
+        if (!!(geometry) == false) {
+            return;
+        }
+
+        let feature_popup =  map.getOverlayById("feature_popup");
+
+        let content = $("#map").find("div.map-popup").find("div.map-popup-content");
+        content.empty();
+        content.append("<div class='callout callout-danger' style='margin: 0px 0px 5px 0px; padding: 1px 1px 0px 1px;'><span>\u7b5b\u9009\u7ed3\u679c</span></div>");
+
+        let count = 0;
+        map.getLayers().forEach(function (layer) {
+            if (layer.get("filterable") == true) {
+                let features = layer.getSource().getFeaturesInExtent(geometry.getExtent());
+                for (let i = 0, length = features.length; i < length; i++) {
+                    let feature = features[i];
+                    if (geometry.intersectsCoordinate(feature.getGeometry().getCoordinates())) {
+                        content.append("<span class='lable label-status-min label-success' style='margin-right: 5px;'>" + ++count + "</span>");
+                        $.each(feature.getProperties(), function (key, value) {
+                            if (!(value instanceof ol.geom.Geometry)) {
+                                content.append("<span class='lable label-status-min label-warning'>" + key + "</span><code style='margin-right: 3px;'>" + value + "</code>");
+                            }
+                        });
+                        content.append("<br />");
+                        content.append("<br />");
+                    }
+                }
+            }
+        });
+
+        event.feature.set("\u7b5b\u9009\u8303\u56f4" + geometry.getExtent(), content.html());
+
+        feature_popup.setPosition(ol.extent.getCenter(geometry.getExtent()));
+    });
+
+    $("#map_tool").find("button.filter").click(function (event) {
+        let button = $(this);
+        button.toggleClass("text-yellow active");
+
+        if (button.hasClass("active")) {
+            map.addInteraction(filter_draw);
+        } else {
+            map.removeInteraction(filter_draw);
+        }
     });
 });
 

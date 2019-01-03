@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.util.Date;
 
 public class ClassUtils {
     public static Method getMethod(Class<?> objectClass, String methodName) {
@@ -62,7 +64,7 @@ public class ClassUtils {
         return (T) method.invoke(object);
     }
 
-    public static void invokeMethod(Method method, Object object, Object value) throws IllegalAccessException, InvocationTargetException {
+    public static void invokeMethod (Method method, Object object, Object value) throws IllegalAccessException, InvocationTargetException, ParseException {
         Class<?> parameterType = method.getParameterTypes()[0];
 
         Object parameter = null;
@@ -76,6 +78,8 @@ public class ClassUtils {
             parameter = Double.parseDouble(value.toString());
         } else if (parameterType.equals(String.class)) {
             parameter = value.toString();
+        } else if (parameterType.equals(Date.class)) {
+            parameter = DateUtils.parse(value.toString());
         }
 
         method.invoke(object, parameterType.cast(parameter));

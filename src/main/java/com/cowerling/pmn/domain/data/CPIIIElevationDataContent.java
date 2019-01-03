@@ -138,6 +138,6 @@ public class CPIIIElevationDataContent extends DataContent {
 
     @Override
     public String getTableName() {
-        return "t_data_content_cpiii";
+        return "t_data_content_cpiii_elevation";
     }
 }

@@ -131,6 +131,10 @@
     color: #ffffff;
 }
 
+.text-yellow {
+    color: #ffff00;
+}
+
 .project-wait {
     border-color: #c23321;
     background-color: #dd4b39 !important;
