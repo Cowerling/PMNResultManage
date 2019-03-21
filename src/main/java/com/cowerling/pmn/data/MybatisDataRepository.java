@@ -3,7 +3,6 @@ package com.cowerling.pmn.data;
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.DataMapper;
 import com.cowerling.pmn.domain.data.*;
-import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.NoSuchDataRecordCategoryException;
 import org.apache.commons.lang3.tuple.Pair;
@@ -98,7 +97,7 @@ public class MybatisDataRepository implements DataRepository {
     @Override
     public void saveDataRecordAuthorities(DataRecord dataRecord, User associator, DataRecordAuthority[] dataRecordAuthorities) {
         for (DataRecordAuthority dataRecordAuthority: dataRecordAuthorities) {
-            saveDataRecordAuthority(dataRecord ,associator, dataRecordAuthority);
+            saveDataRecordAuthority(dataRecord, associator, dataRecordAuthority);
         }
     }
 

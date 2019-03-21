@@ -1,10 +1,7 @@
 package com.cowerling.pmn.web.exception;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
-import com.cowerling.pmn.exception.DataUploadException;
-import com.cowerling.pmn.exception.EncoderServiceException;
-import com.cowerling.pmn.exception.ResourceNotFoundException;
-import com.cowerling.pmn.exception.UserNotFoundException;
+import com.cowerling.pmn.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -89,6 +86,17 @@ public class WideExceptionHandler {
     @ExceptionHandler(DataUploadException.class)
     public @ResponseBody
     Map<String, Object> dataUploadHandler(DataUploadException e) {
+        return new HashMap<>() {
+            {
+                put("error", e.getMessage());
+                put("append", true);
+            }
+        };
+    }
+
+    @ExceptionHandler(AttachmentUploadException.class)
+    public @ResponseBody
+    Map<String, Object> attachmentUploadHandler(AttachmentUploadException e) {
         return new HashMap<>() {
             {
                 put("error", e.getMessage());

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="layout/page :: head(~{::link}, ~{::script})">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/datatables/1.10.16/css/dataTables.bootstrap.min.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/css/daterangepicker.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{/resources/dependence/bootstrap-treeview/2.1.5/css/bootstrap-treeview.min.css}">
+
+        <script type="text/javascript" th:src="@{/resources/dependence/jquery/jquery.dateutils.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/jquery.dataTables.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/datatables/1.10.16/js/dataTables.bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/select2.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/select2/4.0.3/js/i18n/zh-CN.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/moment.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-daterangepicker/3.0.3/js/daterangepicker.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/dependence/bootstrap-treeview/2.1.5/js/bootstrap-treeview.min.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/js/attachment/list.js}"></script>
+    </head>
+
+    <body class="hold-transition skin-blue">
+        <div class="wrapper">
+            <header class="main-header" th:replace="layout/page :: header"></header>
+
+            <aside class="main-sidebar" th:replace="layout/page :: sidebar"></aside>
+
+            <div class="content-wrapper">
+
+                <section class="content">
+
+                    <div class="box box-default">
+
+                        <div class="box-header with-border">
+                            <button id="attachment_search" class="btn btn-primary" data-toggle="modal" data-target="#attachment_search_modal"><i class="fa fa-search icon-right"></i><span th:text="#{attachment_search}">attachment search</span></button>
+                        </div>
+
+                        <div class="box-body">
+
+                            <table id="attachment_list_table" class="table table-bordered table-striped data-table" style="width: 100%">
+                                <thead>
+                                <tr>
+                                    <th th:text="#{attachment_name}">Name</th>
+                                    <th th:text="#{project_name}">Project Name</th>
+                                    <th th:text="#{uploader}">Uploader</th>
+                                    <th th:text="#{upload_time}">Upload Time</th>
+                                    <th th:text="#{operation}">Operation</th>
+                                </tr>
+                                </thead>
+
+                                <tfoot>
+                                <tr>
+                                    <th th:text="#{attachment_name}">Name</th>
+                                    <th th:text="#{project_name}">Project Name</th>
+                                    <th th:text="#{uploader}">Uploader</th>
+                                    <th th:text="#{upload_time}">Upload Time</th>
+                                    <th th:text="#{operation}">Operation</th>
+                                </tr>
+                                </tfoot>
+
+                                <input type="hidden" class="search-condition" />
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                    <div id="attachment_remove_modal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title">
+                                        <i class="fa fa-exclamation-triangle icon-right text-danger"></i>
+                                        <span th:text="#{confirm_remove_attachment}">confirm remove attachment</span>
+                                    </h4>
+                                </div>
+                                <div class="modal-footer">
+                                    <form th:action="@{''}" method="post">
+                                        <input type="hidden" class="attachment-tag">
+                                    </form>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                    <button type="button" class="btn btn-primary confirm-remove" th:text="#{ok}">ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="attachment_search_modal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">
+                                        <i class="fa fa-search icon-right text-primary"></i>
+                                        <span th:text="#{attachment_search}">search attachment</span>
+                                    </h4>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="search_attachment_name" class="col-sm-2 control-label" th:text="#{attachment_name}">attachment name</label>
+
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control attachment-name" id="search_attachment_name" th:placeholder="#{multiple_attachment_name_split}">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_project_name" class="col-sm-2 control-label" th:text="#{project_name}">project name</label>
+
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control project-name" id="search_project_name" th:placeholder="#{multiple_project_name_split}">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_uploader_select" class="col-sm-2 control-label" th:text="#{uploader}">uploader</label>
+
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control uploader-alias" th:placeholder="#{uploader}" readonly="readonly" />
+                                                    <input type="hidden" class="uploader-name" />
+                                                    <span class="input-group-btn">
+                                                        <button id="search_uploader_select" type="button" class="btn btn-primary uploader-select" data-toggle="modal" data-target="#select_user_modal">
+                                                            <i class="fa fa-user-plus" aria-hidden="true"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_upload_time" class="col-sm-2 control-label" th:text="#{upload_time}">upload time</label>
+
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control pull-right date-range upload-time" id="search_upload_time">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="search_remark" class="col-sm-2 control-label" th:text="#{remark}">remark</label>
+
+                                            <div class="col-sm-10">
+                                                <textarea type="text" class="form-control text-area attachment-remark" id="search_remark"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <input type="hidden" class="search_query" />
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{cancel}">cancel</button>
+                                    <button type="button" class="btn btn-primary ok" data-dismiss="modal" th:text="#{ok}">ok</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="select_user_modal"></div>
+
+                </section>
+
+            </div>
+
+            <footer class="main-footer main-footer-narrow" th:replace="layout/page :: footer"></footer>
+
+            <aside class="control-sidebar control-sidebar-dark" th:replace="layout/page :: control_sidebar"></aside>
+            <div class="control-sidebar-bg" th:replace="layout/page :: control_sidebar_ex"></div>
+        </div>
+    </body>
+</html>

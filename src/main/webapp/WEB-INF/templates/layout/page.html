@@ -139,6 +139,20 @@
                             </ul>
                         </li>
 
+                        <li sec:authorize="!hasRole('SUPER_ADMIN')" class="treeview menu-attachment">
+                            <a href="#">
+                                <i class="fa fa-file-archive-o" aria-hidden="true"></i>
+                                <span th:text="#{attachment}">Attachment</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="menu-attachment-list"><a th:href="@{/attachment/list}"><i class="fa fa-circle-o"></i><span th:text="#{attachment_list}">Attachment List</span></a></li>
+                                <li class="menu-attachment-upload"><a th:href="@{/attachment/upload}"><i class="fa fa-circle-o"></i><span th:text="#{attachment_upload}">Attachment Upload</span></a></li>
+                            </ul>
+                        </li>
+
                         <li class="menu-document">
                             <a th:href="@{/document}">
                                 <i class="fa fa-book"></i>

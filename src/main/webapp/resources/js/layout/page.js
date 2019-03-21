@@ -95,4 +95,9 @@ $(document).ready(function () {
         value: "authority/",
         enumerable: true
     });
+
+    Object.defineProperty(CONSTANT, "ATTACHMENT_LIST_URL", {
+        value: "record/list",
+        enumerable: true
+    });
 });

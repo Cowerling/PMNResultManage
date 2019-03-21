@@ -12,6 +12,7 @@ public class PMNResultManageWebAppInitializer extends AbstractAnnotationConfigDi
     private static final String ACTIVE_PROFILES = "development";
     private static final int MEGA_BYTE_SIZE = 1024 * 1024;
     private static final String MULTIPART_LOCATION = "/home/cowerling/IdeaProjects/PMNResultManage/target/PMNResultManage/file/temporary";
+    //private static final String MULTIPART_LOCATION = "E:/webserver/apache-tomcat-9.0.12-pmn/webapps/PMNResultManage/file/temporary";
 
     @Override
     protected String[] getServletMappings() {
@@ -46,6 +47,6 @@ public class PMNResultManageWebAppInitializer extends AbstractAnnotationConfigDi
 
     @Override
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-        registration.setMultipartConfig(new MultipartConfigElement(MULTIPART_LOCATION, 2 * MEGA_BYTE_SIZE, 4 * MEGA_BYTE_SIZE, 0));
+        registration.setMultipartConfig(new MultipartConfigElement(MULTIPART_LOCATION, 200 * MEGA_BYTE_SIZE, 4 * MEGA_BYTE_SIZE, 0));
     }
 }

@@ -3,7 +3,6 @@ package com.cowerling.pmn.web.data;
 import com.cowerling.pmn.annotation.ToResourceNotFound;
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.domain.data.DataRecord;
-import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.EncoderServiceException;
 import com.cowerling.pmn.exception.ResourceNotFoundException;
