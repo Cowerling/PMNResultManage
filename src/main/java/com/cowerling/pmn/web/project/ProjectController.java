@@ -1,6 +1,7 @@
 package com.cowerling.pmn.web.project;
 
 import com.cowerling.pmn.annotation.ToResourceNotFound;
+import com.cowerling.pmn.data.AttachmentRepository;
 import com.cowerling.pmn.data.DataRepository;
 import com.cowerling.pmn.data.ProjectRepository;
 import com.cowerling.pmn.data.UserRepository;
@@ -84,10 +85,16 @@ public class ProjectController {
     private DataRepository dataRepository;
 
     @Autowired
+    private AttachmentRepository attachmentRepository;
+
+    @Autowired
     private GeneralEncoderService generalEncoderService;
 
     @Value("${file.data.location}")
     private String dataFileLocation;
+
+    @Value("${file.attachment.location}")
+    private String attachmentFileLocation;
 
     private void authenticateUser(User user, ProjectSqlProvider.FindMode findMode) {
         if ((findMode == ProjectSqlProvider.FindMode.CREATOR && user.getUserRole() != UserRole.ADMIN) ||
@@ -360,8 +367,28 @@ public class ProjectController {
                 throw new RuntimeException();
             }
 
+            dataRepository.findDataRecordsByProject(project).forEach(dataRecord -> {
+                if (dataRecord.getStatus() != DataRecordStatus.QUALIFIED) {
+                    File deleteFile = new File(dataFileLocation + dataRecord.getFile());
+                    if (deleteFile.exists() && deleteFile.isFile()) {
+                        deleteFile.delete();
+                    }
+                }
+
+                dataRepository.removeDataRecord(dataRecord);
+            });
+
+            attachmentRepository.findAttachmentsByProject(project).forEach(attachment -> {
+                File deleteFile = new File(attachmentFileLocation + attachment.getFile());
+                if (deleteFile.exists() && deleteFile.isFile()) {
+                    deleteFile.delete();
+                }
+
+                attachmentRepository.removeAttachment(attachment);
+            });
+
             project.getMembers().forEach(member -> {
-                dataRepository.findDataRecordsByUser(member, new HashMap<>() {
+                /*dataRepository.findDataRecordsByUser(member, new HashMap<>() {
                     {
                         put(DataSqlProvider.RecordField.PROJECT, new ArrayList<Long>() {
                             {
@@ -378,8 +405,7 @@ public class ProjectController {
                     }
 
                     dataRepository.removeDataRecord(dataRecord);
-                });
-
+                });*/
                 userRepository.removeMemberByProject(member, project);
             });
 

@@ -19,6 +19,7 @@ import static com.cowerling.pmn.data.provider.DataSqlProvider.*;
 public interface DataRepository {
     DataRecord findDataRecordsById(Long id);
     List<DataRecord> findDataRecordsByUser(User user, Map<RecordField, Object> filters, List<Pair<RecordField, Order>> orders, int offset, int limit);
+    List<DataRecord> findDataRecordsByProject(Project project);
     Long findDataRecordCountByUser(User user, Map<RecordField, Object> filters);
     List<DataRecordAuthority> findDataRecordAuthorities(DataRecord dataRecord, User associator);
     void saveDataRecordAuthority(DataRecord dataRecord, User associator, DataRecordAuthority dataRecordAuthority);

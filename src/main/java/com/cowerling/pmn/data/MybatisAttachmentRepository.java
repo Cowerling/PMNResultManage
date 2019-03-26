@@ -4,6 +4,7 @@ import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.AttachmentMapper;
 import com.cowerling.pmn.domain.attachment.Attachment;
 import com.cowerling.pmn.domain.attachment.AttachmentAuthority;
+import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -48,6 +49,19 @@ public class MybatisAttachmentRepository implements AttachmentRepository {
             RowBounds rowBounds = new RowBounds(offset, limit);
 
             return attachmentMapper.selectAttachmentsByUserId(user.getId(), filters, orders, rowBounds);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<Attachment> findAttachmentsByProject(Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            AttachmentMapper attachmentMapper = sqlSession.getMapper(AttachmentMapper.class);
+
+            return attachmentMapper.selectAttachmentsByProjectId(project.getId());
         } finally {
             sqlSession.close();
         }

@@ -23,6 +23,12 @@ public interface AttachmentMapper {
     @ResultMap("com.cowerling.pmn.data.mapper.AttachmentMapper.attachmentResult")
     List<Attachment> selectAttachmentsByUserId(Long userId, Map<Field, Object> filters, List<Pair<Field, Order>> orders, RowBounds rowBounds);
 
+    @Select("SELECT t_attachment.id, t_attachment.name AS name, file, project, uploader, upload_time, t_attachment.remark AS remark " +
+            "FROM t_attachment " +
+            "WHERE project = #{projectId}")
+    @ResultMap("com.cowerling.pmn.data.mapper.AttachmentMapper.attachmentResult")
+    List<Attachment> selectAttachmentsByProjectId(Long projectId);
+
     @SelectProvider(type = AttachmentProvider.class, method = "selectAttachmentCountByUserId")
     Long selectAttachmentCountByUserId(Long userId, Map<Field, Object> filters);
 

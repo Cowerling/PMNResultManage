@@ -39,6 +39,7 @@ $(document).ready(function () {
 
                 for (let i =0, length = result.projects.length; i < length; i++) {
                     result.projects[i].name = $.createProjectName(result.projects[i].name, result.projects[i].tag);
+                    result.projects[i].category = $.createProjectCategory(result.projects[i].category);
                     result.projects[i].create_time = $(new Date(result.projects[i].createTime)).dateFormat("yyyy-MM-dd hh:mm:ss");
                     result.projects[i].status = $.createProjectStatus(result.projects[i].status);
                 }

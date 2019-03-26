@@ -26,6 +26,14 @@ public interface DataMapper {
     @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.dataRecordResult")
     List<DataRecord> selectDataRecordsByUserId(Long userId, Map<RecordField, Object> filters, List<Pair<RecordField, Order>> orders, RowBounds rowBounds);
 
+    @Select("SELECT t_data_record.id, t_data_record.name AS name, file, project, uploader, upload_time, t_data_record_status.category AS status, t_data_record_category.category AS category, t_data_record.remark AS remark, source_proj " +
+            "FROM t_data_record " +
+            "LEFT OUTER JOIN t_data_record_status ON t_data_record.status = t_data_record_status.id " +
+            "LEFT OUTER JOIN t_data_record_category ON t_data_record.category = t_data_record_category.id " +
+            "WHERE project = #{projectId}")
+    @ResultMap("com.cowerling.pmn.data.mapper.DataMapper.dataRecordResult")
+    List<DataRecord> selectDataRecordsByProjectId(Long projectId);
+
     @SelectProvider(type = DataSqlProvider.class, method = "selectDataRecordCountByUserId")
     Long selectDataRecordCountByUserId(Long userId, Map<RecordField, Object> filters);
 

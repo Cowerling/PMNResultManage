@@ -3,6 +3,7 @@ package com.cowerling.pmn.data;
 import com.cowerling.pmn.annotation.GenericData;
 import com.cowerling.pmn.data.mapper.DataMapper;
 import com.cowerling.pmn.domain.data.*;
+import com.cowerling.pmn.domain.project.Project;
 import com.cowerling.pmn.domain.user.User;
 import com.cowerling.pmn.exception.NoSuchDataRecordCategoryException;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,6 +51,19 @@ public class MybatisDataRepository implements DataRepository {
             RowBounds rowBounds = new RowBounds(offset, limit);
 
             return dataMapper.selectDataRecordsByUserId(user.getId(), filters, orders, rowBounds);
+        } finally {
+            sqlSession.close();
+        }
+    }
+
+    @Override
+    public List<DataRecord>  findDataRecordsByProject(Project project) {
+        SqlSession sqlSession = currentSession();
+
+        try {
+            DataMapper dataMapper = sqlSession.getMapper(DataMapper.class);
+
+            return dataMapper.selectDataRecordsByProjectId(project.getId());
         } finally {
             sqlSession.close();
         }
