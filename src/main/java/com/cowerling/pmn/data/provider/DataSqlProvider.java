@@ -139,11 +139,22 @@ public class DataSqlProvider {
         }.toString();
     }
 
-    public String selectDataContentsAsGeoJson(Map<String, Object> parameters) {
-        String dataContentTableName = (String) parameters.get("arg0");
-        String dataContentProperties = (String) parameters.get("arg1");
-        String sourceProJ = (String) parameters.get("arg2");
-        Integer targetEPSG = (Integer) parameters.get("arg3");
+    public String selectDataContentsAsGeoJsonByDataRecordId(Map<String, Object> parameters) {
+        Long dataRecordId = (Long) parameters.get("arg0");
+        String dataContentTableName = (String) parameters.get("arg1");
+        String dataContentProperties = (String) parameters.get("arg2");
+        String sourceProJ = (String) parameters.get("arg3");
+        Integer targetEPSG = (Integer) parameters.get("arg4");
+
+        String c = "SELECT row_to_json(fc) " +
+                "FROM (" +
+                "SELECT 'FeatureCollection' AS type, array_to_json(array_agg(f)) AS features " +
+                "FROM (" +
+                "SELECT 'Feature' As type, ST_AsGeoJSON(ST_Transform(geometry, '" + sourceProJ + "', " + targetEPSG + "))::json AS geometry, row_to_json((SELECT l FROM (SELECT " + dataContentProperties + ") AS l)) AS properties " +
+                "FROM " + dataContentTableName + " " +
+                "AS lg WHERE data_record = " + dataRecordId + ") " +
+                "AS f) " +
+                "AS fc";
 
         return "SELECT row_to_json(fc) " +
                 "FROM (" +
@@ -151,7 +162,7 @@ public class DataSqlProvider {
                 "FROM (" +
                 "SELECT 'Feature' As type, ST_AsGeoJSON(ST_Transform(geometry, '" + sourceProJ + "', " + targetEPSG + "))::json AS geometry, row_to_json((SELECT l FROM (SELECT " + dataContentProperties + ") AS l)) AS properties " +
                 "FROM " + dataContentTableName + " " +
-                "AS lg) " +
+                "AS lg WHERE data_record = " + dataRecordId + ") " +
                 "AS f) " +
                 "AS fc";
     }

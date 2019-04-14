@@ -551,7 +551,8 @@ public class MybatisDataRepository implements DataRepository {
 
             DataContent dataContent = (DataContent) dataContentClass.getConstructor().newInstance();
 
-            return dataMapper.selectDataContentsAsGeoJson(
+            return dataMapper.selectDataContentsAsGeoJsonByDataRecordId(
+                    dataRecord.getId(),
                     dataContent.getTableName(),
                     dataContentProperties != null ? dataContentProperties : String.join(", ", dataContent.attributeNames()),
                     dataRecord.getSourceProJ(),

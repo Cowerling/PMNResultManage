@@ -49,4 +49,11 @@ public class PMNResultManageWebAppInitializer extends AbstractAnnotationConfigDi
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
         registration.setMultipartConfig(new MultipartConfigElement(MULTIPART_LOCATION, 200 * MEGA_BYTE_SIZE, 4 * MEGA_BYTE_SIZE, 0));
     }
+
+    @Override
+    protected DispatcherServlet createDispatcherServlet(WebApplicationContext servletAppContext) {
+        DispatcherServlet dispatcherServlet = (DispatcherServlet) super.createDispatcherServlet(servletAppContext);
+        dispatcherServlet.setThrowExceptionIfNoHandlerFound(true);
+        return dispatcherServlet;
+    }
 }

@@ -241,7 +241,7 @@ public class DataUtils {
                         horizontal3dDataContent.setZ(row.getCell(3).getNumericCellValue());
                         horizontal3dDataContent.setGrade(row.getCell(4).getStringCellValue());
                         horizontal3dDataContent.setPeriod(row.getCell(5).getStringCellValue());
-                        horizontal3dDataContent.setFinishDate(row.getCell(6).getDateCellValue());
+                        horizontal3dDataContent.setFinishDate(row.getCell(6).getCellType() == CellType.STRING ? DateUtils.parse(row.getCell(6).getStringCellValue()) : row.getCell(6).getDateCellValue());
                         horizontal3dDataContent.setTeam(row.getCell(7).getStringCellValue());
                         horizontal3dDataContent.setUpdateX(row.getCell(8).getNumericCellValue());
                         horizontal3dDataContent.setUpdateY(row.getCell(9).getNumericCellValue());
@@ -261,7 +261,7 @@ public class DataUtils {
                         horizontal2dDataContent.setY(row.getCell(2).getNumericCellValue());
                         horizontal2dDataContent.setGrade(row.getCell(3).getStringCellValue());
                         horizontal2dDataContent.setPeriod(row.getCell(4).getStringCellValue());
-                        horizontal2dDataContent.setFinishDate(row.getCell(5).getDateCellValue());
+                        horizontal2dDataContent.setFinishDate(row.getCell(5).getCellType() == CellType.STRING ? DateUtils.parse(row.getCell(5).getStringCellValue()) : row.getCell(5).getDateCellValue());
                         horizontal2dDataContent.setTeam(row.getCell(6).getStringCellValue());
                         horizontal2dDataContent.setUpdateX(row.getCell(7).getNumericCellValue());
                         horizontal2dDataContent.setUpdateY(row.getCell(8).getNumericCellValue());
@@ -280,7 +280,7 @@ public class DataUtils {
                         elevationDataContent.setAdjustedValue(row.getCell(1).getNumericCellValue());
                         elevationDataContent.setGrade(row.getCell(2).getStringCellValue());
                         elevationDataContent.setPeriod(row.getCell(3).getStringCellValue());
-                        elevationDataContent.setFinishDate(row.getCell(4).getDateCellValue());
+                        elevationDataContent.setFinishDate(row.getCell(4).getCellType() == CellType.STRING ? DateUtils.parse(row.getCell(4).getStringCellValue()) : row.getCell(4).getDateCellValue());
                         elevationDataContent.setTeam(row.getCell(5).getStringCellValue());
                         elevationDataContent.setUpdate(row.getCell(6).getNumericCellValue());
                         elevationDataContent.setRemark(row.getCell(7).getStringCellValue());
@@ -300,7 +300,7 @@ public class DataUtils {
                         cpiiielevationDataContent.setZenithHeight(row.getCell(3).getNumericCellValue());
                         cpiiielevationDataContent.setPrismHeight(row.getCell(4).getNumericCellValue());
                         cpiiielevationDataContent.setPeriod(row.getCell(5).getStringCellValue());
-                        cpiiielevationDataContent.setFinishDate(row.getCell(6).getDateCellValue());
+                        cpiiielevationDataContent.setFinishDate(row.getCell(6).getCellType() == CellType.STRING ? DateUtils.parse(row.getCell(6).getStringCellValue()) : row.getCell(6).getDateCellValue());
                         cpiiielevationDataContent.setTeam(row.getCell(7).getStringCellValue());
                         cpiiielevationDataContent.setUpdateX(row.getCell(8).getNumericCellValue());
                         cpiiielevationDataContent.setUpdateY(row.getCell(9).getNumericCellValue());

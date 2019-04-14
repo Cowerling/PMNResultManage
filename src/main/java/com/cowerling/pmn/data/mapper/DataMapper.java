@@ -69,8 +69,8 @@ public interface DataMapper {
             "WHERE id = #{id}")
     void deleteDataRecord(DataRecord dataRecord);
 
-    @SelectProvider(type = DataSqlProvider.class, method = "selectDataContentsAsGeoJson")
-    String selectDataContentsAsGeoJson(String dataContentTableName, String dataContentProperties, String sourceProJ, Integer targetEPSG);
+    @SelectProvider(type = DataSqlProvider.class, method = "selectDataContentsAsGeoJsonByDataRecordId")
+    String selectDataContentsAsGeoJsonByDataRecordId(Long dataRecordId, String dataContentTableName, String dataContentProperties, String sourceProJ, Integer targetEPSG);
 
     @Select("SELECT ST_Transform(#{geometry}, #{sourceProJ}, #{targetEPSG})")
     Point selectTransformPoint(@Param("geometry") Geometry geometry, @Param("sourceProJ") String sourceProJ, @Param("targetEPSG") Integer targetEPSG);
